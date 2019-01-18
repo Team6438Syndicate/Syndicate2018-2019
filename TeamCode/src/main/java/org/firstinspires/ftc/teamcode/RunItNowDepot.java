@@ -274,9 +274,11 @@ public class RunItNowDepot extends LinearOpMode
                                 {
                                     telemetry.addData("value", "Center");
                                     telemetry.update();
-                                    robot.tfod.shutdown();
 
+                                    robot.tfod.shutdown();
+                                    sleep(500); //test
                                     //block is in the center
+
                                     return 1;
                                 }
                                 else
