@@ -275,6 +275,7 @@ public class RunItNowDepot extends LinearOpMode
                                     telemetry.addData("value", "Center");
                                     telemetry.update();
                                     robot.tfod.shutdown();
+                                    firstTime=false;
 
                                     //block is in the center
                                     return 1;
@@ -293,6 +294,8 @@ public class RunItNowDepot extends LinearOpMode
                                                 telemetry.addData("value", "Right");
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
+                                                firstTime = false;
+
                                                 //block on the right
                                                 return 2;
                                             }
@@ -301,6 +304,8 @@ public class RunItNowDepot extends LinearOpMode
                                                 telemetry.addData("value", "Left");
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
+                                                firstTime = false;
+
                                                 //block on the left
                                                 return 3;
                                             }
