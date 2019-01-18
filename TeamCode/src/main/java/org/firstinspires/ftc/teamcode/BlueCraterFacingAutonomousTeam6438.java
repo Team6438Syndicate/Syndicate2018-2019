@@ -20,6 +20,7 @@ import java.util.List;
 // Integrate way to control linearSlide in OpMode
 //Distance from landing to gems: Approximately 34 inches
 //Height of bracket off the ground: 19 inches
+//Matt B joined - 1/18/19
 
 @Autonomous(name = "Blue Crater Facing Autonomous", group = "Blue Autonomous 6438")
 public class BlueCraterFacingAutonomousTeam6438 extends LinearOpMode {

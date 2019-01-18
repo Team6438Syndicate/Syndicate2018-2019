@@ -17,8 +17,7 @@ import java.util.List;
 // Integrate way to control linearSlide in OpMode
 //Distance from landing to gems: Approximately 34 inches
 //Height of bracket off the ground: 19 inches
-//comment123
-//test
+
 @Autonomous(name = "Run It Now Depot", group = "Blue Autonomous 6438")
 public class RunItNowDepot extends LinearOpMode
 {
