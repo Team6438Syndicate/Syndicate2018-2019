@@ -58,11 +58,18 @@ public class RunItNowDepot extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        int block = 0;
+
         //While the program is running
         while (opModeIsActive())
         {
+            if(firstTime)
+            {
+                block = queryTensorFlow();
+            }
+
             //Queries the tensorFlow engine to find the block
-            switch ( queryTensorFlow() )
+            switch ( block )
             {
                 case 1:
                     //insert values for moving center
@@ -85,6 +92,8 @@ public class RunItNowDepot extends LinearOpMode
                     telemetry.update();
                     break;
             }
+            telemetry.addData("TEST","TEST");
+            telemetry.update();
         }
     }
 
@@ -220,7 +229,7 @@ public class RunItNowDepot extends LinearOpMode
     */
     private int queryTensorFlow()
     {
-        while (opModeIsActive() && firstTime )
+        while (opModeIsActive() )
         {
             //Drive forward and turn around
             //encoderRobotDrive(0.5, 10, 10);
@@ -255,9 +264,9 @@ public class RunItNowDepot extends LinearOpMode
 
                         if (updatedRecognitions != null)
                         {
-                            telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
-                            telemetry.addData("robot", robot.tfod.getUpdatedRecognitions());
-                            telemetry.update();
+                            //telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
+                            //telemetry.addData("robot", robot.tfod.getUpdatedRecognitions());
+                            //telemetry.update();
 
                             for (Recognition recognition : updatedRecognitions)
                             {
@@ -307,7 +316,7 @@ public class RunItNowDepot extends LinearOpMode
                 robot.tfod.shutdown();
             }
         }
-        firstTime =false;
+
         return 0;
     }
 
