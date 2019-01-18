@@ -19,22 +19,22 @@ import java.util.List;
 // Integrate way to control linearSlide in OpMode
 //Distance from landing to gems: Approximately 34 inches
 //Height of bracket off the ground: 19 inches
-//this is a test hope u see it plz
+
 @Autonomous(name = "Run It Now Depot", group = "Blue Autonomous 6438")
-public class RunItNowDepot extends LinearOpMode {
+public class RunItNowDepot extends LinearOpMode
+{
     //Reference to our hardware map
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    //Variable to store where the block is
-    private static String blockLocation=null;
-
-    //Constructor method to receive the parameters
+    //Boolean to ensure we only run the block check the first time around
+    private static boolean firstTime = true;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
         //Inits the hardware
         robot.init(hardwareMap);
 
@@ -54,157 +54,39 @@ public class RunItNowDepot extends LinearOpMode {
         telemetry.addData("Status: ", "Ready to Run");
         telemetry.update();
 
-        String blockLocation = null;
-        boolean checkObjects = true;
-        //Wait for the start button to be pressed by the driver
-
+        //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
+        //Wait for the start button to be pressed by the driver
         waitForStart();
 
         //While the program is running
         while (opModeIsActive())
         {
-        /*
-            actuatorMove(1, 28);
-
-            //Build Everything
-
-            //Drop the linear actuator
-            actuatorMove(0.5, -8);
-
-            //Twist the servo
-            robot.hookServo.setPower (-1);
-            sleep(500);
-            robot.hookServo.setPower(0);
-            */
-
-        //Drive forward and turn around
-            //encoderRobotDrive(0.5, 10, 10);
-            //encoderRobotDrive(0.5, -34.558, 34.558);
-            
-            
-/*
-            if (checkObjects)
+            //Queries the tensorFlow engine to find the block
+            switch ( queryTensorFlow() )
             {
-               blockLocation();
-                sleep(1000);
-                checkObjects = false;
+                case 1:
+                    //insert values for moving center
+                    telemetry.addData("Block", "Center");
+                    telemetry.update();
+                    break;
+                case 2:
+                    //insert values for moving right
+                    telemetry.addData("Block", "Right");
+                    telemetry.update();
+                    break;
+                case 3:
+                    //insert values for moving left
+                    telemetry.addData("Block", "Left");
+                    telemetry.update();
+                    break;
+                default:
+                    //insert code if something goes wrong
+                    telemetry.addData("Block", "Not Found");
+                    telemetry.update();
+                    break;
             }
-*/
-
-            //int to determine gold block location: 1 = center, 2 = right, 3 = left
-            int goldLocation = 0;
-
-           if (opModeIsActive())
-        {
-            initTfod();
-            //Activate Tensor Flow Object Detection.
-            if (robot.tfod != null)
-            {
-                robot.tfod.activate();
-                sleep(500);
-
-
-            }
-
-            while (opModeIsActive())
-            {
-                if (robot.tfod != null)
-                {
-                    List<Recognition> valuesForNerds = robot.tfod.getUpdatedRecognitions();
-                    if (valuesForNerds != null)
-                    {
-                        telemetry.addData("value", valuesForNerds);
-                        telemetry.update();
-                    }
-                    // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
-                    List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
-
-                    if (updatedRecognitions != null)
-                    {
-                        telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
-                        telemetry.addData("robot", robot.tfod.getUpdatedRecognitions());
-                        //telemetry.addData("list size", robot.tfod.getUpdatedRecognitions().size());
-                        telemetry.update();
-
-                        sleep(50000);
-
-                        for (Recognition recognition : updatedRecognitions)
-                        {
-                            if(recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                            {
-                                //center
-                                goldLocation = 1;
-                                telemetry.addData("value","Center");
-                                telemetry.update();
-                                robot.tfod.shutdown();
-                            }
-                            else
-                            {
-                                //encoderRobotDrive(.5,100,-100); //temp values
-                                sleep(3000);
-                                List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                if (updatedRecognitions2 != null)
-                                {
-                                    for (Recognition recognition2 : updatedRecognitions2)
-                                    {
-                                        if(recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
-                                        {
-                                            //right
-                                            goldLocation = 2;
-                                            telemetry.addData("value","Right");
-                                            telemetry.update();
-                                            robot.tfod.shutdown();
-                                        }
-                                        else
-                                        {
-                                            //left
-                                            goldLocation = 3;
-                                            telemetry.addData("value","Left");
-                                            telemetry.update();
-                                            robot.tfod.shutdown();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (robot.tfod != null)
-        {
-            robot.tfod.shutdown();
-        }
-        
-        //Tells the robot what path to take
-        if (goldLocation == 1) //Center
-        {
-            
-        }
-        
-        if (goldLocation ==2) //Right
-        {
-            
-        }
-        
-        if (goldLocation == 3) //Left
-        {
-            
-        }
-            
-            //Team marker throw
-            robot.teamMarkerServo.setPower (1);
-            sleep (1000);
-            robot. teamMarkerServo.setPower (0);
-
-            //Drive to depot to deposit marker
-            //insert code to do this
-
-            //Drive back towards the crater for crater park
-            //insert code to do this
-            
         }
     }
 
@@ -256,9 +138,8 @@ public class RunItNowDepot extends LinearOpMode {
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches)
+    private void actuatorMove(double speed, double inches, boolean directionUp )
     {
-
         //Set up a new target variable
         int newTarget;
 
@@ -267,8 +148,16 @@ public class RunItNowDepot extends LinearOpMode {
         {
 
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearSlide.getCurrentPosition() + (int) (inches * robot.linearCPI);
+            if(directionUp)
+            {
+                newTarget = robot.linearSlide.getCurrentPosition() + (int) (inches * robot.linearCPI);
+            }
+            else
+            {
+                newTarget = robot.linearSlide.getCurrentPosition() - (int) (inches * robot.linearCPI);
+            }
 
+            //Passes this target
             robot.linearSlide.setTargetPosition(newTarget);
 
             // Turn On RUN_TO_POSITION
@@ -299,79 +188,139 @@ public class RunItNowDepot extends LinearOpMode {
     }
 
     //Method to move the intake
-    private void intakeMove(double speed, String position)
+    private void intakeMove(double speed, int position)
     {
+        if(opModeIsActive()) {
+            //Sets the target position
+            robot.intakeMover.setTargetPosition(position);
 
+            //tells the motor to run to postion
+            robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //sets the power
+            robot.intakeMover.setPower(speed);
+
+            //while moving is in progress telemetry for user
+            while (robot.intakeMover.isBusy() && opModeIsActive()) {
+                telemetry.addData("Going to: ", position);
+                telemetry.addData("Currently At: ", robot.intakeMover.getCurrentPosition());
+                telemetry.update();
+            }
+        }
     }
 
-
-    //Method to query the tensorFlow Engine
-   /* public String blockLocation()
+    /*
+    * Queries the tensorFlow engine to find the block
+    * No parameter but returns a int to let program know where the block is
+    * 1 = center
+    * 2 = right
+    * 3 = left
+    *
+    * Notes: want to integrate confidence reading
+    *        max y values
+    *        max timeout ( if timeout passes ends the code and defaults to center
+    */
+    private int queryTensorFlow()
     {
-        //initVuforia();
-
-        if (opModeIsActive())
+        while (opModeIsActive() && firstTime )
         {
-            initTfod();
-            //Activate Tensor Flow Object Detection.
-            if (robot.tfod != null)
-            {
-                robot.tfod.activate();
-                sleep(500);
-            }
+            //Drive forward and turn around
+            //encoderRobotDrive(0.5, 10, 10);
+            //encoderRobotDrive(0.5, -34.558, 34.558);
 
-            while (opModeIsActive())
+            //int to determine gold block location: 1 = center, 2 = right, 3 = left
+            int goldLocation = 0;
+
+            if (opModeIsActive())
             {
+                //Call the init TFod method to get block detection ready
+                initTfod();
+                //Activate Tensor Flow Object Detection.
                 if (robot.tfod != null)
                 {
-                    // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
-                    List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
-                    for (Recognition recognition : updatedRecognitions)
+                    robot.tfod.activate();
+                    sleep(500);
+                }
+
+                while (opModeIsActive())
+                {
+                    if (robot.tfod != null)
                     {
-                        if(recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                        List<Recognition> valuesForNerds = robot.tfod.getUpdatedRecognitions();
+                        if (valuesForNerds != null)
                         {
-                            //center
-                            telemetry.addData("value","a");
+                            telemetry.addData("value", valuesForNerds);
                             telemetry.update();
-                            robot.tfod.shutdown();
                         }
-                        else
+                        // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
+                        List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+
+                        if (updatedRecognitions != null)
                         {
-                            //encoderRobotDrive(.5,100,-100); //temp values
-                            sleep(3000);
-                            updatedRecognitions = robot.tfod.getUpdatedRecognitions();
-                            for (Recognition recognition2 : updatedRecognitions)
+                            telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
+                            telemetry.addData("robot", robot.tfod.getUpdatedRecognitions());
+                            telemetry.update();
+
+                            for (Recognition recognition : updatedRecognitions)
                             {
-                                if(recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                 {
-                                    //right
-                                    telemetry.addData("value","b");
+                                    telemetry.addData("value", "Center");
                                     telemetry.update();
                                     robot.tfod.shutdown();
 
+                                    //block is in the center
+                                    return 1;
                                 }
                                 else
                                 {
-                                    //left
-                                    telemetry.addData("value","c");
-                                    telemetry.update();
-                                    robot.tfod.shutdown();
-
+                                    //encoderRobotDrive(.5,100,-100); //temp values
+                                    sleep(3000);
+                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                    if (updatedRecognitions2 != null)
+                                    {
+                                        for (Recognition recognition2 : updatedRecognitions2)
+                                        {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
+                                            {
+                                                telemetry.addData("value", "Right");
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+                                                //block on the right
+                                                return 2;
+                                            }
+                                            else
+                                            {
+                                                telemetry.addData("value", "Left");
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+                                                //block on the left
+                                                return 3;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            if (robot.tfod != null) {
+                robot.tfod.shutdown();
+            }
         }
-        if (robot.tfod != null)
-        {
-            robot.tfod.shutdown();
-            return "none";
-        }
-        return null;
+        firstTime =false;
+        return 0;
     }
-*/
+
+    //Method to move the intake spinner (probably not neccesary in autonomous)
+    private void intakeSpin(double speed, long duration)
+    {
+        robot.intakeSpinner.setPower(speed);
+        telemetry.addData("Speed", speed);
+        telemetry.update();
+        sleep(duration);
+    }
     //Method to init the vuforia engine
     private void initVuforia() {
 
@@ -409,4 +358,6 @@ public class RunItNowDepot extends LinearOpMode {
         //Loads this years assets
         robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
     }
+
+    //End of class
 }
