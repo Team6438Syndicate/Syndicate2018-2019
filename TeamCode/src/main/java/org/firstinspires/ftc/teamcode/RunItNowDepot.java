@@ -262,7 +262,6 @@ public class RunItNowDepot extends LinearOpMode
                         }
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
-
                         if (updatedRecognitions != null)
                         {
                             //telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
