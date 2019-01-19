@@ -16,7 +16,9 @@ public class TeleOp6438 extends OpMode
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for intake location
-
+    int tuckedPosition = 1;
+    int verticalPosition = 1;
+    int downPosition = 1;
     boolean run = true;
 
     /*
@@ -52,10 +54,6 @@ public class TeleOp6438 extends OpMode
         double linearSlidePower;
         double intakeSpinnerPower;
         double right;
-
-        /*
-         * Declaring values for said power variables
-         */
 
         //Left power is the left stick up and down
         leftPower = -gamepad1.left_stick_y;
@@ -116,7 +114,7 @@ public class TeleOp6438 extends OpMode
 
                 //moveIntake(.5,1);
 
-                encoderDrive(.5,  400); //needs to be incremented so the linear slides can be raised
+                encoderDrive(.5,  400);
                 run = false;
             }
         }
