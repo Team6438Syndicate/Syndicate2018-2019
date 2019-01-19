@@ -32,7 +32,6 @@ public class RunItNowDepot extends LinearOpMode
     //Boolean to ensure we only run the block check the first time around
     private static boolean firstTime = true;
 
-
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -230,17 +229,26 @@ public class RunItNowDepot extends LinearOpMode
         }
     }
 
-    /*
-    * Queries the tensorFlow engine to find the block
-    * No parameter but returns a int to let program know where the block is
-    * 1 = center
-    * 2 = right
-    * 3 = left
-    *
-    * Notes: want to integrate confidence reading
-    *        max y values
-    *        max timeout ( if timeout passes ends the code and defaults to center
-    */
+    //Method to move the intake spinner (probably not neccesary in autonomous)
+    private void intakeSpin(double speed, long duration)
+    {
+        robot.intakeSpinner.setPower(speed);
+        telemetry.addData("Speed", speed);
+        telemetry.update();
+        sleep(duration);
+    }
+
+    /**
+     * Queries the tensorFlow engine to find the block
+     * No parameter but returns a int to let program know where the block is
+     * 1 = center
+     * 2 = right
+     * 3 = left
+     *
+     * Notes: want to integrate confidence reading
+     *        max y values
+     *        max timeout ( if timeout passes ends the code and defaults to center
+     **/
     private int queryTensorFlow()
     {
         while (opModeIsActive() )
@@ -292,8 +300,7 @@ public class RunItNowDepot extends LinearOpMode
                                 }
                                 else
                                 {
-                                    rightTurnEncoders(5); //temp values
-
+                                    encoderRobotDrive(.5, 5,-5); //temp values
                                     sleep(3000);
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
@@ -336,33 +343,6 @@ public class RunItNowDepot extends LinearOpMode
         }
 
         return 0;
-    }
-
-    //Method for just moving forward
-    private void forwardDriveEncoders(double distance)
-    {
-     encoderRobotDrive(1,distance,distance);
-    }
-
-    //Method for left turns
-    private void leftTurnEncoders(double distance)
-    {
-        encoderRobotDrive(1,distance,-distance);
-    }
-
-    //Method for right turns
-    private void rightTurnEncoders(double distance)
-    {
-        encoderRobotDrive(1,-distance,distance);
-    }
-
-    //Method to move the intake spinner (probably not necessary in autonomous)
-    private void intakeSpin(double speed, long duration)
-    {
-        robot.intakeSpinner.setPower(speed);
-        telemetry.addData("Speed", speed);
-        telemetry.update();
-        sleep(duration);
     }
 
     //Method to init the vuforia engine
