@@ -263,9 +263,7 @@ public class RunItNowDepot extends LinearOpMode
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                         if (updatedRecognitions != null)
                         {
-                            //telemetry.addData(String.valueOf(updatedRecognitions.size()), "");
-                            //telemetry.addData("robot", robot.tfod.getUpdatedRecognitions());
-                            //telemetry.update();
+
 
                             for (Recognition recognition : updatedRecognitions)
                             {
@@ -344,10 +342,7 @@ public class RunItNowDepot extends LinearOpMode
         //Sets camera direction
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-        /**
-         * Uncomment this in order to use an external webcam.
-         * parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-         **/
+
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);

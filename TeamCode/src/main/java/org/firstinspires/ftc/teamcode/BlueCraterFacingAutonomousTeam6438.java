@@ -73,10 +73,7 @@ Build Everything
             //Drop the linear actuator
             actuatorMove(0.5, -8);
 
-            //Twist the servo
-            robot.hookServo.setPower (-1);
-            sleep(500);
-            robot.hookServo.setPower(0);
+
 
             //Drive forward and turn around
             encoderRobotDrive(0.5, 10, 10);
