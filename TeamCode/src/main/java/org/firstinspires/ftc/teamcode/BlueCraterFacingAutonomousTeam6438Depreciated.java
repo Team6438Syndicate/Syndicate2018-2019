@@ -21,8 +21,8 @@ import java.util.List;
 //Height of bracket off the ground: 19 inches
 //Test 123 Desktop Test123
 
-@Autonomous(name = "Blue Crater Facing Autonomous", group = "Blue Autonomous 6438")
-public class BlueCraterFacingAutonomousTeam6438 extends LinearOpMode {
+@Autonomous(name = "Blue Crater Facing Autonomous (Depreciated)", group = "Blue Autonomous 6438")
+public class BlueCraterFacingAutonomousTeam6438Depreciated extends LinearOpMode {
     //Reference to our hardware map
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
