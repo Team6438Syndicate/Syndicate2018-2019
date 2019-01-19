@@ -23,7 +23,8 @@ import java.util.List;
 //Height of bracket off the ground: 19 inches
 
 @Autonomous(name = "Run It Now Crater", group = "Blue Autonomous 6438")
-public class RunItNowCrater extends LinearOpMode {
+public class RunItNowCrater extends LinearOpMode
+{
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
@@ -36,7 +37,8 @@ public class RunItNowCrater extends LinearOpMode {
     //Constructor method to receive the parameters
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
         //Inits the hardware
         robot.init(hardwareMap);
 
