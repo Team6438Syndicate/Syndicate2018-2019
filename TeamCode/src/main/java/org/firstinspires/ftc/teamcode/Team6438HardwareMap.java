@@ -2,13 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
@@ -30,7 +27,7 @@ public class Team6438HardwareMap
     //Servo mapping
     //public Servo colorSensorServo   = null;
     public CRServo teamMarkerServo = null;
-    public CRServo hookServo = null;
+
     //Sensor Mapping
     public BNO055IMU imu            = null;
     //public ColorSensor colorSensor  = null;
@@ -121,7 +118,6 @@ public class Team6438HardwareMap
         //Select a start position
         //colorSensorServo.setPosition();
         teamMarkerServo = hwMap.get(CRServo.class, "teamMarkerServo");
-        hookServo = hwMap.get(CRServo.class, "hookServo");
 
         //------------------------------------------------------------------------------------------
 
@@ -133,7 +129,6 @@ public class Team6438HardwareMap
 
         //imu map
         imu = hwMap.get(BNO055IMU.class, "imu");
-
     }
 }
 
