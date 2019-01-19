@@ -34,48 +34,48 @@ public class Team6438HardwareMap
     //public DistanceSensor distanceSensor = null;
 
     //Variables
-    public static final double CPR = 288;
+    public  final double CPR = 288;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    public static final double DGR = 1.0;
+    public  final double DGR = 1.0;
 
     //Wheel Diameter Inches
-    public static final double WDI = 3.8;
+    public  final double WDI = 3.8;
 
     //Counts per Inch
-    public static final double CPI = (CPR * DGR)
+    public  final double CPI = (CPR * DGR)
             / (WDI * Math.PI);
 
     //CPR for linear and intake motors
-    public static final double otherCPR = 1120;
+    public  final double otherCPR = 1120;
 
     //Gear Reduction for linear slide
-    public static final double GRL = 2.0;
+    public  final double GRL = 2.0;
 
     // CPI for linear slide
-    public static final double linearCPI = otherCPR * GRL;
+    public  final double linearCPI = otherCPR * GRL;
 
     //Boolean to store teleOp Value
-    public static boolean teleOp = true;
+    public  boolean teleOp = true;
 
     //torquenado cpr
-    public static final double torquenadoCPR = 1440;
+    public  final double torquenadoCPR = 1440;
 
     //intake gear ratio
-    public static final double intakeGearRatio = 3.0;
+    public  final double intakeGearRatio = 3.0;
 
     //intake cpi calc
-    public static final double intakeCPI = torquenadoCPR * intakeGearRatio;
+    public  final double intakeCPI = torquenadoCPR * intakeGearRatio;
 
     /* local OpMode members. */
     HardwareMap hwMap = null;
     //public ElapsedTime period = new ElapsedTime();
 
     //Vuforia variables
-    public static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    public static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
-    public static final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
+    public  final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    public  final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    public  final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    public  final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
     public VuforiaLocalizer vuforia;
     public TFObjectDetector tfod;
 
