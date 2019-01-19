@@ -55,26 +55,6 @@ public class TeleOp6438 extends OpMode
         double intakeSpinnerPower;
         double right;
 
-        /*
-         * Declaring values for said power variables
-         */
-        if (gamepad2.dpad_left)
-        {
-            robot.hookServo.setPower(1);
-            telemetry.addData("servo", robot.hookServo.getPower());
-            telemetry.update();
-
-        }
-        else if (gamepad2.dpad_right)
-        {
-            robot.hookServo.setPower(-1);
-            telemetry.addData("servo", robot.hookServo.getPower());
-            telemetry.update();
-        }
-        else
-        {
-            robot.hookServo.setPower(0);
-        }
         //Left power is the left stick up and down
         leftPower = -gamepad1.left_stick_y;
 
