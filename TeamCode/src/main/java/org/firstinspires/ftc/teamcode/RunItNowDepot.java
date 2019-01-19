@@ -314,7 +314,8 @@ public class RunItNowDepot extends LinearOpMode
                     }
                 }
             }
-            if (robot.tfod != null) {
+            if (robot.tfod != null)
+            {
                 robot.tfod.shutdown();
             }
         }
