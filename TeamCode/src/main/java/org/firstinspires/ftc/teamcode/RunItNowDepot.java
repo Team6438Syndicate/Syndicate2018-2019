@@ -24,7 +24,7 @@ import java.util.List;
 public class RunItNowDepot extends LinearOpMode
 {
     //Reference to our hardware map
-    Team6438HardwareMap robot = new Team6438HardwareMap();
+    private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
