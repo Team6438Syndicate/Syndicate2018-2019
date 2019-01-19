@@ -67,6 +67,7 @@ public class RunItNowDepot extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
+            //If its the firstTime block will equal the output of the queryTensorFlow method.
             if(firstTime)
             {
                 block = queryTensorFlow();
