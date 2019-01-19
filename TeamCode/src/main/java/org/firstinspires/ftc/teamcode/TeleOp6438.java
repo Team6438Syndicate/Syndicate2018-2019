@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class TeleOp6438 extends OpMode
 {
     //Init the hardwareMap
-    Team6438HardwareMap robot = new Team6438HardwareMap();
+    private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for intake location
     int tuckedPosition = 1;
