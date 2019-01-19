@@ -355,7 +355,7 @@ public class RunItNowDepot extends LinearOpMode
         encoderRobotDrive(1,-distance,distance);
     }
 
-    //Method to move the intake spinner (probably not neccesary in autonomous)
+    //Method to move the intake spinner (probably not necessary in autonomous)
     private void intakeSpin(double speed, long duration)
     {
         robot.intakeSpinner.setPower(speed);
