@@ -14,78 +14,78 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
  *  ^^
  *  Spreadsheet to check our hardware
  **/
-public class Team6438HardwareMap
+class Team6438HardwareMap
 {
-    /* public OpMode members. */
+    /*  OpMode members. */
     //Motor mapping
-    public DcMotor leftMotor        = null;
-    public DcMotor rightMotor       = null;
-    public DcMotor linearSlide      = null;
-    public DcMotor intakeSpinner    = null;
-    public DcMotor intakeMover      = null;
+     DcMotor leftMotor        = null;
+     DcMotor rightMotor       = null;
+     DcMotor linearSlide      = null;
+     DcMotor intakeSpinner    = null;
+     DcMotor intakeMover      = null;
 
     //Servo mapping
-    //public Servo colorSensorServo   = null;
-    public CRServo teamMarkerServo = null;
+    // Servo colorSensorServo   = null;
+     CRServo teamMarkerServo = null;
 
     //Sensor Mapping
-    public BNO055IMU imu            = null;
-    //public ColorSensor colorSensor  = null;
-    //public DistanceSensor distanceSensor = null;
+     BNO055IMU imu            = null;
+    // ColorSensor colorSensor  = null;
+    // DistanceSensor distanceSensor = null;
 
     //Variables
-    public  final double CPR = 288;
+      final double CPR = 288;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    public  final double DGR = 1.0;
+      final double DGR = 1.0;
 
     //Wheel Diameter Inches
-    public  final double WDI = 3.8;
+      final double WDI = 3.8;
 
     //Counts per Inch
-    public  final double CPI = (CPR * DGR)
+      final double CPI = (CPR * DGR)
             / (WDI * Math.PI);
 
     //CPR for linear and intake motors
-    public  final double otherCPR = 1120;
+      final double otherCPR = 1120;
 
     //Gear Reduction for linear slide
-    public  final double GRL = 2.0;
+      final double GRL = 2.0;
 
     // CPI for linear slide
-    public  final double linearCPI = otherCPR * GRL;
+      final double linearCPI = otherCPR * GRL;
 
     //Boolean to store teleOp Value
-    public  boolean teleOp = true;
+      boolean teleOp = true;
 
     //torquenado cpr
-    public  final double torquenadoCPR = 1440;
+      final double torquenadoCPR = 1440;
 
     //intake gear ratio
-    public  final double intakeGearRatio = 3.0;
+      final double intakeGearRatio = 3.0;
 
     //intake cpi calc
-    public  final double intakeCPI = torquenadoCPR * intakeGearRatio;
+      final double intakeCPI = torquenadoCPR * intakeGearRatio;
 
     /* local OpMode members. */
     HardwareMap hwMap = null;
-    //public ElapsedTime period = new ElapsedTime();
+    // ElapsedTime period = new ElapsedTime();
 
     //Vuforia variables
-    public  final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    public  final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    public  final String LABEL_SILVER_MINERAL = "Silver Mineral";
-    public  final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
-    public VuforiaLocalizer vuforia;
-    public TFObjectDetector tfod;
+      final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+      final String LABEL_GOLD_MINERAL = "Gold Mineral";
+      final String LABEL_SILVER_MINERAL = "Silver Mineral";
+      final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
+     VuforiaLocalizer vuforia;
+     TFObjectDetector tfod;
 
     /* Constructor */
-    public Team6438HardwareMap()
+    Team6438HardwareMap()
     {
     }
 
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap)
+    void init(HardwareMap ahwMap)
     {
         // Save reference to Hardware map
         hwMap = ahwMap;
