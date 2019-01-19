@@ -32,6 +32,7 @@ public class RunItNowDepot extends LinearOpMode
     //Boolean to ensure we only run the block check the first time around
     private static boolean firstTime = true;
 
+
     @Override
     public void runOpMode() throws InterruptedException
     {
