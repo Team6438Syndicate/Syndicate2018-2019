@@ -363,6 +363,7 @@ public class RunItNowDepot extends LinearOpMode
         telemetry.update();
         sleep(duration);
     }
+
     //Method to init the vuforia engine
     private void initVuforia() {
 
