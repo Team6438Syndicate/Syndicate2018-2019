@@ -13,8 +13,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-//import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABEL_GOLD_MINERAL;
-
 //TO DO
 // Find linearCPI
 // Test encoder based driving
@@ -22,6 +20,7 @@ import java.util.List;
 //Distance from landing to gems: Approximately 34 inches
 //Height of bracket off the ground: 19 inches
 //Test 123 Desktop Test123
+
 @Autonomous(name = "Blue Crater Facing Autonomous", group = "Blue Autonomous 6438")
 public class BlueCraterFacingAutonomousTeam6438 extends LinearOpMode {
     //Reference to our hardware map
