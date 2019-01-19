@@ -71,6 +71,7 @@ public class RunItNowDepot extends LinearOpMode
             }
 
             //Queries the tensorFlow engine to find the block
+            //they can all act as forward + something else
             switch ( block )
             {
                 case 1:
@@ -280,7 +281,7 @@ public class RunItNowDepot extends LinearOpMode
                                 }
                                 else
                                 {
-                                    encoderRobotDrive(.5,5,-5); //temp values
+                                    encoderRobotDrive(.5, 5,-5); //temp values
                                     sleep(3000);
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
