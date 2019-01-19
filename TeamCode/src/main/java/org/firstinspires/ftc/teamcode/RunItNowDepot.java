@@ -78,16 +78,26 @@ public class RunItNowDepot extends LinearOpMode
                     //insert values for moving center
                     telemetry.addData("Block", "Center");
                     telemetry.update();
+
+                    //movement code here
+
                     break;
                 case 2:
                     //insert values for moving right
                     telemetry.addData("Block", "Right");
                     telemetry.update();
+
+                    //movement code here
+
                     break;
                 case 3:
                     //insert values for moving left
                     telemetry.addData("Block", "Left");
                     telemetry.update();
+
+                    //movement code here
+
+
                     break;
                 default:
                     //insert code if something goes wrong
