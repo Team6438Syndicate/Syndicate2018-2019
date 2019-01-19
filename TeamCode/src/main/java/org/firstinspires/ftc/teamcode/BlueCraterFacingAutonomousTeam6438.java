@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -21,7 +20,6 @@ import java.util.List;
 // Integrate way to control linearSlide in OpMode
 //Distance from landing to gems: Approximately 34 inches
 //Height of bracket off the ground: 19 inches
-//Test Desktop 123
 
 @Autonomous(name = "Blue Crater Facing Autonomous", group = "Blue Autonomous 6438")
 public class BlueCraterFacingAutonomousTeam6438 extends LinearOpMode {
