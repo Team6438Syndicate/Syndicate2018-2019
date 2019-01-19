@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 //Imports
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -21,6 +22,7 @@ import java.util.List;
 //Height of bracket off the ground: 19 inches
 //Test 123 Desktop Test123
 
+@Disabled
 @Autonomous(name = "Blue Crater Facing Autonomous (Depreciated)", group = "Blue Autonomous 6438")
 public class BlueCraterFacingAutonomousTeam6438Depreciated extends LinearOpMode {
     //Reference to our hardware map
