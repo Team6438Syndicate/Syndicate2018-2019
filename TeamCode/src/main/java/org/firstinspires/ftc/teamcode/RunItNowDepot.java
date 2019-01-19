@@ -291,7 +291,8 @@ public class RunItNowDepot extends LinearOpMode
                                 }
                                 else
                                 {
-                                    encoderRobotDrive(.5, 5,-5); //temp values
+                                    rightTurnEncoders(5); //temp values
+
                                     sleep(3000);
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
@@ -334,6 +335,24 @@ public class RunItNowDepot extends LinearOpMode
         }
 
         return 0;
+    }
+
+    //Method for just moving forward
+    private void forwardDriveEncoders(double distance)
+    {
+     encoderRobotDrive(1,distance,distance);
+    }
+
+    //Method for left turns
+    private void leftTurnEncoders(double distance)
+    {
+        encoderRobotDrive(1,distance,-distance);
+    }
+
+    //Method for right turns
+    private void rightTurnEncoders(double distance)
+    {
+        encoderRobotDrive(1,-distance,distance);
     }
 
     //Method to move the intake spinner (probably not neccesary in autonomous)
