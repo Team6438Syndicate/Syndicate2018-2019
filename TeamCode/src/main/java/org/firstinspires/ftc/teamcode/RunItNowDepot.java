@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
 //Imports
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,13 +12,15 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-//TO DO
-// Find linearCPI
-// Test encoder based driving
-// Integrate way to control linearSlide in OpMode
-//Distance from landing to gems: Approximately 34 inches
-//Height of bracket off the ground: 19 inches
-
+/**
+ * TO DO
+ * // Find linearCPI
+ * // Test encoder based driving
+ * // Integrate way to control linearSlide in OpMode
+ * //Distance from landing to gems: Approximately 34 inches
+ * //Height of bracket off the ground: 19 inches
+ **/
+//@Disabled
 @Autonomous(name = "Run It Now Depot", group = "Blue Autonomous 6438")
 public class RunItNowDepot extends LinearOpMode
 {
@@ -60,6 +61,7 @@ public class RunItNowDepot extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        //Sets the block int to 0 (default value)
         int block = 0;
 
         //While the program is running
