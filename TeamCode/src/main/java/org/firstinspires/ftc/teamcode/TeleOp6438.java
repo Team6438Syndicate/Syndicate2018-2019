@@ -116,7 +116,7 @@ public class TeleOp6438 extends OpMode
 
                 //moveIntake(.5,1);
 
-                encoderDrive(.5,  400);
+                encoderDrive(.5,  400); //needs to be incremented so the linear slides can be raised
                 run = false;
             }
         }

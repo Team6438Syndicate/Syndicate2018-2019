@@ -275,11 +275,12 @@ public class RunItNowDepot extends LinearOpMode
                                     firstTime=false;
 
                                     //block is in the center
+
                                     return 1;
                                 }
                                 else
                                 {
-                                    //encoderRobotDrive(.5,100,-100); //temp values
+                                    encoderRobotDrive(.5,5,-5); //temp values
                                     sleep(3000);
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
