@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -25,7 +25,7 @@ import java.util.List;
 @Autonomous(name = "Run It Now Crater", group = "Blue Autonomous 6438")
 public class RunItNowCrater extends LinearOpMode {
     //Reference to our hardware map
-    Team6438HardwareMap robot = new Team6438HardwareMap();
+    private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -342,10 +342,10 @@ public class RunItNowCrater extends LinearOpMode {
         //Sets camera direction
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-        /**
+        /*
          * Uncomment this in order to use an external webcam.
          * parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-         **/
+         */
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);

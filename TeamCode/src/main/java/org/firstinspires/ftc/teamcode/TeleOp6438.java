@@ -19,7 +19,7 @@ public class TeleOp6438 extends OpMode
     int tuckedPosition = 1;
     int verticalPosition = 1;
     int downPosition = 1;
-    boolean run = true;
+    private boolean run = true;
 
     /*
      *   Use hardware the normal way just add robot before it
@@ -140,7 +140,7 @@ public class TeleOp6438 extends OpMode
      *  2) Move runs out of time
      *  3) Driver stops the opmode running.
      */
-    public void encoderDrive(double speed, double position)
+    private void encoderDrive(double speed, double position)
     {
         int newTarget;
 
