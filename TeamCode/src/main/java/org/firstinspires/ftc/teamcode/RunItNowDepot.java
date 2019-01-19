@@ -71,7 +71,7 @@ public class RunItNowDepot extends LinearOpMode
             }
 
             //Queries the tensorFlow engine to find the block
-            //they can all act as forward + something else
+            //they can all act as forward + something else ???
             switch ( block )
             {
                 case 1:
