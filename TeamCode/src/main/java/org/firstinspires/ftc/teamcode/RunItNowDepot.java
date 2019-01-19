@@ -296,6 +296,7 @@ public class RunItNowDepot extends LinearOpMode
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
                                     {
+                                        //noinspection LoopStatementThatDoesntLoop
                                         for (Recognition recognition2 : updatedRecognitions2)
                                         {
                                             if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
