@@ -1,3 +1,14 @@
+/**
+ * Name: Team6438HardwareMap
+ * Purpose: This class contains maps for all hardware on the robot
+ *          To reference it you need to create an instance of the Team6438HardwareMap class
+ * Author: Matthew Batkiewicz
+ * Contributors: Bradley Abelman, Matthew Kaboolian
+ * Creation: 11/8/18
+ * Last Edit: 1/20/19
+ * Additional Notes: https://docs.google.com/spreadsheets/d/13nvS4GjjWdywcON7hg1URirm_IHWoOywUKIuTGDfaUs/edit
+ *                   ^^Spreadsheet to check our hardware
+ **/
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -9,11 +20,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-/**
- *  https://docs.google.com/spreadsheets/d/13nvS4GjjWdywcON7hg1URirm_IHWoOywUKIuTGDfaUs/edit
- *  ^^
- *  Spreadsheet to check our hardware
- **/
 class Team6438HardwareMap
 {
     /*  OpMode members. */
