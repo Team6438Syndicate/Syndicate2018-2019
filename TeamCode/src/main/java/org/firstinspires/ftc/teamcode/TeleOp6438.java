@@ -1,32 +1,34 @@
+/**
+ * Name: Team6438TeleOp
+ * Purpose: This class allows the robot to run during the Driver Controlled period
+ *          This class can: move the driver motors, move the intake spinner,
+ *          move the Linear Actuator, and spin the intake.
+ * Author: Matthew Batkiewicz
+ * Contributors: Bradley Abelman, Matthew Kaboolian
+ * Creation: 11/8/18
+ * Last Edit: 1/20/19
+ * Additional Notes: Needs to be cleaned up
+ **/
 package org.firstinspires.ftc.teamcode;
+
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-/**
- * This is the TeleOp Class for Team 6438.
- * Created by Team 6438 Programmers on 11/15/18
- * Last edit: 1/3/19
- */
 @TeleOp(name = "Team 6438 Driver Controlled", group = "Team 6438 TeleOp")
 public class TeleOp6438 extends OpMode
 {
-    //Init the hardwareMap
+    //Create reference to the Team6438HardwareMap Class
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for intake location
     int tuckedPosition = 1;
     int verticalPosition = 1;
     int downPosition = 1;
-    private boolean run = true;
 
-    /*
-     *   Use hardware the normal way just add robot before it
-     *    i.e. robot.leftDrive.setPower() as opposed to leftDrive.setPower
-     *   Everything is mapped to a central class so there are no name discrepancies
-     *
-     */
+    //Boolean to asses if the arm should be allowed to move if true the arm can move if not it can't
+    private boolean run = true;
 
     @Override
     public void init()
@@ -34,12 +36,13 @@ public class TeleOp6438 extends OpMode
         //Init and map the hardware
         robot.init(hardwareMap);
 
-        //Turns off color sensor Led (DEPRECIATED)
-        //robot.colorSensor.enableLed(false);
-
-
+        //Resets the encoders on the intake to allow for movement
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Sets the drive motors to run without encoders
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //Telemetry to show user robot has been init
         telemetry.addData("Hardware Status ", "Mapped");
@@ -53,7 +56,6 @@ public class TeleOp6438 extends OpMode
         double leftPower, rightPower;
         double linearSlidePower;
         double intakeSpinnerPower;
-        double right;
 
         //Left power is the left stick up and down
         leftPower = -gamepad1.left_stick_y;
@@ -78,10 +80,8 @@ public class TeleOp6438 extends OpMode
         telemetry.addData("Right Power", rightPower);
         telemetry.addData("Linear Slide Power", linearSlidePower);
         telemetry.addData("Intake Power", intakeSpinnerPower);
-        telemetry.addData("trigger", gamepad2.right_trigger);
         telemetry.addData("Going to ", robot.intakeMover.getTargetPosition());
         telemetry.addData("Currently At", robot.intakeMover.getCurrentPosition());
-
         telemetry.update();
 
         /*
@@ -93,7 +93,7 @@ public class TeleOp6438 extends OpMode
         {
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            encoderDrive(.5,  -1000);
+            intakeMove(.5,  -1000);
 
 
             while ( robot.intakeMover.isBusy() )
@@ -107,45 +107,28 @@ public class TeleOp6438 extends OpMode
 
         }
 
-        if(run){
+        if(run)
+        {
             if (gamepad2.right_trigger>.01)
             {
-                //int increment = (int) (10 * gamepad2.right_trigger);
-
-                //moveIntake(.5,1);
-
-                encoderDrive(.5,  400);
+                intakeMove(.5,400);
                 run = false;
             }
         }
-
-
         else if (gamepad2.left_trigger>.01)
         {
             //int increment = (int) (10 * gamepad2.left_trigger);
             //moveIntake(.5, -1);
-            encoderDrive(.5,  50);
+            intakeMove(.5,50);
             robot.intakeMover.setPower(0);
             run = true;
-
         }
-
     }
 
-    /*
-     *  Method to perfmorm a relative move, based on encoder counts.
-     *  Encoders are not reset as the move is based on the current position.
-     *  Move will stop if any of three conditions occur:
-     *  1) Move gets to the desired position
-     *  2) Move runs out of time
-     *  3) Driver stops the opmode running.
-     */
-    private void encoderDrive(double speed, double position)
+    //Method to move the intake
+    private void intakeMove(double speed, double position)
     {
         int newTarget;
-
-        // Ensure that the opmode is still active
-
 
         // Determine new target position, and pass to motor controller
         newTarget = robot.intakeMover.getCurrentPosition() + (int)(position);
@@ -158,8 +141,5 @@ public class TeleOp6438 extends OpMode
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
-
-
     }
-
 }

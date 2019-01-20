@@ -30,39 +30,36 @@ class Team6438HardwareMap
      DcMotor intakeMover      = null;
 
     //Servo mapping
-    // Servo colorSensorServo   = null;
-     CRServo teamMarkerServo = null;
+    CRServo teamMarkerServo   = null;
 
     //Sensor Mapping
-     BNO055IMU imu            = null;
-    // ColorSensor colorSensor  = null;
-    // DistanceSensor distanceSensor = null;
+    private BNO055IMU imu     = null;
 
     //Variables
-    final double CPR = 288;
+    private final double CPR = 288;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    final double DGR = 1.0;
+    private final double DGR = 1.0;
 
     //Wheel Diameter Inches
-    final double WDI = 3.8;
+    private final double WDI = 3.8;
 
     //Counts per Inch
     final double CPI = (CPR * DGR)
                      / (WDI * Math.PI);
 
     //CPR for linear and intake motors
-    final double otherCPR = 1120;
+    private final double otherCPR = 1120;
 
     //Gear Reduction for linear slide
-    final double GRL = 2.0;
+    private final double GRL = 2.0;
 
     // CPI for linear slide
     final double linearCPI = otherCPR * GRL;
 
 
     //local OpMode members.
-    HardwareMap hwMap = null;
+    private HardwareMap hwMap = null;
 
     //Vuforia variables
      final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
