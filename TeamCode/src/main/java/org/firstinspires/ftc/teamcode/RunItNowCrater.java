@@ -1,3 +1,19 @@
+/**
+ * Name: Team6438CraterSideAutonomous
+ * Purpose: This class contains instructions for autonomous
+ *          Currently the actions (in order) are: Raise the linear slide to unlatch
+ *          Sample Blocks, Drive to the Depot and fling the team marker.
+ * Author: Bradley Abelman
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian
+ * Creation: 11/8/18
+ * Last Edit: 1/2/19
+ * Additional Notes: TO DO
+ *                  Find linearCPI
+ *                  Test encoder based driving
+ *                  Integrate way to control linearSlide in OpMode
+ *                  Distance from landing to gems: Approximately 34 inches
+ *                  Height of bracket off the ground: 19 inches
+ **/
 package org.firstinspires.ftc.teamcode;
 
 //Imports
@@ -13,16 +29,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-//import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABEL_GOLD_MINERAL;
-
-//TO DO
-// Find linearCPI
-// Test encoder based driving
-// Integrate way to control linearSlide in OpMode
-//Distance from landing to gems: Approximately 34 inches
-//Height of bracket off the ground: 19 inches
-
-@Autonomous(name = "Run It Now Crater", group = "Blue Autonomous 6438")
+@Autonomous(name = "Crater Side Autonomous", group = "Blue Autonomous 6438")
 public class RunItNowCrater extends LinearOpMode
 {
     //Reference to our hardware map

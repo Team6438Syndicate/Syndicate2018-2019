@@ -1,6 +1,22 @@
+/**
+ * Name: Team6438AutonomousDepotSide
+ * Purpose: This class contains instructions for autonomous
+ *          Currently the actions (in order) are: Raise the linear slide to unlatch
+ *          Sample Blocks, Drive to the Depot and fling the team marker.
+ * Author: Bradley Abelman
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian
+ * Creation: 11/8/18
+ * Last Edit: 1/2/19
+ * Additional Notes: TO DO
+ *                  Find linearCPI
+ *                  Test encoder based driving
+ *                  Integrate way to control linearSlide in OpMode
+ *                  Distance from landing to gems: Approximately 34 inches
+ *                  Height of bracket off the ground: 19 inches
+ **/
 package org.firstinspires.ftc.teamcode;
-//Imports
 
+//Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,16 +28,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-/**
- * TO DO
- * // Find linearCPI
- * // Test encoder based driving
- * // Integrate way to control linearSlide in OpMode
- * //Distance from landing to gems: Approximately 34 inches
- * //Height of bracket off the ground: 19 inches
- **/
-//@Disabled
-@Autonomous(name = "Run It Now Depot", group = "Blue Autonomous 6438")
+//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Autonomous(name = "Depot Side Autonomous", group = "Autonomous 6438")
 public class RunItNowDepot extends LinearOpMode
 {
     //Reference to our hardware map

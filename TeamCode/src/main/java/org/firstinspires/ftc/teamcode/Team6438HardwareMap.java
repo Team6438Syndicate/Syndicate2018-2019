@@ -11,6 +11,8 @@
  **/
 package org.firstinspires.ftc.teamcode;
 
+//Imports
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -58,9 +60,6 @@ class Team6438HardwareMap
     final double linearCPI = otherCPR * GRL;
 
 
-    //local OpMode members.
-    private HardwareMap hwMap = null;
-
     //Vuforia variables
      final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
      final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -72,7 +71,8 @@ class Team6438HardwareMap
     void init(HardwareMap ahwMap)
     {
         // Save reference to Hardware map
-        hwMap = ahwMap;
+        //local OpMode members.
+        HardwareMap hwMap = ahwMap;
 
         //Define and Initialize Motors
         leftMotor     = hwMap.get(DcMotor.class, "leftDrive");
