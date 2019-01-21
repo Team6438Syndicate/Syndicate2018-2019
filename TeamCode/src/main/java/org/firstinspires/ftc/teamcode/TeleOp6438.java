@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @TeleOp(name = "Team 6438 Driver Controlled", group = "Team 6438 TeleOp")
 public class TeleOp6438 extends OpMode
 {
