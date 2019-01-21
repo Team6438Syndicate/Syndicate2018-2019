@@ -29,7 +29,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name = "Crater Side Autonomous", group = "Autonomous 6438")
+@Autonomous(name = "Crater Side Autonomous", group = "Team 6438 Autonomous")
 public class Team6438CraterAutonomous extends LinearOpMode
 {
     //Reference to our hardware map
