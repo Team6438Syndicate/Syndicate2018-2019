@@ -88,7 +88,6 @@ public class TeleOp6438 extends OpMode
          * Gamepad logic to move the intake
          */
         ///When A is pressed go to the down position
-
         if (gamepad2.a)
         {
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
