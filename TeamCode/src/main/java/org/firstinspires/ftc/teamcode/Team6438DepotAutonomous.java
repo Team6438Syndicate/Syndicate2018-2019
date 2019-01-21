@@ -29,7 +29,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side Autonomous", group = "Autonomous 6438")
+@Autonomous(name = "Depot Side Autonomous", group = "Autonomous Team 6438")
 public class Team6438DepotAutonomous extends LinearOpMode
 {
     //Reference to our hardware map
