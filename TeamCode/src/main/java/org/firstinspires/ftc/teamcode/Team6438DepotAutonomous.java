@@ -75,52 +75,11 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
-            //If its the firstTime block will equal the output of the queryTensorFlow method.
-            if(firstTime)
-            {
-                telemetry.addData("firstTime = ", firstTime);
-                telemetry.update();
+            telemetry.addData("Testing ", "123");
+            telemetry.update();
+            sleep(2000);
+            sampleMineral();
 
-                block = queryTensorFlow();
-                //Queries the tensorFlow engine to find the block
-
-                //they can all act as forward + something else ???
-                switch (block) {
-                    case 1:
-                        //insert values for moving center
-                        telemetry.addData("Block is on the ", " Center");
-                        telemetry.update();
-
-                        //movement code here
-
-                        break;
-
-                    case 2:
-                        //insert values for moving right
-                        telemetry.addData("Block is on the ", " Right");
-                        telemetry.update();
-
-                        //movement code here
-
-                        break;
-
-                    case 3:
-                        //insert values for moving left
-                        telemetry.addData("Block is on the ", " Left");
-                        telemetry.update();
-
-                        //movement code here
-
-
-                        break;
-
-                    default:
-                        //insert code if something goes wrong
-                        telemetry.addData("Block", "Not Found");
-                        telemetry.update();
-                        break;
-                }
-            }
         }
     }
 
@@ -252,6 +211,65 @@ public class Team6438DepotAutonomous extends LinearOpMode
         sleep(duration);
     }
 
+    //Method to sample the mineral uses the queryTensorFlow method
+    private void sampleMineral()
+    {
+        //Sets the block int to 0 (default value)
+        int block = 0;
+
+        //While the program is running
+        while (opModeIsActive())
+        {
+            //If its the firstTime block will equal the output of the queryTensorFlow method.
+            if(firstTime)
+            {
+                telemetry.addData("firstTime = ", firstTime);
+                telemetry.update();
+
+                block = queryTensorFlow();
+                //Queries the tensorFlow engine to find the block
+
+                //they can all act as forward + something else ???
+                switch (block) {
+                    case 1:
+                        //insert values for moving center
+                        telemetry.addData("Block is on the ", " Center");
+                        telemetry.update();
+
+                        //movement code here
+
+                        break;
+
+                    case 2:
+                        //insert values for moving right
+                        telemetry.addData("Block is on the ", " Right");
+                        telemetry.update();
+
+                        //movement code here
+
+                        break;
+
+                    case 3:
+                        //insert values for moving left
+                        telemetry.addData("Block is on the ", " Left");
+                        telemetry.update();
+
+                        //movement code here
+
+
+                        break;
+
+                    default:
+                        //insert code if something goes wrong
+                        telemetry.addData("Block", "Not Found");
+                        telemetry.update();
+                        break;
+                }
+            }
+        }
+
+    }
+
     /**
      * Queries the tensorFlow engine to find the block
      * No parameter but returns a int to let program know where the block is
@@ -267,10 +285,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
     {
         while (opModeIsActive() )
         {
-            //Drive forward and turn around
-            //encoderRobotDrive(0.5, 10, 10);
-            //encoderRobotDrive(0.5, -34.558, 34.558);
-
             //int to determine gold block location: 1 = center, 2 = right, 3 = left
             int goldLocation = 0;
 
