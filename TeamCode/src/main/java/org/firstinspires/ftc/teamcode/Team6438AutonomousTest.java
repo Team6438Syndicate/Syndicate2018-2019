@@ -12,6 +12,7 @@
  *                  Integrate way to control linearSlide in OpMode
  *                  Distance from landing to gems: Approximately 34 inches
  *                  Height of bracket off the ground: 19 inches
+ *                  Experiment with IMU
  **/
 package org.firstinspires.ftc.teamcode;
 
