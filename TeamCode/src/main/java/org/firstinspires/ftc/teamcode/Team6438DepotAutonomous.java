@@ -122,7 +122,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
                 }
             }
         }
-
     }
 
     //Encoder drive method to drive the motors
