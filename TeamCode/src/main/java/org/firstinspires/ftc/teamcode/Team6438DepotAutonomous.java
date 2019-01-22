@@ -78,47 +78,52 @@ public class Team6438DepotAutonomous extends LinearOpMode
             //If its the firstTime block will equal the output of the queryTensorFlow method.
             if(firstTime)
             {
+                telemetry.addData("firstTime = ", firstTime);
+                telemetry.update();
+
                 block = queryTensorFlow();
+                //Queries the tensorFlow engine to find the block
+
+                //they can all act as forward + something else ???
+                switch (block) {
+                    case 1:
+                        //insert values for moving center
+                        telemetry.addData("Block is on the ", " Center");
+                        telemetry.update();
+
+                        //movement code here
+
+                        break;
+
+                    case 2:
+                        //insert values for moving right
+                        telemetry.addData("Block is on the ", " Right");
+                        telemetry.update();
+
+                        //movement code here
+
+                        break;
+
+                    case 3:
+                        //insert values for moving left
+                        telemetry.addData("Block is on the ", " Left");
+                        telemetry.update();
+
+                        //movement code here
+
+
+                        break;
+
+                    default:
+                        //insert code if something goes wrong
+                        telemetry.addData("Block", "Not Found");
+                        telemetry.update();
+                        break;
+                }
             }
-
-            //Queries the tensorFlow engine to find the block
-            //they can all act as forward + something else ???
-            switch ( block )
-            {
-                case 1:
-                    //insert values for moving center
-                    telemetry.addData("Block", "Center");
-                    telemetry.update();
-
-                    //movement code here
-
-                    break;
-                case 2:
-                    //insert values for moving right
-                    telemetry.addData("Block", "Right");
-                    telemetry.update();
-
-                    //movement code here
-
-                    break;
-                case 3:
-                    //insert values for moving left
-                    telemetry.addData("Block", "Left");
-                    telemetry.update();
-
-                    //movement code here
-
-
-                    break;
-                default:
-                    //insert code if something goes wrong
-                    telemetry.addData("Block", "Not Found");
-                    telemetry.update();
-                    break;
-            }
-            telemetry.addData("TEST","TEST");
-            telemetry.update();
         }
+        sleep(25000);
+        firstTime = true;
     }
 
     //Encoder drive method to drive the motors
@@ -240,7 +245,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
         }
     }
 
-    //Method to move the intake spinner (probably not neccesary in autonomous)
+    //Method to move the intake spinner (probably not necessary in autonomous)
     private void intakeSpin(double speed, long duration)
     {
         robot.intakeSpinner.setPower(speed);
@@ -311,7 +316,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                 }
                                 else
                                 {
-                                    encoderRobotDrive(.5, 5,-5); //temp values
+                                    //encoderRobotDrive(.5, 5,-5); //temp values
+                                    telemetry.addData("Moving", "Right");
+                                    telemetry.update();
                                     sleep(3000);
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null)
@@ -357,7 +364,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
     }
 
     //Method to init the vuforia engine
-    private void initVuforia() {
+    private void initVuforia()
+    {
 
         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -368,12 +376,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //Sets camera direction
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-
-
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        //Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
     //Method to init the tfod engine
