@@ -75,7 +75,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
-            telemetry.addData("Testing ", "123");
+            telemetry.addData("Waiting 2000 MS to Sample", "True");
             telemetry.update();
             sleep(2000);
             sampleMineral();
