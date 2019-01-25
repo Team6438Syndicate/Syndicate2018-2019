@@ -324,6 +324,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                     sleep(500);
                                     robot.tfod.shutdown();
                                     firstTime = false;
+
+                                    //block in the center
                                     return 1;
 
                                 }
@@ -374,7 +376,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
                 robot.tfod.shutdown();
             }
         }
-
         return 0;
     }
 
