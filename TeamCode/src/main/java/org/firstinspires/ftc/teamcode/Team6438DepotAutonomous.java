@@ -322,18 +322,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                     telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
                                     sleep(500);
-                                    if(recognition.getConfidence() >= .90) {
-                                        robot.tfod.shutdown();
-                                        firstTime = false;
-                                        return 1;
-                                    }
-                                    else
-                                    {
-                                        telemetry.addData("SOL","rip");
-                                        telemetry.update();
-                                        return 0;
-                                    }
-
+                                    robot.tfod.shutdown();
+                                    firstTime = false;
+                                    return 1;
 
                                 }
                                 else
@@ -412,6 +403,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
         //
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+
+        //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
+        tfodParameters.minimumConfidence = robot.confidence;
 
         //
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
