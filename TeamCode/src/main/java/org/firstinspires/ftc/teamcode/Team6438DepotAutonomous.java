@@ -315,16 +315,26 @@ public class Team6438DepotAutonomous extends LinearOpMode
                         {
                             for (Recognition recognition : updatedRecognitions)
                             {
+                                if( recognition.getTop() < recognition.getImageHeight()/3 )
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                 {
-                                    telemetry.addData("value", "Center");
+                                    telemetry.addData("Value", "Center");
+                                    telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
-                                    robot.tfod.shutdown();
-                                    firstTime=false;
+                                    sleep(500);
+                                    if(recognition.getConfidence() >= .90) {
+                                        robot.tfod.shutdown();
+                                        firstTime = false;
+                                        return 1;
+                                    }
+                                    else
+                                    {
+                                        telemetry.addData("SOL","rip");
+                                        telemetry.update();
+                                        return 0;
+                                    }
 
-                                    //block is in the center
 
-                                    return 1;
                                 }
                                 else
                                 {
@@ -341,6 +351,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                             if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
                                             {
                                                 telemetry.addData("value", "Right");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
                                                 firstTime = false;
@@ -351,6 +362,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                             else
                                             {
                                                 telemetry.addData("value", "Left");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
                                                 firstTime = false;

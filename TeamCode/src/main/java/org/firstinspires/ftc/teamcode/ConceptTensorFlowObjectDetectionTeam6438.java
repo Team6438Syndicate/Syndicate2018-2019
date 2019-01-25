@@ -101,9 +101,7 @@ public class ConceptTensorFlowObjectDetectionTeam6438 extends LinearOpMode {
                             for (Recognition recognition : updatedRecognitions) {
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                     goldMineralX = (int) recognition.getLeft();
-                                    telemetry.addData("test","test123");
                                     telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.addData("Get Top",recognition.getTop());
                                 } else if (silverMineral1X == -1) {
                                     silverMineral1X = (int) recognition.getLeft();
                                 } else {
