@@ -277,7 +277,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
      * 2 = right
      * 3 = left
      *
-     * Notes: want to integrate confidence reading
+     * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
      *        max y values
      *        max timeout ( if timeout passes ends the code and defaults to center
      **/
