@@ -75,6 +75,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
+            actuatorMove(1,-9,false);
             telemetry.addData("Waiting 2000 MS to Sample", "True");
             telemetry.update();
             sleep(2000);
@@ -139,16 +140,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive())
         {
-
             // Determine new target position, and pass to motor controller
-            if(directionUp)
-            {
-                newTarget = robot.linearSlide.getCurrentPosition() + (int) (inches * robot.linearCPI);
-            }
-            else
-            {
-                newTarget = robot.linearSlide.getCurrentPosition() - (int) (inches * robot.linearCPI);
-            }
+            newTarget = robot.linearSlide.getCurrentPosition() + (int) (inches * robot.linearCPI);
 
             //Passes this target
             robot.linearSlide.setTargetPosition(newTarget);
@@ -158,7 +151,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
             // reset the timeout time and start motion.
             robot.linearSlide.setPower(Math.abs(speed));
-
 
             // keep looping while we are still active, and the motor is running.
             while (opModeIsActive() && robot.linearSlide.isBusy())
@@ -171,8 +163,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
             // Stop all motion;
             robot.linearSlide.setPower(0);
-
-
+            
             // Turn off RUN_TO_POSITION
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

@@ -84,7 +84,7 @@ class Team6438HardwareMap
         //Reverse the right Motor and linear slide motor to make code operation easier
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
         rightMotor.setDirection(DcMotor.Direction.FORWARD);
-        linearSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSpinner.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
 
