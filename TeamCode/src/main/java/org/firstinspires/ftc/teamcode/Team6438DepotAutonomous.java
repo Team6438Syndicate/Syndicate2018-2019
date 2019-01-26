@@ -261,8 +261,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
     }
 
-    //test123
-
     /**
      * Queries the tensorFlow engine to find the block
      * No parameter but returns a int to let program know where the block is
