@@ -252,7 +252,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
                         //movement code here
 
-
                         break;
 
                     default:
