@@ -55,7 +55,7 @@ public class TeleOp6438 extends OpMode
     {
         //Declaring power variables
         double leftPower, rightPower;
-        double linearSlidePower;
+        double linearActuatorPower;
         double intakeSpinnerPower;
 
         //Left power is the left stick up and down
@@ -65,7 +65,7 @@ public class TeleOp6438 extends OpMode
         rightPower = -gamepad1.right_stick_y;
 
         //Linear slide is the second gamepad left stick up and down
-        linearSlidePower = gamepad2.left_stick_y;
+        linearActuatorPower = gamepad2.left_stick_y;
 
         //Intake spinner is the right gamepad 2  stick up and down
         intakeSpinnerPower = gamepad2.right_stick_y;
@@ -73,13 +73,13 @@ public class TeleOp6438 extends OpMode
         //Sending the power info to the motors
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
-        robot.linearSlide.setPower(linearSlidePower);
+        robot.linearActuator.setPower(linearActuatorPower);
         robot.intakeSpinner.setPower(intakeSpinnerPower);
 
         //Telemetry
         telemetry.addData("Left Power:", leftPower);
         telemetry.addData("Right Power", rightPower);
-        telemetry.addData("Linear Slide Power", linearSlidePower);
+        telemetry.addData("Linear Slide Power", linearActuatorPower);
         telemetry.addData("Intake Power", intakeSpinnerPower);
         telemetry.addData("Going to ", robot.intakeMover.getTargetPosition());
         telemetry.addData("Currently At", robot.intakeMover.getCurrentPosition());
