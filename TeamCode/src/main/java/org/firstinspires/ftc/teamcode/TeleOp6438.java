@@ -24,12 +24,10 @@ public class TeleOp6438 extends OpMode
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for intake location
-    int tuckedPosition = 1;
-    int verticalPosition = 1;
-    int downPosition = 1;
+
 
     //Boolean to asses if the arm should be allowed to move if true the arm can move if not it can't
-    private boolean run = true;
+    private boolean run = true; //depreciated
 
     @Override
     public void init()
