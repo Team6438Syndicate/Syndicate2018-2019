@@ -81,6 +81,11 @@ public class Team6438DepotAutonomous extends LinearOpMode
             //Samples mineral
             sampleMineral();
 
+            //Drives towards depot
+            encoderRobotDrive(0,0,0);       //Change these
+
+            //Drops team marker
+
         }
     }
 
@@ -258,7 +263,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                 }
             }
         }
-
+        sleep(1000); //waits for a second (could be removed in final)
     }
 
     /**
