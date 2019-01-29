@@ -9,7 +9,7 @@
  * Additional Notes: TO DO
  *                  Find linearCPI
  *                  Test encoder based driving
- *                  Integrate way to control linearSlide in OpMode
+ *                  Integrate way to control linearActuator in OpMode
  *                  Distance from landing to gems: Approximately 34 inches
  *                  Height of bracket off the ground: 19 inches
  *                  Experiment with IMU
@@ -114,38 +114,38 @@ public class Team6438AutonomousTest extends LinearOpMode
             // Determine new target position, and pass to motor controller
             if(directionUp)
             {
-                newTarget = robot.linearSlide.getCurrentPosition() + (int) (inches * robot.linearCPI);
+                newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
             }
             else
             {
-                newTarget = robot.linearSlide.getCurrentPosition() - (int) (inches * robot.linearCPI);
+                newTarget = robot.linearActuator.getCurrentPosition() - (int) (inches * robot.linearCPI);
             }
 
             //Passes this target
-            robot.linearSlide.setTargetPosition(newTarget);
+            robot.linearActuator.setTargetPosition(newTarget);
 
             // Turn On RUN_TO_POSITION
-            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
-            robot.linearSlide.setPower(Math.abs(speed));
+            robot.linearActuator.setPower(Math.abs(speed));
 
 
             // keep looping while we are still active, and the motor is running.
-            while (opModeIsActive() && robot.linearSlide.isBusy())
+            while (opModeIsActive() && robot.linearActuator.isBusy())
             {
                 // Display it for the driver.
                 telemetry.addData("Actuator moving to", newTarget);
-                telemetry.addData("Actuator at", robot.linearSlide.getCurrentPosition());
+                telemetry.addData("Actuator at", robot.linearActuator.getCurrentPosition());
                 telemetry.update();
             }
 
             // Stop all motion;
-            robot.linearSlide.setPower(0);
+            robot.linearActuator.setPower(0);
 
 
             // Turn off RUN_TO_POSITION
-            robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
