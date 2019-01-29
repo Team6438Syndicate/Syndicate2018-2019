@@ -95,7 +95,6 @@ public class TeleOp6438 extends OpMode
 
             intakeMove(.5,  -1000);
 
-
             while ( robot.intakeMover.isBusy() )
             {
                 telemetry.addData("Going to ", robot.intakeMover.getTargetPosition());
@@ -103,8 +102,6 @@ public class TeleOp6438 extends OpMode
                 telemetry.update();
             }
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
         }
 
         if(run)

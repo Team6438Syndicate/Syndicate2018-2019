@@ -26,9 +26,10 @@ class Team6438HardwareMap
     //Motor mapping
      DcMotor leftMotor        = null;
      DcMotor rightMotor       = null;
-     DcMotor linearSlide      = null;
+     DcMotor linearActuator   = null;
      DcMotor intakeSpinner    = null;
      DcMotor intakeMover      = null;
+     DcMotor intakeSlide     = null;
 
     //Servo mapping
     CRServo teamMarkerServo   = null;
@@ -58,7 +59,6 @@ class Team6438HardwareMap
     // CPI for linear slide
     final double linearCPI = otherCPR * GRL;
 
-
     //Vuforia variables
      final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
      final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -77,23 +77,26 @@ class Team6438HardwareMap
         //Define and Initialize Motors
         leftMotor     = hwMap.get(DcMotor.class, "leftDrive");
         rightMotor    = hwMap.get(DcMotor.class, "rightDrive");
-        linearSlide   = hwMap.get(DcMotor.class, "linearSlide");
+        linearActuator   = hwMap.get(DcMotor.class, "linearActuator");         //Change this in the config
         intakeSpinner = hwMap.get(DcMotor.class, "intakeSpinner");
         intakeMover   = hwMap.get(DcMotor.class, "intakeMover");
+        intakeSlide = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
         rightMotor.setDirection(DcMotor.Direction.FORWARD);
-        linearSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+        linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSpinner.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
         //Set all motors to zero power to prevent unintended movement
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        linearSlide.setPower(0);
+        linearActuator.setPower(0);
         intakeSpinner.setPower(0);
         intakeMover.setPower(0);
+        intakeSlide.setPower(0);
 
         //------------------------------------------------------------------------------------------
 
