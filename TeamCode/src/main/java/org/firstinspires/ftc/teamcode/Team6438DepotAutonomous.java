@@ -75,10 +75,10 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
-            actuatorMove(1,-9,false);
-            telemetry.addData("Waiting 2000 MS to Sample", "True");
-            telemetry.update();
-            sleep(2000);
+            //move the actuator down
+            actuatorMove(1,-9);
+
+            //Samples mineral
             sampleMineral();
 
         }
@@ -132,7 +132,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches, boolean directionUp )
+    private void actuatorMove(double speed, double inches)
     {
         //Set up a new target variable
         int newTarget;
