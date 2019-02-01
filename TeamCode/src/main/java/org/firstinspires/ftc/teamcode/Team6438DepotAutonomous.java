@@ -32,18 +32,15 @@ import java.util.List;
 @Autonomous(name = "Depot Side Autonomous", group = "Autonomous Team 6438")
 public class Team6438DepotAutonomous extends LinearOpMode
 {
+    private static boolean firstTime = true;
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    //Boolean to ensure we only run the block check the first time around
-    private static boolean firstTime = true;
-
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         //Inits the hardware
         robot.init(hardwareMap);
 
@@ -69,6 +66,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        //Boolean to ensure we only run the block check the first time around
+        firstTime = true;
+
         //Sets the block int to 0 (default value)
         int block = 0;
 
@@ -76,16 +76,40 @@ public class Team6438DepotAutonomous extends LinearOpMode
         while (opModeIsActive())
         {
             //move the actuator down
-            actuatorMove(1,-9);
+            //actuatorMove(1,-9);
+            if (firstTime)
+            {
+                //Query the tensorFlowEngine and set the block variable equal to the result
+                block = queryTensorFlow();
 
-            //Samples mineral
-            sampleMineral();
-
-            //Drives towards depot
-            encoderRobotDrive(0,0,0);       //Change these
-
-            //Drops team marker
-
+                //Block logic (seperated into ifs because we need different motions depending on where the block is
+                if (block == 1 && firstTime)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "center");
+                    telemetry.update();
+                    sleep(2000);
+                    firstTime=false;
+                }
+                else if (block == 2 && firstTime)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "right");
+                    telemetry.update();
+                    sleep(2000);
+                    firstTime=false;
+                }
+                else if (block == 3 && firstTime)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "left");
+                    telemetry.update();
+                    sleep(2000);
+                    firstTime=false;
+                }
+            }
+            telemetry.addData("Autonomous Complete", "True");
+            telemetry.update();
         }
     }
 
@@ -168,7 +192,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
             // Stop all motion;
             robot.linearActuator.setPower(0);
-            
+
             // Turn off RUN_TO_POSITION
             robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -207,63 +231,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
         sleep(duration);
     }
 
-    //Method to sample the mineral uses the queryTensorFlow method
-    private void sampleMineral()
-    {
-        //Sets the block int to 0 (default value)
-        int block = 0;
-
-        //While the program is running
-        while (opModeIsActive())
-        {
-            //If its the firstTime block will equal the output of the queryTensorFlow method.
-            if(firstTime)
-            {
-                telemetry.addData("firstTime = ", firstTime);
-                telemetry.update();
-
-                block = queryTensorFlow();
-                //Queries the tensorFlow engine to find the block
-
-                //they can all act as forward + something else ???
-                switch (block) {
-                    case 1:
-                        //insert values for moving center
-                        telemetry.addData("Block is on the ", " Center");
-                        telemetry.update();
-
-                        //movement code here
-
-                        break;
-
-                    case 2:
-                        //insert values for moving right
-                        telemetry.addData("Block is on the ", " Right");
-                        telemetry.update();
-
-                        //movement code here
-
-                        break;
-
-                    case 3:
-                        //insert values for moving left
-                        telemetry.addData("Block is on the ", " Left");
-                        telemetry.update();
-
-                        //movement code here
-
-                        break;
-
-                    default:
-                        //insert code if something goes wrong
-                        telemetry.addData("Block", "Not Found");
-                        telemetry.update();
-                        break;
-                }
-            }
-        }
-        sleep(1000); //waits for a second (could be removed in final)
-    }
 
     /**
      * Queries the tensorFlow engine to find the block
@@ -272,9 +239,14 @@ public class Team6438DepotAutonomous extends LinearOpMode
      * 2 = right
      * 3 = left
      *
+     * IMPORTANT: ASSUMES LEFT/RIGHT (SELECT WHICH ONE AND DELETE THIS)
+     *
      * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
      *        max y values
      *        max timeout ( if timeout passes ends the code and defaults to center
+     *        we are assuming left/right? (assuming means were checking the center and the unassumed side
+     *        i.e. if we assume left were checking center and right so if center and right are silver minerals
+     *        we know the gold is on the left
      **/
     private int queryTensorFlow()
     {
@@ -287,10 +259,14 @@ public class Team6438DepotAutonomous extends LinearOpMode
             {
                 //Call the init TFod method to get block detection ready
                 initTfod();
+
                 //Activate Tensor Flow Object Detection.
                 if (robot.tfod != null)
                 {
+                    //Activates the tfod engine
                     robot.tfod.activate();
+
+                    //Waits for 1/2 second to allow processor to catch up
                     sleep(500);
                 }
 
@@ -298,65 +274,56 @@ public class Team6438DepotAutonomous extends LinearOpMode
                 {
                     if (robot.tfod != null)
                     {
-                        List<Recognition> valuesForNerds = robot.tfod.getUpdatedRecognitions();
-                        if (valuesForNerds != null)
-                        {
-                            telemetry.addData("value", valuesForNerds);
-                            telemetry.update();
-                        }
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                         if (updatedRecognitions != null)
                         {
                             for (Recognition recognition : updatedRecognitions)
                             {
-                                if( recognition.getTop() < recognition.getImageHeight()/3 )
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                                if( recognition.getTop() < 2 * (recognition.getImageHeight()/3) )
                                 {
-                                    telemetry.addData("Value", "Center");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.update();
-                                    sleep(500);
-                                    robot.tfod.shutdown();
-                                    firstTime = false;
-
-                                    //block in the center
-                                    return 1;
-
-                                }
-                                else
-                                {
-                                    //encoderRobotDrive(.5, 5,-5); //temp values
-                                    telemetry.addData("Moving", "Right");
-                                    telemetry.update();
-                                    sleep(3000);
-                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null)
+                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                     {
-                                        //noinspection LoopStatementThatDoesntLoop
-                                        for (Recognition recognition2 : updatedRecognitions2)
-                                        {
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
-                                            {
-                                                telemetry.addData("value", "Right");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
-                                                firstTime = false;
+                                        telemetry.addData("Value", "Center");
+                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                        telemetry.update();
+                                        sleep(500);
+                                        robot.tfod.shutdown();
 
-                                                //block on the right
-                                                return 2;
-                                            }
-                                            else
-                                            {
-                                                telemetry.addData("value", "Left");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
-                                                firstTime = false;
+                                        //block in the center
+                                        return 1;
+                                    }
+                                    else
+                                    {
+                                        telemetry.addData("Moving", "Right");
+                                        telemetry.update();
+                                        //encoderRobotDrive(.5, 5, -5); //temp values
+                                        sleep(3000);
+                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                        if (updatedRecognitions2 != null) {
+                                            //noinspection LoopStatementThatDoesntLoop
+                                            for (Recognition recognition2 : updatedRecognitions2) {
+                                                if( recognition.getTop() < 2 * (recognition.getImageHeight()/3) )
+                                                {
+                                                    if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                        telemetry.addData("value", "Right");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
 
-                                                //block on the left
-                                                return 3;
+                                                        //block on the right
+                                                        return 2;
+                                                    }
+                                                    else {
+                                                        telemetry.addData("value", "Left");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
+
+                                                        //block on the left
+                                                        return 3;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -377,7 +344,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
     //Method to init the vuforia engine
     private void initVuforia()
     {
-
         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -389,21 +355,21 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
     }
 
     //Method to init the tfod engine
-    private void initTfod() {
-        //
+    private void initTfod()
+    {
+        //creates a tfod object which is using the tfodMonitor
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        //
+        //creates a new parameters object
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
 
         //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
         tfodParameters.minimumConfidence = robot.confidence;
 
-        //
+        //sets the tfod object equal to a new tfod object with parameters
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
 
         //Loads this years assets
