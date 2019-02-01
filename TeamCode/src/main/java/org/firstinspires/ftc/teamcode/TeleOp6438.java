@@ -23,9 +23,6 @@ public class TeleOp6438 extends OpMode
     //Create reference to the Team6438HardwareMap Class
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
-    //Variables for intake location
-
-
     //Boolean to asses if the arm should be allowed to move if true the arm can move if not it can't
     private boolean run = true; //depreciated
 
@@ -91,38 +88,32 @@ public class TeleOp6438 extends OpMode
         {
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            intakeMove(.5,  -1000);
+            intakeMove(.9,  -1000);
 
             while ( robot.intakeMover.isBusy() )
             {
-                telemetry.addData("Going to ", robot.intakeMover.getTargetPosition());
-                telemetry.addData("Currently At", robot.intakeMover.getCurrentPosition());
+                telemetry.addData("Going to (depreceated) ", robot.intakeMover.getTargetPosition());
+                telemetry.addData("Currently At (deprec", robot.intakeMover.getCurrentPosition());
                 telemetry.update();
             }
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-
-        if(run)
+        else if (gamepad2.right_trigger>.01 && robot.intakeMover.getCurrentPosition() == 50)
         {
-            if (gamepad2.right_trigger>.01)
-            {
-                intakeMove(.5,400);
-                run = false;
-            }
+            intakeMove(.5,400);
+            //run = false;
         }
-        else if (gamepad2.left_trigger>.01)
+        else if (gamepad2.left_trigger>.01 && robot.intakeMover.getCurrentPosition() == 400 )
         {
-            //int increment = (int) (10 * gamepad2.left_trigger);
-            //moveIntake(.5, -1);
             intakeMove(.5,50);
             robot.intakeMover.setPower(0);
-            run = true;
         }
     }
 
     //Method to move the intake
     private void intakeMove(double speed, double position)
     {
+        //Sets up a temp variable for new target
         int newTarget;
 
         // Determine new target position, and pass to motor controller
@@ -136,5 +127,12 @@ public class TeleOp6438 extends OpMode
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
+
+        while ( robot.intakeMover.isBusy() )
+        {
+            telemetry.addData("Moving to: ", robot.intakeMover.getTargetPosition());
+            telemetry.addData("Currently at: ", robot.intakeMover.getCurrentPosition());
+            telemetry.update();
+        }
     }
 }
