@@ -214,7 +214,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
     private void intakeMove(double speed, int position)
     {
         if(opModeIsActive()) {
-            //Sets the target position
+            //Set the target position
             robot.intakeMover.setTargetPosition(position);
 
             //tells the motor to run to postion
