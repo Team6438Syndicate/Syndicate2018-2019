@@ -88,26 +88,36 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "center");
                     telemetry.update();
-                    sleep(2000);
+                    sleep(500);
                     firstTime=false;
+                    encoderRobotDrive(.5, -52.5, -52.5);
                 }
                 else if (block == 2 && firstTime)
                 {
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "right");
                     telemetry.update();
-                    sleep(2000);
+                    sleep(500);
                     firstTime=false;
+                    encoderRobotDrive(.5, -23.75, -23.75);
+                    encoderRobotDrive(.5, -12.97, 12.97);
+                    encoderRobotDrive(.5, -36, -36);
+
                 }
                 else if (block == 3 && firstTime)
                 {
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
-                    sleep(2000);
+                    sleep(500);
                     firstTime=false;
+                    encoderRobotDrive(.5, -14.34, 14.34);
+                    encoderRobotDrive(.5, -23.75, -23.75);
+                    encoderRobotDrive(.5, 12.97, -12.97);
+                    encoderRobotDrive(.5, -36, -36);
                 }
             }
+
             telemetry.addData("Autonomous Complete", "True");
             telemetry.update();
         }
@@ -239,7 +249,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
      * 2 = right
      * 3 = left
      *
-     * IMPORTANT: ASSUMES LEFT/RIGHT (SELECT WHICH ONE AND DELETE THIS)
+     * IMPORTANT: ASSUMES RIGHT (SELECT WHICH ONE AND DELETE THIS)
      *
      * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
      *        max y values
@@ -280,7 +290,11 @@ public class Team6438DepotAutonomous extends LinearOpMode
                         {
                             for (Recognition recognition : updatedRecognitions)
                             {
-                                if( recognition.getTop() < 2 * (recognition.getImageHeight()/3) )
+                                telemetry.addData("imageHeight ", recognition.getImageHeight());
+                                telemetry.addData("mineralLocation ", recognition.getTop());
+                                telemetry.update();
+
+                                if( recognition.getTop() > (recognition.getImageHeight()/7) )
                                 {
                                     if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                     {
@@ -297,13 +311,14 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                     {
                                         telemetry.addData("Moving", "Right");
                                         telemetry.update();
-                                        //encoderRobotDrive(.5, 5, -5); //temp values
+                                        encoderRobotDrive(.5, 7.17, -7.17);
                                         sleep(3000);
                                         List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                         if (updatedRecognitions2 != null) {
                                             //noinspection LoopStatementThatDoesntLoop
-                                            for (Recognition recognition2 : updatedRecognitions2) {
-                                                if( recognition.getTop() < 2 * (recognition.getImageHeight()/3) )
+                                            for (Recognition recognition2 : updatedRecognitions2)
+                                            {
+                                                if( recognition.getTop() > (recognition.getImageHeight()/8) )
                                                 {
                                                     if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                                         telemetry.addData("value", "Right");
