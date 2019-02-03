@@ -24,12 +24,12 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 class Team6438HardwareMap
 {
     //Motor mapping
-     DcMotor leftMotor        = null;
-     DcMotor rightMotor       = null;
-     DcMotor linearActuator   = null;
-     DcMotor intakeSpinner    = null;
-     DcMotor intakeMover      = null;
-     DcMotor intakeSlide     = null;
+    DcMotor leftMotor        = null;
+    DcMotor rightMotor       = null;
+    DcMotor linearActuator   = null;
+    DcMotor intakeSpinner    = null;
+    DcMotor intakeMover      = null;
+    DcMotor intakeSlide      = null;
 
     //Servo mapping
     CRServo teamMarkerServo   = null;
@@ -48,7 +48,7 @@ class Team6438HardwareMap
 
     //Counts per Inch
     final double CPI = (CPR * DGR)
-                     / (WDI * Math.PI);
+            / (WDI * Math.PI);
 
     //CPR for linear and intake motors
     private final double otherCPR = 1120;
@@ -60,13 +60,13 @@ class Team6438HardwareMap
     final double linearCPI = otherCPR * GRL;
 
     //Vuforia variables
-     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-     final String LABEL_SILVER_MINERAL = "Silver Mineral";
-     final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
-     VuforiaLocalizer vuforia;
-     TFObjectDetector tfod;
-     //Place in a number 0.0 - 1.0
-     public static final double confidence = .75;
+    final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
+    VuforiaLocalizer vuforia;
+    TFObjectDetector tfod;
+    //Place in a number 0.0 - 1.0
+    public static final double confidence = .75;
 
     //Method to initialize standard Hardware interfaces
     void init(HardwareMap ahwMap)

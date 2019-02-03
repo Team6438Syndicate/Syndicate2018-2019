@@ -153,7 +153,7 @@ public class Team6438CraterAutonomous extends LinearOpMode
                     break;
 
             }
-            
+
             //Team marker throw
             robot.teamMarkerServo.setPower (1);
             sleep (1000);
@@ -164,7 +164,7 @@ public class Team6438CraterAutonomous extends LinearOpMode
 
             //Drive back towards the crater for crater park
             //insert code to do this
-            
+
         }
     }
 
@@ -308,7 +308,7 @@ public class Team6438CraterAutonomous extends LinearOpMode
                         {
                             telemetry.addData("Block Found: ", "no");
                             telemetry.update();
-                            sleep (3000);  
+                            sleep (3000);
                             //encoderRobotDrive(0.5, 6, -6);
                             for (Recognition recognition : updatedRecognitions)
                             {
@@ -327,7 +327,7 @@ public class Team6438CraterAutonomous extends LinearOpMode
                             }
                         }
                     }
-                        telemetry.update();
+                    telemetry.update();
                 }
             }
         }
