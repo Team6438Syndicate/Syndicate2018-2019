@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -76,7 +77,13 @@ public class Team6438DepotAutonomous extends LinearOpMode
         while (opModeIsActive())
         {
             //move the actuator down
-            //actuatorMove(1,-9);
+            //actuatorMove(1,-15);
+
+            /*encoderRobotDrive(.7, 10, 10);
+            encoderRobotDrive(.7, -45, 45);
+            encoderRobotDrive(.7, 9.5, 9.5);
+            */
+
             if (firstTime)
             {
                 //Query the tensorFlowEngine and set the block variable equal to the result
@@ -214,7 +221,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
     private void intakeMove(double speed, int position)
     {
         if(opModeIsActive()) {
-            //Set the target position
+            //Sets the target position
             robot.intakeMover.setTargetPosition(position);
 
             //tells the motor to run to postion
@@ -282,7 +289,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
                 while (opModeIsActive())
                 {
-                    if (robot.tfod != null)
+                    if (robot.tfod != null && firstTime == true)
                     {
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
@@ -294,7 +301,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                 telemetry.addData("mineralLocation ", recognition.getTop());
                                 telemetry.update();
 
-                                if( recognition.getTop() > (recognition.getImageHeight()/7) )
+                                if( recognition.getTop() > (recognition.getImageHeight()/3) && recognition.getBottom() < 2 * (recognition.getImageHeight()/3) && recognition.getLeft() > 2 * (recognition.getImageWidth()/3) )
                                 {
                                     if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                     {
@@ -318,7 +325,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                             //noinspection LoopStatementThatDoesntLoop
                                             for (Recognition recognition2 : updatedRecognitions2)
                                             {
-                                                if( recognition.getTop() > (recognition.getImageHeight()/8) )
+                                                if( recognition.getTop() > (recognition.getImageHeight()/3) && recognition.getBottom() < 2 * (recognition.getImageHeight()/3) && recognition.getLeft() > 2 * (recognition.getImageWidth()/3))
                                                 {
                                                     if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                                         telemetry.addData("value", "Right");
@@ -366,7 +373,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);

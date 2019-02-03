@@ -13,6 +13,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -23,8 +24,16 @@ public class TeleOp6438 extends OpMode
     //Create reference to the Team6438HardwareMap Class
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
-    //Boolean to asses if the arm should be allowed to move if true the arm can move if not it can't
-    private boolean run = true; //depreciated
+    //Variables for intake location
+    int tuckedPosition = 1;
+    int verticalPosition = 1;
+    int downPosition = 1;
+
+    //Length that the intake slide wire needs to be pulled
+    final double slideWire = 8.0;
+
+    //Boolean to assess if the arm should be allowed to move if true the arm can move if not it can't
+    private boolean run = true;
 
     @Override
     public void init()
@@ -50,7 +59,7 @@ public class TeleOp6438 extends OpMode
     {
         //Declaring power variables
         double leftPower, rightPower;
-        double linearActuatorPower;
+        double linearSlidePower;
         double intakeSpinnerPower;
 
         //Left power is the left stick up and down
@@ -60,60 +69,72 @@ public class TeleOp6438 extends OpMode
         rightPower = -gamepad1.right_stick_y;
 
         //Linear slide is the second gamepad left stick up and down
-        linearActuatorPower = gamepad2.left_stick_y;
+        linearSlidePower = gamepad2.left_stick_y;
 
         //Intake spinner is the right gamepad 2  stick up and down
         intakeSpinnerPower = gamepad2.right_stick_y;
 
+        //Intake slide is the right gamepad stick 2 left and right
+        robot.intakeSlide.setPower(gamepad2.right_stick_x);
+
         //Sending the power info to the motors
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
-        robot.linearActuator.setPower(linearActuatorPower);
+        robot.linearActuator.setPower(linearSlidePower);
         robot.intakeSpinner.setPower(intakeSpinnerPower);
 
         //Telemetry
-        telemetry.addData("Left Power:", leftPower);
-        telemetry.addData("Right Power", rightPower);
-        telemetry.addData("Linear Slide Power", linearActuatorPower);
-        telemetry.addData("Intake Power", intakeSpinnerPower);
-        telemetry.addData("Going to ", robot.intakeMover.getTargetPosition());
-        telemetry.addData("Currently At", robot.intakeMover.getCurrentPosition());
+        telemetry.addData("Left Power: ", leftPower);
+        telemetry.addData("Right Power: ", rightPower);
+        telemetry.addData("Linear Slide Power: ", linearSlidePower);
+        telemetry.addData("Intake Power: ", intakeSpinnerPower);
+        telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
+        telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
         telemetry.update();
 
-        /*
-         * Gamepad logic to move the intake
-         */
+        //Gamepad logic to move the intake
         ///When A is pressed go to the down position
         if (gamepad2.a)
         {
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            intakeMove(.9,  -1000);
+            //Intake move method invocation
+            intakeMove(.5,  -1000);
 
-            while ( robot.intakeMover.isBusy() )
-            {
-                telemetry.addData("Going to (depreceated) ", robot.intakeMover.getTargetPosition());
-                telemetry.addData("Currently At (deprec", robot.intakeMover.getCurrentPosition());
-                telemetry.update();
-            }
+            //Should be able to be deleted
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        else if (gamepad2.right_trigger>.01 && robot.intakeMover.getCurrentPosition() == 50)
+
+        /*
+         * Gamepad logic to extend/retract the intake
+         */
+        ///When Y is pressed extend to max position
+        //if (gamepad2.y)
+        //{
+           // intakeSlide(1, 1);
+        //}
+
+        if(run)
         {
-            intakeMove(.5,400);
-            //run = false;
+            if (gamepad2.right_trigger>.01)
+            {
+                intakeMove(.5,400);
+                run = false;
+            }
         }
-        else if (gamepad2.left_trigger>.01 && robot.intakeMover.getCurrentPosition() == 400 )
+        else if (gamepad2.left_trigger>.01)
         {
+            //int increment = (int) (10 * gamepad2.left_trigger);
+            //moveIntake(.5, -1);
             intakeMove(.5,50);
             robot.intakeMover.setPower(0);
+            run = true;
         }
     }
 
     //Method to move the intake
     private void intakeMove(double speed, double position)
     {
-        //Sets up a temp variable for new target
         int newTarget;
 
         // Determine new target position, and pass to motor controller
@@ -128,10 +149,33 @@ public class TeleOp6438 extends OpMode
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
 
-        while ( robot.intakeMover.isBusy() )
+        while (robot.intakeMover.isBusy())
         {
-            telemetry.addData("Moving to: ", robot.intakeMover.getTargetPosition());
-            telemetry.addData("Currently at: ", robot.intakeMover.getCurrentPosition());
+            telemetry.addData("Currently at ", robot.intakeMover.getTargetPosition());
+            telemetry.addData("Going to ", robot.intakeMover.getCurrentPosition());
+            telemetry.update();
+        }
+    }
+
+    private void intakeSlide(double speed, int position)
+    {
+        int slideTarget;
+
+        //Sets the slide position to max length
+        slideTarget = (int)((Math.round(slideWire))*(position));
+
+        //Set the target
+        robot.intakeSlide.setTargetPosition(slideTarget);
+
+        //Turn On RUN_TO_POSITION
+        robot.intakeSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Start motion
+        robot.intakeSlide.setPower(Math.abs(speed));
+
+        while (robot.intakeSlide.isBusy())
+        {
+            telemetry.addData("Moving to", robot.intakeSlide.getTargetPosition());
             telemetry.update();
         }
     }
