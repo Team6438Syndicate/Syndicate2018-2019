@@ -151,7 +151,7 @@ public class ConceptTensorFlowObjectDetectionTeam6438 extends LinearOpMode {
     }
 
     /**
-     * Initialize the Tensor Flow Object Detection engine.
+     * Initialize the Tensor Flow Object Detection engine
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
