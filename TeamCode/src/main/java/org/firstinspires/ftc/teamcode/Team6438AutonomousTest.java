@@ -1,163 +1,328 @@
-/* Copyright (c) 2018 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
+/**
+ * Name: Team6438CAutonomousTest
+ * Purpose: This class contains instructions for autonomous
+ *          Expirements are made in here to be implemented in the real autonomous op modes
+ * Author: Matthew Batkiewicz
+ * Contributors:
+ * Creation: 1/21/18
+ * Last Edit: 1/21/19
+ * Additional Notes: TO DO
+ *                  Find linearCPI
+ *                  Test encoder based driving
+ *                  Integrate way to control linearActuator in OpMode
+ *                  Distance from landing to gems: Approximately 34 inches
+ *                  Height of bracket off the ground: 19 inches
+ *                  Experiment with IMU
+ **/
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+//Imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-//@Disabled
-public class ConceptTensorFlowObjectDetectionTeam6438 extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
-
+public class Team6438AutonomousTest extends LinearOpMode
+{
+    //Creates a reference to the hardware map class
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
+    //Variables for TensorFlow
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
+    //Boolean to ensure we only run the block check the first time around
+    private static boolean firstTime = true;
 
     @Override
-    public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-        initVuforia();
+    public void runOpMode() throws InterruptedException
+    {
+        //Inits the hardware on the robot
+        robot.init(hardwareMap);
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
-
-        /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start tracking");
-        telemetry.update();
+        //waits till user presses start
         waitForStart();
 
-        if (opModeIsActive()) {
-            /** Activate Tensor Flow Object Detection. */
-            if (tfod != null) {
-                tfod.activate();
+        //loops while the op mode is active
+        while (opModeIsActive())
+        {
+
+        }
+    }
+
+    //Encoder drive method to drive the motors
+    private void encoderRobotDrive(double speed, double leftInches, double rightInches)
+    {
+        //Declaring new targets
+        int leftTarget, rightTarget;
+
+        //Gets the motors starting positions
+        int startLeftPosition = robot.leftMotor.getCurrentPosition();
+        int startRightPosition = robot.rightMotor.getCurrentPosition();
+
+        //Telemetry to show start position
+        telemetry.addData("Left Start Position", startLeftPosition);
+        telemetry.addData("Right Start Position", startRightPosition);
+
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            //Using the current position and the new desired position send this to the motor
+            leftTarget = startLeftPosition + (int) (leftInches * robot.CPI);
+            rightTarget = startRightPosition + (int) (rightInches * robot.CPI);
+            robot.leftMotor.setTargetPosition(leftTarget);
+            robot.rightMotor.setTargetPosition(rightTarget);
+
+            //Turns the motors to run to position mode
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //Sets the power to the absolute value of the speed of the method input
+            robot.leftMotor.setPower(Math.abs(speed));
+            robot.rightMotor.setPower(Math.abs(speed));
+
+            //While opMode is still active and the motors are going add telemetry to tell the user where its going
+            while (opModeIsActive() && robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+            {
+                telemetry.addData("Running to ", " %7d :%7d", leftTarget, rightTarget);
+                telemetry.addData("Currently At", " %7d :%7d", robot.leftMotor.getCurrentPosition(), robot.rightMotor.getCurrentPosition());
+                telemetry.update();
             }
 
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null)
+            //When done stop all the motion and turn off run to position
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    //Method to move the actuator
+    private void actuatorMove(double speed, double inches, boolean directionUp )
+    {
+        //Set up a new target variable
+        int newTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive())
+        {
+
+            // Determine new target position, and pass to motor controller
+            if(directionUp)
+            {
+                newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
+            }
+            else
+            {
+                newTarget = robot.linearActuator.getCurrentPosition() - (int) (inches * robot.linearCPI);
+            }
+
+            //Passes this target
+            robot.linearActuator.setTargetPosition(newTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            robot.linearActuator.setPower(Math.abs(speed));
+
+
+            // keep looping while we are still active, and the motor is running.
+            while (opModeIsActive() && robot.linearActuator.isBusy())
+            {
+                // Display it for the driver.
+                telemetry.addData("Actuator moving to", newTarget);
+                telemetry.addData("Actuator at", robot.linearActuator.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.linearActuator.setPower(0);
+
+
+            // Turn off RUN_TO_POSITION
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+
+    //Method to move the intake
+    private void intakeMove(double speed, int position)
+    {
+        if(opModeIsActive()) {
+            //Sets the target position
+            robot.intakeMover.setTargetPosition(position);
+
+            //tells the motor to run to postion
+            robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //sets the power
+            robot.intakeMover.setPower(speed);
+
+            //while moving is in progress telemetry for user
+            while (robot.intakeMover.isBusy() && opModeIsActive()) {
+                telemetry.addData("Going to: ", position);
+                telemetry.addData("Currently At: ", robot.intakeMover.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+    }
+
+    //Method to move the intake spinner (probably not neccesary in autonomous)
+    private void intakeSpin(double speed, long duration)
+    {
+        robot.intakeSpinner.setPower(speed);
+        telemetry.addData("Speed", speed);
+        telemetry.update();
+        sleep(duration);
+    }
+
+    /**
+     * Queries the tensorFlow engine to find the block
+     * No parameter but returns a int to let program know where the block is
+     * 1 = center
+     * 2 = right
+     * 3 = left
+     *
+     * Notes: want to integrate confidence reading
+     *        max y values
+     *        max timeout ( if timeout passes ends the code and defaults to center
+     **/
+    private int queryTensorFlow()
+    {
+        while (opModeIsActive() )
+        {
+            //Drive forward and turn around
+            //encoderRobotDrive(0.5, 10, 10);
+            //encoderRobotDrive(0.5, -34.558, 34.558);
+
+            //int to determine gold block location: 1 = center, 2 = right, 3 = left
+            int goldLocation = 0;
+
+            if (opModeIsActive())
+            {
+                //Call the init TFod method to get block detection ready
+                initTfod();
+                //Activate Tensor Flow Object Detection.
+                if (robot.tfod != null)
+                {
+                    robot.tfod.activate();
+                    sleep(500);
+                }
+
+                while (opModeIsActive())
+                {
+                    if (robot.tfod != null)
                     {
-                        telemetry.addData("updatedRecognitions", updatedRecognitions.toString());
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        if (updatedRecognitions.size() == 1) {
-                            int goldMineralX = -1;
-                            int silverMineral1X = -1;
-                            int silverMineral2X = -1;
-                            for (Recognition recognition : updatedRecognitions) {
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                    goldMineralX = (int) recognition.getLeft();
-                                    telemetry.addData("test","test123");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.addData("Get Top",recognition.getTop());
-                                } else if (silverMineral1X == -1) {
-                                    silverMineral1X = (int) recognition.getLeft();
-                                } else {
-                                    silverMineral2X = (int) recognition.getLeft();
+                        List<Recognition> valuesForNerds = robot.tfod.getUpdatedRecognitions();
+                        if (valuesForNerds != null)
+                        {
+                            telemetry.addData("value", valuesForNerds);
+                            telemetry.update();
+                        }
+                        // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
+                        List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+                        if (updatedRecognitions != null)
+                        {
+                            for (Recognition recognition : updatedRecognitions)
+                            {
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                                {
+                                    telemetry.addData("value", "Center");
+                                    telemetry.update();
+                                    robot.tfod.shutdown();
+                                    firstTime=false;
+
+                                    //block is in the center
+
+                                    return 1;
                                 }
-                            }
-                            if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                                if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Left");
-                                } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Right");
-                                } else {
-                                    telemetry.addData("Gold Mineral Position", "Center");
+                                else
+                                {
+                                    encoderRobotDrive(.5, 5,-5); //temp values
+                                    sleep(3000);
+                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                    if (updatedRecognitions2 != null)
+                                    {
+                                        //noinspection LoopStatementThatDoesntLoop
+                                        for (Recognition recognition2 : updatedRecognitions2)
+                                        {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
+                                            {
+                                                telemetry.addData("value", "Right");
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+                                                firstTime = false;
+
+                                                //block on the right
+                                                return 2;
+                                            }
+                                            else
+                                            {
+                                                telemetry.addData("value", "Left");
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+                                                firstTime = false;
+
+                                                //block on the left
+                                                return 3;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
-                        telemetry.update();
                     }
                 }
             }
+            if (robot.tfod != null)
+            {
+                robot.tfod.shutdown();
+            }
         }
 
-        if (tfod != null) {
-            tfod.shutdown();
-        }
+        return 0;
     }
 
-    /**
-     * Initialize the Vuforia localization engine.
-     */
+    //Method to init the vuforia engine
     private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
+
+        //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
+        //Sets the vuforia key
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        //Sets camera direction
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+
+
+        //Instantiate the Vuforia engine
+        robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        //Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
-    /**
-     * Initialize the Tensor Flow Object Detection engine
-     */
+    //Method to init the tfod engine
     private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        //
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        //
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+
+        //
+        robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
+
+        //Loads this years assets
+        robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
     }
+
+    //End of class
 }
