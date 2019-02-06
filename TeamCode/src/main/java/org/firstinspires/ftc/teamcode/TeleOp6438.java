@@ -12,8 +12,8 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -162,7 +162,7 @@ public class TeleOp6438 extends OpMode
         int slideTarget;
 
         //Sets the slide position to max length
-        slideTarget = (int)((Math.round(slideWire))*(position));
+        slideTarget = (int)(Math.round(slideWire*(position)));
 
         //Set the target
         robot.intakeSlide.setTargetPosition(slideTarget);
