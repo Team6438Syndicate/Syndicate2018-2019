@@ -95,6 +95,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     sleep(500);
                     firstTime=false;
                     encoderRobotDrive(.75, 43, 43);
+                    encoderRobotDrive(.75, -26, 26);
+                    encoderRobotDrive(.75, 140, 140);
                 }
                 else if (block == 2)
                 {
@@ -106,7 +108,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     encoderRobotDrive(.75, 25.5, 24.5);
                     encoderRobotDrive(.75, -17, 17);
                     encoderRobotDrive(.75, 27, 27);
-
+                    encoderRobotDrive(.75, -23, 23);
+                    encoderRobotDrive(.75, 140, 140);
                 }
                 else if (block == 3)
                 {
@@ -119,6 +122,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     encoderRobotDrive(.75, 24.5, 24.5);
                     encoderRobotDrive(.75, 18, -18);
                     encoderRobotDrive(.75, 24, 24);
+                    encoderRobotDrive(.75, 17.5, -17.5);
+                    encoderRobotDrive(.75, 140, 140);
                 }
             }
 

@@ -1,5 +1,5 @@
 /**
- * Name: Team6438CraterSideAutonomous
+ * Name: Team6438AutonomousDepotSide
  * Purpose: This class contains instructions for autonomous
  *          Currently the actions (in order) are: Raise the linear slide to unlatch
  *          Sample Blocks, Drive to the Depot and fling the team marker.
@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -29,23 +30,18 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Crater Side Autonomous", group = "Team 6438 Autonomous")
+@Autonomous(name = "Crater Side Autonomous", group = "Autonomous Team 6438")
 public class Team6438CraterAutonomous extends LinearOpMode
 {
+    private static boolean firstTime = true;
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    //Variable to store where the block is
-    private static String blockLocation=null;
-
-    //Constructor method to receive the parameters
-
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         //Inits the hardware
         robot.init(hardwareMap);
 
@@ -65,106 +61,69 @@ public class Team6438CraterAutonomous extends LinearOpMode
         telemetry.addData("Status: ", "Ready to Run");
         telemetry.update();
 
-        String blockLocation = null;
-        boolean checkObjects = true;
-        //Wait for the start button to be pressed by the driver
-
+        //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
+        //Wait for the start button to be pressed by the driver
         waitForStart();
+
+        //Boolean to ensure we only run the block check the first time around
+        firstTime = true;
+
+        //Sets the block int to 0 (default value)
+        int block = 0;
 
         //While the program is running
         while (opModeIsActive())
         {
-/*            actuatorMove(1, 28);
-
-//Build Everything
-
-            //Drop the linear actuator
-            actuatorMove(0.5, -8);
-
-            //Twist the servo
-            robot.hookServo.setPower (-1);
-            sleep(500);
-            robot.hookServo.setPower(0);
-*/
-            //Drive forward and turn around
-            //encoderRobotDrive(0.5, 10, 10);
-            //encoderRobotDrive(0.5, -34.558, 34.558);
-
-            if (checkObjects)
+            if (firstTime)
             {
-                blockLocation = blockLocation();
-                sleep(1000);
-                checkObjects = false;
-            }
-            switch (blockLocation)
-            {
+                //move the actuator up and over
+                //actuatorMove(1, 7.75);
 
-                case "left":
-                    //Insert left code here
-                    telemetry.addData("Block Found: ", "Left");
+                encoderRobotDrive(0.75, 5, 5);
+
+                //Query the tensorFlowEngine and set the block variable equal to the result
+                block = queryTensorFlow();
+
+                //Block logic (seperated into ifs because we need different motions depending on where the block is
+                if (block == 1)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "center");
                     telemetry.update();
-                    encoderRobotDrive(0.5, 12, -12);
-                    encoderRobotDrive(0.5, -30, -30);
-                    encoderRobotDrive(0.5, -6, 6);
-                    encoderRobotDrive(0.5, -30, -30);
-                    robot.tfod.shutdown();
-                    break;
-
-                case "center":
-                    //Insert center code here
-                    encoderRobotDrive(0.5, -65, -65);
-                    robot.tfod.shutdown();
-                    break;
-
-                case "right":
-                    //Insert right code here
-                    telemetry.addData("Block Found: ", "Right" );
+                    sleep(500);
+                    firstTime=false;
+                    encoderRobotDrive(.75, 43, 43);
+                }
+                else if (block == 2)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "right");
                     telemetry.update();
-                    encoderRobotDrive(0.5, -30, -30);
-                    encoderRobotDrive(0.5, 6, -6);
-                    encoderRobotDrive(0.5, -30, -30);
-                    robot.tfod.shutdown();
-                    break;
+                    sleep(500);
+                    firstTime=false;
+                    encoderRobotDrive(.75, 25.5, 24.5);
+                    encoderRobotDrive(.75, -17, 17);
+                    encoderRobotDrive(.75, 27, 27);
 
-                case "none":
-                    //Insert error code here
-                    telemetry.addData("Error","Tensor Flow Found: " + "none");
+                }
+                else if (block == 3)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
-                    encoderRobotDrive(0.5, -65, -65);
-                    robot.tfod.shutdown();
-                    break;
-
-                case "null":
-                    //Insert backup plan here
-                    telemetry.addData("YEET NULL","YEET");
-                    telemetry.update();
-                    encoderRobotDrive(0.5, -65, -65);
-                    robot.tfod.shutdown();
-                    break;
-
-                default:
-                    //Insert more error code
-                    telemetry.addData("Block Found: ", "Default Center");
-                    telemetry.update();
-                    encoderRobotDrive(0.5, -65, -65);
-                    robot.tfod.shutdown();
-                    break;
-
+                    sleep(500);
+                    firstTime=false;
+                    encoderRobotDrive(.75, -19.5, 19.5);
+                    encoderRobotDrive(.75, 24.5, 24.5);
+                    encoderRobotDrive(.75, 18, -18);
+                    encoderRobotDrive(.75, 24, 24);
+                }
             }
 
-            //Team marker throw
-            robot.teamMarkerServo.setPower (1);
-            sleep (1000);
-            robot. teamMarkerServo.setPower (0);
-
-            //Drive to depot to deposit marker
-            //insert code to do this
-
-            //Drive back towards the crater for crater park
-            //insert code to do this
-
+            telemetry.addData("Autonomous Complete", "True");
+            telemetry.update();
         }
     }
 
@@ -218,17 +177,16 @@ public class Team6438CraterAutonomous extends LinearOpMode
     //Method to move the actuator
     private void actuatorMove(double speed, double inches)
     {
-
         //Set up a new target variable
         int newTarget;
 
         // Ensure that the opmode is still active
         if (opModeIsActive())
         {
-
             // Determine new target position, and pass to motor controller
             newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
 
+            //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
 
             // Turn On RUN_TO_POSITION
@@ -236,7 +194,6 @@ public class Team6438CraterAutonomous extends LinearOpMode
 
             // reset the timeout time and start motion.
             robot.linearActuator.setPower(Math.abs(speed));
-
 
             // keep looping while we are still active, and the motor is running.
             while (opModeIsActive() && robot.linearActuator.isBusy())
@@ -250,7 +207,6 @@ public class Team6438CraterAutonomous extends LinearOpMode
             // Stop all motion;
             robot.linearActuator.setPower(0);
 
-
             // Turn off RUN_TO_POSITION
             robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -259,89 +215,149 @@ public class Team6438CraterAutonomous extends LinearOpMode
     }
 
     //Method to move the intake
-    private void intakeMove(double speed, String position)
+    private void intakeMove(double speed, int position)
     {
+        if(opModeIsActive()) {
+            //Sets the target position
+            robot.intakeMover.setTargetPosition(position);
 
+            //tells the motor to run to postion
+            robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //sets the power
+            robot.intakeMover.setPower(speed);
+
+            //while moving is in progress telemetry for user
+            while (robot.intakeMover.isBusy() && opModeIsActive()) {
+                telemetry.addData("Going to: ", position);
+                telemetry.addData("Currently At: ", robot.intakeMover.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+    }
+
+    //Method to move the intake spinner (probably not necessary in autonomous)
+    private void intakeSpin(double speed, long duration)
+    {
+        robot.intakeSpinner.setPower(speed);
+        telemetry.addData("Speed", speed);
+        telemetry.update();
+        sleep(duration);
     }
 
 
-    //Method to query the tensorFlow Engine
-    public String blockLocation()
+    /**
+     * Queries the tensorFlow engine to find the block
+     * No parameter but returns a int to let program know where the block is
+     * 1 = center
+     * 2 = right
+     * 3 = left
+     *
+     * IMPORTANT: ASSUMES RIGHT (SELECT WHICH ONE AND DELETE THIS)
+     *
+     * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
+     *        max y values
+     *        max timeout ( if timeout passes ends the code and defaults to center
+     *        we are assuming left/right? (assuming means were checking the center and the unassumed side
+     *        i.e. if we assume left were checking center and right so if center and right are silver minerals
+     *        we know the gold is on the left
+     **/
+    private int queryTensorFlow()
     {
-        //initVuforia();
-
-        if (opModeIsActive())
+        while (opModeIsActive() )
         {
-            initTfod();
-            //Activate Tensor Flow Object Detection.
-            if (robot.tfod != null)
-            {
-                robot.tfod.activate();
-                sleep(500);
-            }
+            //int to determine gold block location: 1 = center, 2 = right, 3 = left
+            int goldLocation = 0;
 
-            while (opModeIsActive())
+            if (opModeIsActive())
             {
+                //Call the init TFod method to get block detection ready
+                initTfod();
+
+                //Activate Tensor Flow Object Detection.
                 if (robot.tfod != null)
                 {
-                    // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
-                    List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+                    //Activates the tfod engine
+                    robot.tfod.activate();
 
-                    if (updatedRecognitions != null)
+                    //Waits for 1/2 second to allow processor to catch up
+                    sleep(500);
+                }
+
+                while (opModeIsActive())
+                {
+                    if (robot.tfod != null && firstTime == true)
                     {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        boolean center = false;
-                        for (Recognition recognition : updatedRecognitions)
+                        // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
+                        List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+                        if (updatedRecognitions != null)
                         {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                            {
-                                telemetry.addData("Block Found: ", "Center");
-                                telemetry.update();
-                                center = true;
-                                return "center";
-                            }
-                        }
-                        if (!center)
-                        {
-                            telemetry.addData("Block Found: ", "no");
-                            telemetry.update();
-                            sleep (3000);
-                            //encoderRobotDrive(0.5, 6, -6);
                             for (Recognition recognition : updatedRecognitions)
                             {
+                                telemetry.addData("imageWidth ", recognition.getImageWidth());
+                                telemetry.addData("mineralLocation ", recognition.getLeft());
+                                telemetry.update();
+
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                 {
-                                    telemetry.addData("Block Found: ", "right");
+                                    telemetry.addData("Value", "Center");
+                                    telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
-                                    return "right";
+                                    sleep(500);
+                                    robot.tfod.shutdown();
+
+                                    //block in the center
+                                    return 1;
                                 }
                                 else
                                 {
-                                    telemetry.addData("Block Found: ", "left");
+                                    telemetry.addData("Moving", "Right");
                                     telemetry.update();
-                                    return "left";
+                                    encoderRobotDrive(.75, 9.17, -9.17);
+                                    sleep(1000);
+
+                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                    if (updatedRecognitions2 != null) {
+                                        //noinspection LoopStatementThatDoesntLoop
+                                        for (Recognition recognition2 : updatedRecognitions2)
+                                        {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                telemetry.addData("value", "Right");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+
+                                                //block on the right
+                                                return 2;
+                                            }
+                                            else {
+                                                telemetry.addData("value", "Left");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+
+                                                //block on the left
+                                                return 3;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    telemetry.update();
                 }
             }
+            if (robot.tfod != null)
+            {
+                robot.tfod.shutdown();
+            }
         }
-        if (robot.tfod != null)
-        {
-            robot.tfod.shutdown();
-            return "none";
-        }
-        return null;
+        return 0;
     }
 
     //Method to init the vuforia engine
-    private void initVuforia() {
-
+    private void initVuforia()
+    {
         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -349,31 +365,30 @@ public class Team6438CraterAutonomous extends LinearOpMode
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        /*
-         * Uncomment this in order to use an external webcam.
-         * parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-         */
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        //Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
     //Method to init the tfod engine
-    private void initTfod() {
-        //
+    private void initTfod()
+    {
+        //creates a tfod object which is using the tfodMonitor
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        //
+        //creates a new parameters object
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
 
-        //
+        //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
+        tfodParameters.minimumConfidence = robot.confidence;
+
+        //sets the tfod object equal to a new tfod object with parameters
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
 
         //Loads this years assets
         robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
     }
+
+    //End of class
 }
