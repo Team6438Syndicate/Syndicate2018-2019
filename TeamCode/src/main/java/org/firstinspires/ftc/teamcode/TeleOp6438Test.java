@@ -12,14 +12,14 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+        import com.qualcomm.robotcore.hardware.Gamepad;
+        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+        import com.qualcomm.robotcore.hardware.DcMotor;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@TeleOp(name = "Team 6438 Driver Controlled", group = "Team 6438 TeleOp")
-public class TeleOp6438 extends OpMode
+@TeleOp(name = "Team 6438 Driver Controlled (Test) ", group = "Team 6438 TeleOp (Test)")
+public class TeleOp6438Test extends OpMode
 {
     //Create reference to the Team6438HardwareMap Class
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -28,6 +28,9 @@ public class TeleOp6438 extends OpMode
     int tuckedPosition = 1;
     int verticalPosition = 1;
     int downPosition = 1;
+
+    //Boolean to determine if were in linear Mode
+    public boolean linearMode = false;
 
     //Length that the intake slide wire needs to be pulled
     final double slideWire = 8.0;
@@ -58,15 +61,16 @@ public class TeleOp6438 extends OpMode
     public void loop()
     {
         //Declaring power variables
-        double leftPower, rightPower;
+        double leftPower = 0;
+        double rightPower = 0;
         double linearSlidePower;
         double intakeSpinnerPower;
 
         //Left power is the left stick up and down
-        leftPower = -gamepad1.left_stick_y;
+        //leftPower = -gamepad1.left_stick_y;
 
         //Right power is the right stick up and down
-        rightPower = -gamepad1.right_stick_y;
+        //rightPower = -gamepad1.right_stick_y;
 
         //Linear slide is the second gamepad left stick up and down
         linearSlidePower = gamepad2.left_stick_y;
@@ -76,21 +80,6 @@ public class TeleOp6438 extends OpMode
 
         //Intake slide is the right gamepad stick 2 left and right
         robot.intakeSlide.setPower(gamepad2.right_stick_x);
-
-        //Sending the power info to the motors
-        robot.leftMotor.setPower(leftPower);
-        robot.rightMotor.setPower(rightPower);
-        robot.linearActuator.setPower(linearSlidePower);
-        robot.intakeSpinner.setPower(intakeSpinnerPower);
-
-        //Telemetry
-        telemetry.addData("Left Power: ", leftPower);
-        telemetry.addData("Right Power: ", rightPower);
-        telemetry.addData("Linear Actuator Power: ", linearSlidePower);
-        telemetry.addData("Intake Power: ", intakeSpinnerPower);
-        telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
-        telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
-        telemetry.update();
 
         //Gamepad logic to move the intake
         ///When A is pressed go to the down position
@@ -130,6 +119,34 @@ public class TeleOp6438 extends OpMode
             robot.intakeMover.setPower(0);
             run = true;
         }
+
+        if (gamepad2.left_bumper)
+        {
+            //
+            leftPower =  -gamepad1.left_stick_y;
+            rightPower = -gamepad1.left_stick_y;
+        }
+        else
+        {
+            leftPower=   -gamepad1.left_stick_y;
+            rightPower = -gamepad1.right_stick_y;
+        }
+
+        //Sending the power info to the motors
+        robot.leftMotor.setPower(leftPower);
+        robot.rightMotor.setPower(rightPower);
+        robot.linearActuator.setPower(linearSlidePower);
+        robot.intakeSpinner.setPower(intakeSpinnerPower);
+
+        //Telemetry
+        telemetry.addData("Left Power: ", leftPower);
+        telemetry.addData("Right Power: ", rightPower);
+        telemetry.addData("Linear Actuator Power: ", linearSlidePower);
+        telemetry.addData("Intake Power: ", intakeSpinnerPower);
+        telemetry.addData("Linear Mode Enabled: " , " " + linearMode);
+        telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
+        telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
+        telemetry.update();
     }
 
     //Method to move the intake
@@ -159,6 +176,7 @@ public class TeleOp6438 extends OpMode
 
     private void intakeSlide(double speed, int position)
     {
+        //Temp var
         int slideTarget;
 
         //Sets the slide position to max length
@@ -176,6 +194,7 @@ public class TeleOp6438 extends OpMode
         while (robot.intakeSlide.isBusy())
         {
             telemetry.addData("Moving to", robot.intakeSlide.getTargetPosition());
+            telemetry.addData("Currently at", robot.intakeSlide.getCurrentPosition());
             telemetry.update();
         }
     }
