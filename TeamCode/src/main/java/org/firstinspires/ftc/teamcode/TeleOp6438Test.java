@@ -120,7 +120,7 @@ public class TeleOp6438Test extends OpMode
             run = true;
         }
 
-        if (gamepad2.left_bumper)
+        if (gamepad1.left_bumper)
         {
             //
             leftPower =  -gamepad1.left_stick_y;

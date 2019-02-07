@@ -116,13 +116,13 @@ public class TeleOp6438 extends OpMode
 
         if(run)
         {
-            if (gamepad2.right_trigger>.01)
+            if (gamepad2.right_trigger>.01 && robot.intakeMover.getCurrentPosition() != 400)
             {
                 intakeMove(.5,400);
                 run = false;
             }
         }
-        else if (gamepad2.left_trigger>.01)
+        else if (gamepad2.left_trigger>.01 && robot.intakeMover.getCurrentPosition() != 50)
         {
             //int increment = (int) (10 * gamepad2.left_trigger);
             //moveIntake(.5, -1);
