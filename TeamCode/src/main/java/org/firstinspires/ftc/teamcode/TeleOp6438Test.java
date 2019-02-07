@@ -12,10 +12,10 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
-        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-        import com.qualcomm.robotcore.hardware.Gamepad;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-        import com.qualcomm.robotcore.hardware.DcMotor;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @TeleOp(name = "Team 6438 Driver Controlled (Test) ", group = "Team 6438 TeleOp (Test)")
@@ -88,7 +88,7 @@ public class TeleOp6438Test extends OpMode
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             //Intake move method invocation
-            intakeMove(.5,  -1000);
+            intakeMove(.75,  -1000);
 
             //Should be able to be deleted
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -107,7 +107,7 @@ public class TeleOp6438Test extends OpMode
         {
             if (gamepad2.right_trigger>.01)
             {
-                intakeMove(.5,400);
+                intakeMove(.75,400);
                 run = false;
             }
         }
@@ -115,7 +115,7 @@ public class TeleOp6438Test extends OpMode
         {
             //int increment = (int) (10 * gamepad2.left_trigger);
             //moveIntake(.5, -1);
-            intakeMove(.5,50);
+            intakeMove(.75,50);
             robot.intakeMover.setPower(0);
             run = true;
         }
