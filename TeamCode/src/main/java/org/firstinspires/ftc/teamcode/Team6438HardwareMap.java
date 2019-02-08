@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -32,7 +33,7 @@ class Team6438HardwareMap
     DcMotor intakeSlide      = null;
 
     //Servo mapping
-    CRServo teamMarkerServo   = null;
+    Servo teamMarkerServo   = null;
 
     //Sensor Mapping
     private BNO055IMU imu     = null;
@@ -65,8 +66,13 @@ class Team6438HardwareMap
     final String VUFORIA_KEY = "ATEEWHn/////AAABmXzvuqxXZkYkr3AeTQT4Qg0P3tudpoBP/Rp2Xyw3zNlZYk+ZI5Jp/yo8TDf62o+UjdBvoe0LP5nNDqFESCtSImOG2WRuMkoESAyhSVzMU0hY53dWb4l0s7mCe+xqqT8i0r9pPdav7N7RiGHG7WYoIBXrQeyz+NEq8TLYTTCXmZMFgPeEU30Nb+t4JikoNMr0X0Ej6y1vG+7EX3O9KI8RXoPYbBmPzvX5uVvWBNg2J0g0SBiZUXa8pQOCxi0QyHyNUiwvV5WKnM2jncg+eI7im5s+k4yn6Xjaeecg6q9IT45YNvbhV4PM/LbwGQTKBf0AOCM/qL7tz7evypWw5uK15BayqAitBLy7Sr0SvIjYMjPg";
     VuforiaLocalizer vuforia;
     TFObjectDetector tfod;
+
     //Place in a number 0.0 - 1.0
-    public static final double confidence = .75;
+    static final double confidence = .75;
+
+    //Positions for the team marker servo
+    static final double toss = 1.0;
+    static final double tucked = 0.0;
 
     //Method to initialize standard Hardware interfaces
     void init(HardwareMap ahwMap)
@@ -102,7 +108,7 @@ class Team6438HardwareMap
         //------------------------------------------------------------------------------------------
 
         // Define and initialize ALL installed servos.
-        teamMarkerServo = hwMap.get(CRServo.class, "teamMarkerServo");
+        teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");
 
         //------------------------------------------------------------------------------------------
         //imu map

@@ -1,60 +1,148 @@
 /**
- * Name: Team6438CAutonomousTest
+ * Name: Team6438AutonomousDepotSide
  * Purpose: This class contains instructions for autonomous
- *          Expirements are made in here to be implemented in the real autonomous op modes
- * Author: Matthew Batkiewicz
- * Contributors:
- * Creation: 1/21/18
- * Last Edit: 1/21/19
+ *          Currently the actions (in order) are: Raise the linear slide to unlatch
+ *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
+ * Author: Bradley Abelman
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian
+ * Creation: 11/8/18
+ * Last Edit: 1/2/19
  * Additional Notes: TO DO
  *                  Find linearCPI
  *                  Test encoder based driving
  *                  Integrate way to control linearActuator in OpMode
  *                  Distance from landing to gems: Approximately 34 inches
  *                  Height of bracket off the ground: 19 inches
- *                  Experiment with IMU
+ *
+ *
+ *
+ * Tested paths: Right
+ * Broken paths: Center
+ * Unsure paths: Left
  **/
 package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
 import java.util.List;
 
-//@Disabled
-@Autonomous(name = "Test Autonomous 6438", group = "Team 6438 Test")
+//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Autonomous(name = "Team6438AutonomousTest", group = "Autonomous Test Team 6438")
 public class Team6438AutonomousTest extends LinearOpMode
 {
-    //Creates a reference to the hardware map class
-    Team6438HardwareMap robot = new Team6438HardwareMap();
+    //First time evaluation
+    private static boolean firstTime = true;
+
+    //Reference to our hardware map
+    private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    //Boolean to ensure we only run the block check the first time around
-    private static boolean firstTime = true;
-
     @Override
     public void runOpMode() throws InterruptedException
     {
-        //Inits the hardware on the robot
+        //Inits the hardware
         robot.init(hardwareMap);
 
-        //waits till user presses start
+        //Sets them to use encoders
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //Resets encoders
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Telemetry to let user know robot init
+        telemetry.addData("Status: ", "Ready to Run");
+        telemetry.update();
+
+        //init the vuforia engine when the class is called forward (selected on DS)
+        initVuforia();
+
+        //Wait for the start button to be pressed by the driver
         waitForStart();
 
-        //loops while the op mode is active
+        //Boolean to ensure we only run the block check the first time around
+        firstTime = true;
+
+        //Sets the block int to 0 (default value)
+        int block = 0;
+
+        //While the program is running
         while (opModeIsActive())
         {
+            if (firstTime)
+            {
+                //move the actuator up and over
+                actuatorMove(1, 16.25);
 
+                //Move forward to get a better view of the blocks
+                encoderRobotDrive(1, 5, 5);
+
+                //Query the tensorFlowEngine and set the block variable equal to the result
+                block = queryTensorFlow();
+
+                //Block logic (seperated into ifs because we need different motions depending on where the block is
+                if (block == 1)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "center");
+                    telemetry.update();
+                    //sleep(500);
+                    firstTime=false;
+
+                    //Encoder movements to run over the block
+                    encoderRobotDrive(.75, 43, 43);
+
+                    //Encoder movements to turn and run towards crater
+                    encoderRobotDrive(.75, -15, 15);
+                    encoderRobotDrive(1, -140, -140);
+                }
+                else if (block == 2)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "right");
+                    telemetry.update();
+                    //sleep(500);
+                    firstTime=false;
+
+                    //Encoder movements to run over the block
+                    encoderRobotDrive(.75, 25.5, 24.5);
+                    encoderRobotDrive(.75, -17, 17);
+                    encoderRobotDrive(.75, 27, 27);
+                    encoderRobotDrive(.75, -4, 4);
+                    encoderRobotDrive(1, -140, -140);
+                }
+                else if (block == 3)
+                {
+                    //telemetery to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "left");
+                    telemetry.update();
+                    //sleep(500);
+                    firstTime=false;
+                    encoderRobotDrive(.75, -19.5, 19.5);
+                    encoderRobotDrive(.75, 24.5, 24.5);
+                    encoderRobotDrive(.75, 18, -18);
+                    encoderRobotDrive(.75, 24, 24);
+                    encoderRobotDrive(.75, 32.5, -32.5);
+                    encoderRobotDrive(1, 140, 140);
+                }
+            }
+
+            telemetry.addData("Autonomous Complete", "True");
+            telemetry.update();
         }
     }
 
@@ -106,7 +194,7 @@ public class Team6438AutonomousTest extends LinearOpMode
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches, boolean directionUp )
+    private void actuatorMove(double speed, double inches)
     {
         //Set up a new target variable
         int newTarget;
@@ -114,16 +202,8 @@ public class Team6438AutonomousTest extends LinearOpMode
         // Ensure that the opmode is still active
         if (opModeIsActive())
         {
-
             // Determine new target position, and pass to motor controller
-            if(directionUp)
-            {
-                newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
-            }
-            else
-            {
-                newTarget = robot.linearActuator.getCurrentPosition() - (int) (inches * robot.linearCPI);
-            }
+            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
@@ -133,7 +213,6 @@ public class Team6438AutonomousTest extends LinearOpMode
 
             // reset the timeout time and start motion.
             robot.linearActuator.setPower(Math.abs(speed));
-
 
             // keep looping while we are still active, and the motor is running.
             while (opModeIsActive() && robot.linearActuator.isBusy())
@@ -147,10 +226,24 @@ public class Team6438AutonomousTest extends LinearOpMode
             // Stop all motion;
             robot.linearActuator.setPower(0);
 
-
             // Turn off RUN_TO_POSITION
             robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+
+    //Method to move the actuator
+    @Deprecated
+    private void actuatorByTime(int time)
+    {
+        // Ensure that the opmode is still active
+        if (opModeIsActive())
+        {
+            // reset the timeout time and start motion.
+            robot.linearActuator.setPower(1);
+            sleep(time);
+            robot.linearActuator.setPower(0);
             //  sleep(250);   // optional pause after each move
         }
     }
@@ -177,13 +270,26 @@ public class Team6438AutonomousTest extends LinearOpMode
         }
     }
 
-    //Method to move the intake spinner (probably not neccesary in autonomous)
+    //Method to move the intake spinner (probably not necessary in autonomous)
     private void intakeSpin(double speed, long duration)
     {
         robot.intakeSpinner.setPower(speed);
         telemetry.addData("Speed", speed);
         telemetry.update();
         sleep(duration);
+    }
+
+    //Method to extend the servo and allow it to drop the team marker.
+    private void tossMarker()
+    {
+        //Sleep for a quater second to make sure the servo can perform the action
+        sleep(250);
+
+        //Toss the servo
+        robot.teamMarkerServo.setPosition(robot.toss);
+
+        //Sleep again to make sure markers is off
+        sleep(250);
     }
 
     /**
@@ -193,18 +299,19 @@ public class Team6438AutonomousTest extends LinearOpMode
      * 2 = right
      * 3 = left
      *
-     * Notes: want to integrate confidence reading
+     * IMPORTANT: ASSUMES RIGHT (SELECT WHICH ONE AND DELETE THIS)
+     *
+     * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
      *        max y values
      *        max timeout ( if timeout passes ends the code and defaults to center
+     *        we are assuming left/right? (assuming means were checking the center and the unassumed side
+     *        i.e. if we assume left were checking center and right so if center and right are silver minerals
+     *        we know the gold is on the left
      **/
     private int queryTensorFlow()
     {
         while (opModeIsActive() )
         {
-            //Drive forward and turn around
-            //encoderRobotDrive(0.5, 10, 10);
-            //encoderRobotDrive(0.5, -34.558, 34.558);
-
             //int to determine gold block location: 1 = center, 2 = right, 3 = left
             int goldLocation = 0;
 
@@ -212,66 +319,68 @@ public class Team6438AutonomousTest extends LinearOpMode
             {
                 //Call the init TFod method to get block detection ready
                 initTfod();
+
                 //Activate Tensor Flow Object Detection.
                 if (robot.tfod != null)
                 {
+                    //Activates the tfod engine
                     robot.tfod.activate();
+
+                    //Waits for 1/2 second to allow processor to catch up
                     sleep(500);
                 }
 
                 while (opModeIsActive())
                 {
-                    if (robot.tfod != null)
+                    if (robot.tfod != null && firstTime == true)
                     {
-                        List<Recognition> valuesForNerds = robot.tfod.getUpdatedRecognitions();
-                        if (valuesForNerds != null)
-                        {
-                            telemetry.addData("value", valuesForNerds);
-                            telemetry.update();
-                        }
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                         if (updatedRecognitions != null)
                         {
                             for (Recognition recognition : updatedRecognitions)
                             {
+                                telemetry.addData("imageWidth ", recognition.getImageWidth());
+                                telemetry.addData("mineralLocation ", recognition.getLeft());
+                                telemetry.update();
+
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                 {
-                                    telemetry.addData("value", "Center");
+                                    telemetry.addData("Value", "Center");
+                                    telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
+                                    sleep(500);
                                     robot.tfod.shutdown();
-                                    firstTime=false;
 
-                                    //block is in the center
-
+                                    //block in the center
                                     return 1;
                                 }
                                 else
                                 {
-                                    encoderRobotDrive(.5, 5,-5); //temp values
-                                    sleep(3000);
+                                    telemetry.addData("Moving", "Right");
+                                    telemetry.update();
+                                    encoderRobotDrive(.75, 9.17, -9.17);
+                                    sleep(1000);
+
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null)
-                                    {
+                                    if (updatedRecognitions2 != null) {
                                         //noinspection LoopStatementThatDoesntLoop
                                         for (Recognition recognition2 : updatedRecognitions2)
                                         {
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
-                                            {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                                 telemetry.addData("value", "Right");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
-                                                firstTime = false;
 
                                                 //block on the right
                                                 return 2;
                                             }
-                                            else
-                                            {
+                                            else {
                                                 telemetry.addData("value", "Left");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();
                                                 robot.tfod.shutdown();
-                                                firstTime = false;
 
                                                 //block on the left
                                                 return 3;
@@ -289,13 +398,12 @@ public class Team6438AutonomousTest extends LinearOpMode
                 robot.tfod.shutdown();
             }
         }
-
         return 0;
     }
 
     //Method to init the vuforia engine
-    private void initVuforia() {
-
+    private void initVuforia()
+    {
         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -303,25 +411,25 @@ public class Team6438AutonomousTest extends LinearOpMode
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        //Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
     //Method to init the tfod engine
-    private void initTfod() {
-        //
+    private void initTfod()
+    {
+        //creates a tfod object which is using the tfodMonitor
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        //
+        //creates a new parameters object
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
 
-        //
+        //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
+        tfodParameters.minimumConfidence = robot.confidence;
+
+        //sets the tfod object equal to a new tfod object with parameters
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
 
         //Loads this years assets

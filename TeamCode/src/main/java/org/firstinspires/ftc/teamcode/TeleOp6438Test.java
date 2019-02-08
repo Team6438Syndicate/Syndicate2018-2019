@@ -58,28 +58,29 @@ public class TeleOp6438Test extends OpMode
     }
 
     @Override
+    public void start()
+    {
+        //When the opmode starts tuck the servo to prevent damage during gameplay
+        robot.teamMarkerServo.setPosition(robot.tucked);
+    }
+    @Override
     public void loop()
     {
         //Declaring power variables
         double leftPower = 0;
         double rightPower = 0;
-        double linearSlidePower;
+        double linearActuatorPower;
         double intakeSpinnerPower;
+        double intakeSlidePower;
 
-        //Left power is the left stick up and down
-        //leftPower = -gamepad1.left_stick_y;
-
-        //Right power is the right stick up and down
-        //rightPower = -gamepad1.right_stick_y;
-
-        //Linear slide is the second gamepad left stick up and down
-        linearSlidePower = gamepad2.left_stick_y;
+        //Linear Actuator power is set to the left y stick
+        linearActuatorPower = -gamepad2.left_stick_y;
 
         //Intake spinner is the right gamepad 2  stick up and down
         intakeSpinnerPower = gamepad2.right_stick_y;
 
-        //Intake slide is the right gamepad stick 2 left and right
-        robot.intakeSlide.setPower(gamepad2.right_stick_x);
+        //Robot slide is the x stick for the linear actuator
+        intakeSlidePower = gamepad2.left_stick_x;
 
         //Gamepad logic to move the intake
         ///When A is pressed go to the down position
@@ -125,6 +126,7 @@ public class TeleOp6438Test extends OpMode
             //
             leftPower =  -gamepad1.left_stick_y;
             rightPower = -gamepad1.left_stick_y;
+            telemetry.addData("Linear Mode", "Engaged");
         }
         else
         {
@@ -135,15 +137,17 @@ public class TeleOp6438Test extends OpMode
         //Sending the power info to the motors
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
-        robot.linearActuator.setPower(linearSlidePower);
+        robot.linearActuator.setPower(linearActuatorPower);
         robot.intakeSpinner.setPower(intakeSpinnerPower);
+        robot.intakeSlide.setPower(intakeSlidePower);
 
         //Telemetry
         telemetry.addData("Left Power: ", leftPower);
         telemetry.addData("Right Power: ", rightPower);
-        telemetry.addData("Linear Actuator Power: ", linearSlidePower);
+        telemetry.addData("Linear Actuator Power: ", linearActuatorPower);
         telemetry.addData("Intake Power: ", intakeSpinnerPower);
-        telemetry.addData("Linear Mode Enabled: " , " " + linearMode);
+        telemetry.addData("Intake Slide Power", intakeSlidePower);
+        //telemetry.addData("Linear Mode Enabled: " , " " + linearMode);
         telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
         telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
         telemetry.update();
