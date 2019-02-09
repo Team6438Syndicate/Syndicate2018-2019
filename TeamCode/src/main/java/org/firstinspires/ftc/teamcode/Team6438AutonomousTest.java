@@ -4,7 +4,7 @@
  *          Currently the actions (in order) are: Raise the linear slide to unlatch
  *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
  * Author: Bradley Abelman
- * Contributors: Matthew Batkiewicz, Matthew Kaboolian
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian, David Stekol
  * Creation: 11/8/18
  * Last Edit: 1/2/19
  * Additional Notes: TO DO
@@ -86,7 +86,7 @@ public class Team6438AutonomousTest extends LinearOpMode
             if (firstTime)
             {
                 //move the actuator up and over
-                actuatorMove(1, 16.25);
+                //actuatorMove(1, 17800/robot.linearCPI);
 
                 //Move forward to get a better view of the blocks
                 encoderRobotDrive(1, 5, 5);
@@ -104,11 +104,12 @@ public class Team6438AutonomousTest extends LinearOpMode
                     firstTime=false;
 
                     //Encoder movements to run over the block
-                    encoderRobotDrive(.75, 43, 43);
-
+                    encoderRobotDrive(.75, 47.875, 47.875);
+                    tossMarker();
+                    
                     //Encoder movements to turn and run towards crater
-                    encoderRobotDrive(.75, -15, 15);
-                    encoderRobotDrive(1, -140, -140);
+                    encoderRobotDrive(.75, -12.875, 12.875);
+                    encoderRobotDrive(1, -130, -130);
                 }
                 else if (block == 2)
                 {
@@ -122,8 +123,9 @@ public class Team6438AutonomousTest extends LinearOpMode
                     encoderRobotDrive(.75, 25.5, 24.5);
                     encoderRobotDrive(.75, -17, 17);
                     encoderRobotDrive(.75, 27, 27);
+                    tossMarker();
                     encoderRobotDrive(.75, -4, 4);
-                    encoderRobotDrive(1, -140, -140);
+                    encoderRobotDrive(1, -125, -125);
                 }
                 else if (block == 3)
                 {
@@ -136,7 +138,8 @@ public class Team6438AutonomousTest extends LinearOpMode
                     encoderRobotDrive(.75, 24.5, 24.5);
                     encoderRobotDrive(.75, 18, -18);
                     encoderRobotDrive(.75, 24, 24);
-                    encoderRobotDrive(.75, 32.5, -32.5);
+                    tossMarker();
+                    encoderRobotDrive(.75, 26.5, -26.5);
                     encoderRobotDrive(1, 140, 140);
                 }
             }
@@ -197,7 +200,7 @@ public class Team6438AutonomousTest extends LinearOpMode
     private void actuatorMove(double speed, double inches)
     {
         //Set up a new target variable
-        int newTarget;
+        int newTarget;  //(x/robot.)
 
         // Ensure that the opmode is still active
         if (opModeIsActive())

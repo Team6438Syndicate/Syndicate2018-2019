@@ -12,10 +12,10 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+        import com.qualcomm.robotcore.hardware.Gamepad;
+        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+        import com.qualcomm.robotcore.hardware.DcMotor;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @TeleOp(name = "Team 6438 Driver Controlled (Test) ", group = "Team 6438 TeleOp (Test)")
@@ -74,13 +74,14 @@ public class TeleOp6438Test extends OpMode
         double intakeSlidePower;
 
         //Linear Actuator power is set to the left y stick
-        linearActuatorPower = -gamepad2.left_stick_y;
+        linearActuatorPower = 0;//gamepad2.left_stick_y;
+        
 
         //Intake spinner is the right gamepad 2  stick up and down
         intakeSpinnerPower = gamepad2.right_stick_y;
 
         //Robot slide is the x stick for the linear actuator
-        intakeSlidePower = gamepad2.left_stick_x;
+        intakeSlidePower = gamepad2.left_stick_y;
 
         //Gamepad logic to move the intake
         ///When A is pressed go to the down position
@@ -89,7 +90,7 @@ public class TeleOp6438Test extends OpMode
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             //Intake move method invocation
-            intakeMove(.75,  -1000);
+            intakeMove(.5,  -1000);
 
             //Should be able to be deleted
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -108,7 +109,7 @@ public class TeleOp6438Test extends OpMode
         {
             if (gamepad2.right_trigger>.01)
             {
-                intakeMove(.75,400);
+                intakeMove(.5,400);
                 run = false;
             }
         }
@@ -116,7 +117,7 @@ public class TeleOp6438Test extends OpMode
         {
             //int increment = (int) (10 * gamepad2.left_trigger);
             //moveIntake(.5, -1);
-            intakeMove(.75,50);
+            intakeMove(.5,50);
             robot.intakeMover.setPower(0);
             run = true;
         }
@@ -147,7 +148,9 @@ public class TeleOp6438Test extends OpMode
         telemetry.addData("Linear Actuator Power: ", linearActuatorPower);
         telemetry.addData("Intake Power: ", intakeSpinnerPower);
         telemetry.addData("Intake Slide Power", intakeSlidePower);
+        telemetry.addData("Intake Slide Position", robot.intakeSlide.getCurrentPosition());
         //telemetry.addData("Linear Mode Enabled: " , " " + linearMode);
+        telemetry.addData("Linear Actuator Position: ", robot.linearActuator.getCurrentPosition());
         telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
         telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
         telemetry.update();

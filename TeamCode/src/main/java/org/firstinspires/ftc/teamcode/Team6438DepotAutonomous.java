@@ -80,9 +80,9 @@ public class Team6438DepotAutonomous extends LinearOpMode
             {
                 //move the actuator up and over
                 //actuatorMove(1, 7.75);
-
+            
                 encoderRobotDrive(0.75, 5, 5);
-
+            
                 //Query the tensorFlowEngine and set the block variable equal to the result
                 block = queryTensorFlow();
 
@@ -95,8 +95,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     sleep(500);
                     firstTime=false;
                     encoderRobotDrive(.75, 43, 43);
-                    encoderRobotDrive(.75, -26, 26);
-                    encoderRobotDrive(.75, 140, 140);
                 }
                 else if (block == 2)
                 {
@@ -108,8 +106,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     encoderRobotDrive(.75, 25.5, 24.5);
                     encoderRobotDrive(.75, -17, 17);
                     encoderRobotDrive(.75, 27, 27);
-                    encoderRobotDrive(.75, -23, 23);
-                    encoderRobotDrive(.75, 140, 140);
+
                 }
                 else if (block == 3)
                 {
@@ -122,8 +119,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     encoderRobotDrive(.75, 24.5, 24.5);
                     encoderRobotDrive(.75, 18, -18);
                     encoderRobotDrive(.75, 24, 24);
-                    encoderRobotDrive(.75, 17.5, -17.5);
-                    encoderRobotDrive(.75, 140, 140);
                 }
             }
 
@@ -302,51 +297,51 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                 telemetry.addData("imageWidth ", recognition.getImageWidth());
                                 telemetry.addData("mineralLocation ", recognition.getLeft());
                                 telemetry.update();
+                                
+                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                                    {
+                                        telemetry.addData("Value", "Center");
+                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                        telemetry.update();
+                                        sleep(500);
+                                        robot.tfod.shutdown();
 
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                                {
-                                    telemetry.addData("Value", "Center");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.update();
-                                    sleep(500);
-                                    robot.tfod.shutdown();
+                                        //block in the center
+                                        return 1;
+                                    }
+                                    else
+                                    {
+                                        telemetry.addData("Moving", "Right");
+                                        telemetry.update();
+                                        encoderRobotDrive(.75, 9.17, -9.17);
+                                        sleep(1000);
+                                        
+                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                        if (updatedRecognitions2 != null) {
+                                            //noinspection LoopStatementThatDoesntLoop
+                                            for (Recognition recognition2 : updatedRecognitions2)
+                                            {
+                                                    if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                        telemetry.addData("value", "Right");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
 
-                                    //block in the center
-                                    return 1;
-                                }
-                                else
-                                {
-                                    telemetry.addData("Moving", "Right");
-                                    telemetry.update();
-                                    encoderRobotDrive(.75, 9.17, -9.17);
-                                    sleep(1000);
+                                                        //block on the right
+                                                        return 2;
+                                                    }
+                                                    else {
+                                                        telemetry.addData("value", "Left");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
 
-                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null) {
-                                        //noinspection LoopStatementThatDoesntLoop
-                                        for (Recognition recognition2 : updatedRecognitions2)
-                                        {
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                                telemetry.addData("value", "Right");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
-
-                                                //block on the right
-                                                return 2;
-                                            }
-                                            else {
-                                                telemetry.addData("value", "Left");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
-
-                                                //block on the left
-                                                return 3;
+                                                        //block on the left
+                                                        return 3;
+                                                    }
                                             }
                                         }
                                     }
-                                }
                             }
                         }
                     }
@@ -387,7 +382,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
         //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
         tfodParameters.minimumConfidence = robot.confidence;
-
+        
         //sets the tfod object equal to a new tfod object with parameters
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
 

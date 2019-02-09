@@ -113,9 +113,9 @@ public class ConceptTensorFlowObjectDetectionTeam6438 extends LinearOpMode {
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
-
+        
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
-
+        
         //Sets the camera to the back camera
         parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
