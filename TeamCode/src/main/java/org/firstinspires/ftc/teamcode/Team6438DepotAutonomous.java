@@ -2,7 +2,7 @@
  * Name: Team6438AutonomousDepotSide
  * Purpose: This class contains instructions for autonomous
  *          Currently the actions (in order) are: Raise the linear slide to unlatch
- *          Sample Blocks, Drive to the Depot and fling the team marker.
+ *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
  * Author: Bradley Abelman
  * Contributors: Matthew Batkiewicz, Matthew Kaboolian
  * Creation: 11/8/18
@@ -20,20 +20,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
 import java.util.List;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side Autonomous", group = "Autonomous Team 6438")
+@Autonomous(name = "Depot Side", group = "Team 6438 Autonomous")
 public class Team6438DepotAutonomous extends LinearOpMode
 {
+    //First time evaluation
     private static boolean firstTime = true;
+
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
@@ -41,7 +41,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
         //Inits the hardware
         robot.init(hardwareMap);
 
@@ -79,10 +80,11 @@ public class Team6438DepotAutonomous extends LinearOpMode
             if (firstTime)
             {
                 //move the actuator up and over
-                //actuatorMove(1, 7.75);
-            
-                encoderRobotDrive(0.75, 5, 5);
-            
+                actuatorMove(1, 17800/robot.linearCPI);
+
+                //Move forward to get a better view of the blocks
+                encoderRobotDrive(1, 5, 5);
+
                 //Query the tensorFlowEngine and set the block variable equal to the result
                 block = queryTensorFlow();
 
@@ -92,33 +94,46 @@ public class Team6438DepotAutonomous extends LinearOpMode
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "center");
                     telemetry.update();
-                    sleep(500);
+                    //sleep(500);
                     firstTime=false;
-                    encoderRobotDrive(.75, 43, 43);
+
+                    //Encoder movements to run over the block
+                    encoderRobotDrive(.75, 47.875, 47.875);
+                    tossMarker();
+
+                    //Encoder movements to turn and run towards crater
+                    encoderRobotDrive(.75, -12.555, 12.555);
+                    encoderRobotDrive(1, -90, -90);
                 }
                 else if (block == 2)
                 {
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "right");
                     telemetry.update();
-                    sleep(500);
+                    //sleep(500);
                     firstTime=false;
-                    encoderRobotDrive(.75, 25.5, 24.5);
+
+                    //Encoder movements to run over the block
+                    encoderRobotDrive(.75, 25.5, 25.5);
                     encoderRobotDrive(.75, -17, 17);
                     encoderRobotDrive(.75, 27, 27);
-
+                    tossMarker();
+                    encoderRobotDrive(.75, -4, 4);
+                    encoderRobotDrive(1, -125, -125);
                 }
                 else if (block == 3)
                 {
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
-                    sleep(500);
+                    //sleep(500);
                     firstTime=false;
                     encoderRobotDrive(.75, -19.5, 19.5);
-                    encoderRobotDrive(.75, 24.5, 24.5);
+                    encoderRobotDrive(1, 24.5, 24.5);
                     encoderRobotDrive(.75, 18, -18);
-                    encoderRobotDrive(.75, 24, 24);
+                    encoderRobotDrive(1, 24, 24);
+                    tossMarker();
+
                 }
             }
 
@@ -178,7 +193,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
     private void actuatorMove(double speed, double inches)
     {
         //Set up a new target variable
-        int newTarget;
+        int newTarget;  //(x/robot.)
 
         // Ensure that the opmode is still active
         if (opModeIsActive())
@@ -214,6 +229,21 @@ public class Team6438DepotAutonomous extends LinearOpMode
         }
     }
 
+    //Method to move the actuator
+    @Deprecated
+    private void actuatorByTime(int time)
+    {
+        // Ensure that the opmode is still active
+        if (opModeIsActive())
+        {
+            // reset the timeout time and start motion.
+            robot.linearActuator.setPower(1);
+            sleep(time);
+            robot.linearActuator.setPower(0);
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+
     //Method to move the intake
     private void intakeMove(double speed, int position)
     {
@@ -245,6 +275,18 @@ public class Team6438DepotAutonomous extends LinearOpMode
         sleep(duration);
     }
 
+    //Method to extend the servo and allow it to drop the team marker.
+    private void tossMarker()
+    {
+        //Sleep for a quater second to make sure the servo can perform the action
+        sleep(250);
+
+        //Toss the servo
+        robot.teamMarkerServo.setPosition(robot.toss);
+
+        //Sleep again to make sure markers is off
+        sleep(250);
+    }
 
     /**
      * Queries the tensorFlow engine to find the block
@@ -297,51 +339,51 @@ public class Team6438DepotAutonomous extends LinearOpMode
                                 telemetry.addData("imageWidth ", recognition.getImageWidth());
                                 telemetry.addData("mineralLocation ", recognition.getLeft());
                                 telemetry.update();
-                                
-                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                                    {
-                                        telemetry.addData("Value", "Center");
-                                        telemetry.addData("Confidence", recognition.getConfidence());
-                                        telemetry.update();
-                                        sleep(500);
-                                        robot.tfod.shutdown();
 
-                                        //block in the center
-                                        return 1;
-                                    }
-                                    else
-                                    {
-                                        telemetry.addData("Moving", "Right");
-                                        telemetry.update();
-                                        encoderRobotDrive(.75, 9.17, -9.17);
-                                        sleep(1000);
-                                        
-                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                        if (updatedRecognitions2 != null) {
-                                            //noinspection LoopStatementThatDoesntLoop
-                                            for (Recognition recognition2 : updatedRecognitions2)
-                                            {
-                                                    if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                                        telemetry.addData("value", "Right");
-                                                        telemetry.addData("Confidence", recognition.getConfidence());
-                                                        telemetry.update();
-                                                        robot.tfod.shutdown();
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
+                                {
+                                    telemetry.addData("Value", "Center");
+                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                    telemetry.update();
+                                    sleep(100);
+                                    robot.tfod.shutdown();
 
-                                                        //block on the right
-                                                        return 2;
-                                                    }
-                                                    else {
-                                                        telemetry.addData("value", "Left");
-                                                        telemetry.addData("Confidence", recognition.getConfidence());
-                                                        telemetry.update();
-                                                        robot.tfod.shutdown();
+                                    //block in the center
+                                    return 1;
+                                }
+                                else
+                                {
+                                    telemetry.addData("Moving", "Right");
+                                    telemetry.update();
+                                    encoderRobotDrive(.75, 9.17, -9.17);
+                                    sleep(100);
 
-                                                        //block on the left
-                                                        return 3;
-                                                    }
+                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                    if (updatedRecognitions2 != null) {
+                                        //noinspection LoopStatementThatDoesntLoop
+                                        for (Recognition recognition2 : updatedRecognitions2)
+                                        {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                telemetry.addData("value", "Right");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+
+                                                //block on the right
+                                                return 2;
+                                            }
+                                            else {
+                                                telemetry.addData("value", "Left");
+                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.update();
+                                                robot.tfod.shutdown();
+
+                                                //block on the left
+                                                return 3;
                                             }
                                         }
                                     }
+                                }
                             }
                         }
                     }
@@ -382,7 +424,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
 
         //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
         tfodParameters.minimumConfidence = robot.confidence;
-        
+
         //sets the tfod object equal to a new tfod object with parameters
         robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
 

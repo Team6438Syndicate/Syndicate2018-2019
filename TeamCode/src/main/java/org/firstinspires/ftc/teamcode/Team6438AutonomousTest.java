@@ -1,10 +1,10 @@
 /**
- * Name: Team6438AutonomousDepotSide
+ * Name: Team6438AutonomousTest
  * Purpose: This class contains instructions for autonomous
  *          Currently the actions (in order) are: Raise the linear slide to unlatch
  *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
  * Author: Bradley Abelman
- * Contributors: Matthew Batkiewicz, Matthew Kaboolian, David Stekol
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian
  * Creation: 11/8/18
  * Last Edit: 1/2/19
  * Additional Notes: TO DO
@@ -24,6 +24,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -33,7 +34,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Team6438AutonomousTest", group = "Autonomous Test Team 6438")
 public class Team6438AutonomousTest extends LinearOpMode
 {
@@ -86,7 +87,7 @@ public class Team6438AutonomousTest extends LinearOpMode
             if (firstTime)
             {
                 //move the actuator up and over
-                //actuatorMove(1, 17800/robot.linearCPI);
+                actuatorMove(1, 17800/robot.linearCPI);
 
                 //Move forward to get a better view of the blocks
                 encoderRobotDrive(1, 5, 5);
@@ -106,10 +107,10 @@ public class Team6438AutonomousTest extends LinearOpMode
                     //Encoder movements to run over the block
                     encoderRobotDrive(.75, 47.875, 47.875);
                     tossMarker();
-                    
+
                     //Encoder movements to turn and run towards crater
-                    encoderRobotDrive(.75, -12.875, 12.875);
-                    encoderRobotDrive(1, -130, -130);
+                    encoderRobotDrive(.75, -12.555, 12.555);
+                    encoderRobotDrive(1, -90, -90);
                 }
                 else if (block == 2)
                 {
@@ -120,7 +121,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                     firstTime=false;
 
                     //Encoder movements to run over the block
-                    encoderRobotDrive(.75, 25.5, 24.5);
+                    encoderRobotDrive(.75, 25.5, 25.5);
                     encoderRobotDrive(.75, -17, 17);
                     encoderRobotDrive(.75, 27, 27);
                     tossMarker();
@@ -135,12 +136,11 @@ public class Team6438AutonomousTest extends LinearOpMode
                     //sleep(500);
                     firstTime=false;
                     encoderRobotDrive(.75, -19.5, 19.5);
-                    encoderRobotDrive(.75, 24.5, 24.5);
+                    encoderRobotDrive(1, 24.5, 24.5);
                     encoderRobotDrive(.75, 18, -18);
-                    encoderRobotDrive(.75, 24, 24);
+                    encoderRobotDrive(1, 24, 24);
                     tossMarker();
-                    encoderRobotDrive(.75, 26.5, -26.5);
-                    encoderRobotDrive(1, 140, 140);
+
                 }
             }
 
@@ -352,7 +352,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                                     telemetry.addData("Value", "Center");
                                     telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
-                                    sleep(500);
+                                    sleep(100);
                                     robot.tfod.shutdown();
 
                                     //block in the center
@@ -363,7 +363,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                                     telemetry.addData("Moving", "Right");
                                     telemetry.update();
                                     encoderRobotDrive(.75, 9.17, -9.17);
-                                    sleep(1000);
+                                    sleep(100);
 
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null) {
