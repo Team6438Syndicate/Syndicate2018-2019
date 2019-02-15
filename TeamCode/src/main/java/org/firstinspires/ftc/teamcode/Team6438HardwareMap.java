@@ -36,7 +36,7 @@ class Team6438HardwareMap
     Servo teamMarkerServo   = null;
 
     //Sensor Mapping
-    private BNO055IMU imu     = null;
+    BNO055IMU imu     = null;
 
     //Variables
     private final double CPR = 288;

@@ -12,7 +12,9 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,6 +23,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @TeleOp(name = "Team 6438 Driver Controlled (Test) ", group = "Team 6438 TeleOp (Test)")
 public class TeleOp6438Test extends OpMode
 {
+
     //Create reference to the Team6438HardwareMap Class
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
@@ -41,6 +44,15 @@ public class TeleOp6438Test extends OpMode
     @Override
     public void init()
     {
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        robot.imu.initialize(parameters);
+
         //Init and map the hardware
         robot.init(hardwareMap);
 
@@ -122,10 +134,10 @@ public class TeleOp6438Test extends OpMode
 
         if (gamepad2.left_bumper)
         {
-                //int increment = (int) (10 * gamepad2.left_trigger);
-                //moveIntake(.5, -1);
-                intakeMove(0.75, -350);
-                //robot.intakeMover.setPower(0);
+            //int increment = (int) (10 * gamepad2.left_trigger);
+            //moveIntake(.5, -1);
+            intakeMove(0.75, -350);
+            //robot.intakeMover.setPower(0);
         }
         if (gamepad2.right_bumper)
         {
@@ -166,6 +178,7 @@ public class TeleOp6438Test extends OpMode
         //telemetry.addData("Linear Mode Enabled: " , " " + linearMode);
         telemetry.addData("Linear Actuator Position: ", robot.linearActuator.getCurrentPosition());
         telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
+        telemetry.addData("Speed", robot.imu.getVelocity());
         //telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
         telemetry.update();
     }
