@@ -18,6 +18,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -27,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Depot Side", group = "Team 6438 Autonomous")
 public class AutonomousTestChangedForFinals extends LinearOpMode
 {

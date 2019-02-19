@@ -130,7 +130,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                 }
                 else if (block == 3)
                 {
-                    //telemetery to show the user what path we're running
+                    //telemetry to show the user what path we're running
                     telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
                     //sleep(500);
