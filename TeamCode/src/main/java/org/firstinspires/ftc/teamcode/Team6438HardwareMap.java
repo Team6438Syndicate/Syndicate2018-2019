@@ -34,6 +34,7 @@ class Team6438HardwareMap
 
     //Servo mapping
     Servo teamMarkerServo   = null;
+    Servo cameraMount = null;
 
     //Sensor Mapping
     BNO055IMU imu     = null;
@@ -59,6 +60,11 @@ class Team6438HardwareMap
 
     // CPI for linear slide
     final double linearCPI = otherCPR * GRL;
+
+    //Camera mount servo positions
+    final double cameraMountTucked = 1;
+    final double cameraMountCenter = .15;
+    final double cameraMountRight = 0;
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -109,6 +115,7 @@ class Team6438HardwareMap
 
         // Define and initialize ALL installed servos.
         teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");
+        cameraMount = hwMap.get(Servo.class, "cameraMount");
 
         //------------------------------------------------------------------------------------------
         //imu map

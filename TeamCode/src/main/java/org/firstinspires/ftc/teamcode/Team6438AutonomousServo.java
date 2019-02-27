@@ -13,12 +13,14 @@
  *                  Integrate way to control linearActuator in OpMode
  *                  Distance from landing to gems: Approximately 34 inches
  *                  Height of bracket off the ground: 19 inches
+ *
+ *                  Do we want to double sample??????
+ *                  How much time are we dealing with
  **/
 package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -28,10 +30,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-@Deprecated
-@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side", group = "Team 6438 Autonomous")
-public class AutonomousTestChangedForFinals extends LinearOpMode
+//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Autonomous(name = "Depot Side w/ Servo", group = "Team 6438 Autonomous")
+public class Team6438AutonomousServo extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -70,6 +71,9 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        //Makes sure the camera is looking at the center
+        robot.cameraMount.setPosition(robot.cameraMountCenter);
+
         //Boolean to ensure we only run the block check the first time around
         firstTime = true;
 
@@ -79,16 +83,22 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
-            if (firstTime)
-            {
-                //move the actuator up and over
-                actuatorMove(1, 18200/robot.linearCPI);
+            //move the actuator up and over
+            //actuatorMove(1, 17800/robot.linearCPI);  //This will go at the bottom
 
-                //Move forward to get a better view of the blocks
-                encoderRobotDrive(1, 5, 5);
+            //Query the tensorFlowEngine and set the block variable equal to the result
+            block = queryTensorFlow();
 
-                //Query the tensorFlowEngine and set the block variable equal to the result
-                block = queryTensorFlow();
+            //if (firstTime)
+            //{
+                //Tucks in the servo
+                robot.cameraMount.setPosition(robot.cameraMountTucked);
+
+                //Moves the robot down
+                actuatorMove(1,17800/robot.linearCPI);
+
+                //Compensate for the original scan distance -- Can remove??
+                encoderRobotDrive(1,5,5);
 
                 //Block logic (seperated into ifs because we need different motions depending on where the block is
                 if (block == 1)
@@ -96,33 +106,37 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
                     //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "center");
                     telemetry.update();
-                    sleep(500);
-                    firstTime=false;
+                    //sleep(500);
+                    firstTime = false;
 
                     //Encoder movements to run over the block
-                    encoderRobotDrive(1, 48.25, 48.25);
+                    encoderRobotDrive(.75, 47.875, 47.875);
                     tossMarker();
-                    encoderRobotDrive(1, -65, -65);
 
                     //Encoder movements to turn and run towards crater
-                    //encoderRobotDrive(.75, -12.625, 12.625);
-                    //encoderRobotDrive(1, -80, -80);
+                    encoderRobotDrive(.75, -12.555, 12.555);
+                    encoderRobotDrive(1, -90, -90);
+
+                    //If time allows double sample code here
+
+                    //Add Methods to extend intake
+
                 }
                 else if (block == 2)
                 {
                     //telemetery to show the user what path we're running
-                    /*telemetry.addData("Path running currently: ", "right");
+                    telemetry.addData("Path running currently: ", "right");
                     telemetry.update();
-                    sleep(500);
-                    firstTime=false;
+                    //sleep(500);
+                    firstTime = false;
 
                     //Encoder movements to run over the block
                     encoderRobotDrive(.75, 25.5, 25.5);
-                    encoderRobotDrive(.75, -12, 12);
-                    encoderRobotDrive(.75, 30, 30);
-                    tossMarker();*/
-                    //encoderRobotDrive(.75, -4, 4);
-                    //encoderRobotDrive(1, -125, -125);
+                    encoderRobotDrive(.75, -17, 17);
+                    encoderRobotDrive(.75, 27, 27);
+                    tossMarker();
+                    encoderRobotDrive(.75, -4, 4);
+                    encoderRobotDrive(1, -125, -125);
                 }
                 else if (block == 3)
                 {
@@ -130,23 +144,35 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
                     telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
                     //sleep(500);
-                    firstTime=false;
+                    firstTime = false;
+
+                    //These values will probably need changing
                     encoderRobotDrive(.75, -19.5, 19.5);
                     encoderRobotDrive(1, 24.5, 24.5);
-                    encoderRobotDrive(.75, 20, -20);
+                    encoderRobotDrive(.75, 18, -18);
                     encoderRobotDrive(1, 24, 24);
                     tossMarker();
-                    encoderRobotDrive(1, -36, -36);
-
                 }
-            }
 
-            telemetry.addData("Autonomous Complete", "True");
-            telemetry.update();
+                //Lets the user know the Autonomous is complete
+                telemetry.addData("Autonomous Complete", "True");
+                telemetry.update();
+
+                //End the opMode
+                requestOpModeStop();
+
+                //add diagnostic telemetry, this should never be shown
+                telemetry.addData("If you see this:", "it's too late");
+                telemetry.update();
+            //}
         }
     }
 
-    //Encoder drive method to drive the motors
+    /**
+     *  Encoder drive method to drive the motors, adds telemetry while the motors are busy
+     *
+     *  @param: Speed, inches for left and right
+     */
     private void encoderRobotDrive(double speed, double leftInches, double rightInches)
     {
         //Declaring new targets
@@ -299,7 +325,7 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
      * 2 = right
      * 3 = left
      *
-     * IMPORTANT: ASSUMES RIGHT (SELECT WHICH ONE AND DELETE THIS)
+     * IMPORTANT: ASSUMES RIGHT
      *
      * Notes: want to integrate confidence reading (done - set to variable in the hardware map class)
      *        max y values
@@ -349,7 +375,7 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
                                     telemetry.addData("Value", "Center");
                                     telemetry.addData("Confidence", recognition.getConfidence());
                                     telemetry.update();
-                                    sleep(500);
+                                    sleep(100);
                                     robot.tfod.shutdown();
 
                                     //block in the center
@@ -357,17 +383,18 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
                                 }
                                 else
                                 {
-                                    telemetry.addData("Moving", "Right");
+                                    telemetry.addData("Scanning Right", "Right");
                                     telemetry.update();
-                                    encoderRobotDrive(.75, 9.17, -9.17);
-                                    sleep(500);
+                                    robot.cameraMount.setPosition(robot.cameraMountCenter);
+                                    sleep(100);
 
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                     if (updatedRecognitions2 != null) {
                                         //noinspection LoopStatementThatDoesntLoop
                                         for (Recognition recognition2 : updatedRecognitions2)
                                         {
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL))
+                                            {
                                                 telemetry.addData("value", "Right");
                                                 telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();
@@ -376,7 +403,8 @@ public class AutonomousTestChangedForFinals extends LinearOpMode
                                                 //block on the right
                                                 return 2;
                                             }
-                                            else {
+                                            else
+                                            {
                                                 telemetry.addData("value", "Left");
                                                 telemetry.addData("Confidence", recognition.getConfidence());
                                                 telemetry.update();

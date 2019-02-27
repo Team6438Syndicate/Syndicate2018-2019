@@ -34,6 +34,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
+@Deprecated
 @Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Team6438AutonomousTest", group = "Autonomous Test Team 6438")
 public class Team6438AutonomousTest extends LinearOpMode
@@ -72,6 +73,9 @@ public class Team6438AutonomousTest extends LinearOpMode
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
+        //Retract webcam
+        robot.cameraMount.setPosition(1);
+
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
@@ -87,10 +91,10 @@ public class Team6438AutonomousTest extends LinearOpMode
             if (firstTime)
             {
                 //move the actuator up and over
-                actuatorMove(1, 17800/robot.linearCPI);
+                //actuatorMove(1, 17800/robot.linearCPI);
 
                 //Move forward to get a better view of the blocks
-                encoderRobotDrive(1, 5, 5);
+                //encoderRobotDrive(1, 5, 5);
 
                 //Query the tensorFlowEngine and set the block variable equal to the result
                 block = queryTensorFlow();
@@ -130,7 +134,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                 }
                 else if (block == 3)
                 {
-                    //telemetry to show the user what path we're running
+                    //telemetery to show the user what path we're running
                     telemetry.addData("Path running currently: ", "left");
                     telemetry.update();
                     //sleep(500);
@@ -362,7 +366,7 @@ public class Team6438AutonomousTest extends LinearOpMode
                                 {
                                     telemetry.addData("Moving", "Right");
                                     telemetry.update();
-                                    encoderRobotDrive(.75, 9.17, -9.17);
+                                    robot.cameraMount.setPosition(0);
                                     sleep(100);
 
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
