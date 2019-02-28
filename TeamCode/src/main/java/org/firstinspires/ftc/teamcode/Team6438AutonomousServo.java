@@ -68,11 +68,11 @@ public class Team6438AutonomousServo extends LinearOpMode
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
-        //Wait for the start button to be pressed by the driver
-        waitForStart();
-
         //Makes sure the camera is looking at the center
         robot.cameraMount.setPosition(robot.cameraMountCenter);
+
+        //Wait for the start button to be pressed by the driver
+        waitForStart();
 
         //Boolean to ensure we only run the block check the first time around
         firstTime = true;
@@ -89,81 +89,82 @@ public class Team6438AutonomousServo extends LinearOpMode
             //Query the tensorFlowEngine and set the block variable equal to the result
             block = queryTensorFlow();
 
+            //Might not need the first time provision
             //if (firstTime)
             //{
-                //Tucks in the servo
-                robot.cameraMount.setPosition(robot.cameraMountTucked);
+            //Tucks in the servo
+            robot.cameraMount.setPosition(robot.cameraMountTucked);
 
-                //Moves the robot down
-                actuatorMove(1,17800/robot.linearCPI);
+            //Moves the robot down
+            actuatorMove(1,18000/robot.linearCPI);
 
-                //Compensate for the original scan distance -- Can remove??
-                encoderRobotDrive(1,5,5);
+            //Compensate for the original scan distance -- Can remove??
+            encoderRobotDrive(1,5,5);
 
-                //Block logic (seperated into ifs because we need different motions depending on where the block is
-                if (block == 1)
-                {
-                    //telemetery to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "center");
-                    telemetry.update();
-                    //sleep(500);
-                    firstTime = false;
-
-                    //Encoder movements to run over the block
-                    encoderRobotDrive(.75, 47.875, 47.875);
-                    tossMarker();
-
-                    //Encoder movements to turn and run towards crater
-                    encoderRobotDrive(.75, -12.555, 12.555);
-                    encoderRobotDrive(1, -90, -90);
-
-                    //If time allows double sample code here
-
-                    //Add Methods to extend intake
-
-                }
-                else if (block == 2)
-                {
-                    //telemetery to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "right");
-                    telemetry.update();
-                    //sleep(500);
-                    firstTime = false;
-
-                    //Encoder movements to run over the block
-                    encoderRobotDrive(.75, 25.5, 25.5);
-                    encoderRobotDrive(.75, -17, 17);
-                    encoderRobotDrive(.75, 27, 27);
-                    tossMarker();
-                    encoderRobotDrive(.75, -4, 4);
-                    encoderRobotDrive(1, -125, -125);
-                }
-                else if (block == 3)
-                {
-                    //telemetery to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "left");
-                    telemetry.update();
-                    //sleep(500);
-                    firstTime = false;
-
-                    //These values will probably need changing
-                    encoderRobotDrive(.75, -19.5, 19.5);
-                    encoderRobotDrive(1, 24.5, 24.5);
-                    encoderRobotDrive(.75, 18, -18);
-                    encoderRobotDrive(1, 24, 24);
-                    tossMarker();
-                }
-
-                //Lets the user know the Autonomous is complete
-                telemetry.addData("Autonomous Complete", "True");
+            //Block logic (seperated into ifs because we need different motions depending on where the block is
+            if (block == 1)
+            {
+                //telemetery to show the user what path we're running
+                telemetry.addData("Path running currently: ", "center");
                 telemetry.update();
+                //sleep(500);
+                firstTime = false;
 
-                //End the opMode
-                requestOpModeStop();
+                //Encoder movements to run over the block
+                encoderRobotDrive(.75, 47.875, 47.875);
+                tossMarker();
 
-                //add diagnostic telemetry, this should never be shown
-                telemetry.addData("If you see this:", "it's too late");
+                //Encoder movements to turn and run towards crater
+                encoderRobotDrive(.75, -12.555, 12.555);
+                encoderRobotDrive(1, -90, -90);
+
+                //If time allows double sample code here
+
+                //Add Methods to extend intake
+
+            }
+            else if (block == 2)
+            {
+                //telemetery to show the user what path we're running
+                telemetry.addData("Path running currently: ", "right");
                 telemetry.update();
+                //sleep(500);
+                firstTime = false;
+
+                //Encoder movements to run over the block
+                encoderRobotDrive(.75, 25.5, 25.5);
+                encoderRobotDrive(.75, -17, 17);
+                encoderRobotDrive(.75, 27, 27);
+                tossMarker();
+                encoderRobotDrive(.75, -4, 4);
+                encoderRobotDrive(1, -125, -125);
+            }
+            else if (block == 3)
+            {
+                //telemetery to show the user what path we're running
+                telemetry.addData("Path running currently: ", "left");
+                telemetry.update();
+                //sleep(500);
+                firstTime = false;
+
+                //These values will probably need changing
+                encoderRobotDrive(.75, -19.5, 19.5);
+                encoderRobotDrive(1, 24.5, 24.5);
+                encoderRobotDrive(.75, 18/2, -18/2);
+                encoderRobotDrive(1, 24, 24);
+                tossMarker();
+            }
+
+            //Lets the user know the Autonomous is complete
+            telemetry.addData("Autonomous Complete", "True");
+            telemetry.update();
+
+            //End the opMode
+            requestOpModeStop();
+
+            //add diagnostic telemetry, this should never be shown
+            telemetry.addData("If you see this:", "it's too late");
+            telemetry.update();
             //}
         }
     }
@@ -358,7 +359,7 @@ public class Team6438AutonomousServo extends LinearOpMode
 
                 while (opModeIsActive())
                 {
-                    if (robot.tfod != null && firstTime == true)
+                    if (robot.tfod != null && firstTime)
                     {
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
@@ -383,9 +384,9 @@ public class Team6438AutonomousServo extends LinearOpMode
                                 }
                                 else
                                 {
+                                    robot.cameraMount.setPosition(robot.cameraMountRight);
                                     telemetry.addData("Scanning Right", "Right");
                                     telemetry.update();
-                                    robot.cameraMount.setPosition(robot.cameraMountCenter);
                                     sleep(100);
 
                                     List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
