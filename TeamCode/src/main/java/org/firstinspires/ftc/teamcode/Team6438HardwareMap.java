@@ -77,8 +77,8 @@ class Team6438HardwareMap
     static final double confidence = .75;
 
     //Positions for the team marker servo
-    static final double toss = 1.0;
-    static final double tucked = 0.0;
+    final double toss = 1.0;
+    final double tucked = 0.0;
 
     //Method to initialize standard Hardware interfaces
     void init(HardwareMap ahwMap)
@@ -88,12 +88,12 @@ class Team6438HardwareMap
         HardwareMap hwMap = ahwMap;
 
         //Define and Initialize Motors
-        leftMotor     = hwMap.get(DcMotor.class, "leftDrive");
-        rightMotor    = hwMap.get(DcMotor.class, "rightDrive");
-        linearActuator   = hwMap.get(DcMotor.class, "linearActuator");         //Change this in the config
-        intakeSpinner = hwMap.get(DcMotor.class, "intakeSpinner");
-        intakeMover   = hwMap.get(DcMotor.class, "intakeMover");
-        intakeSlide = hwMap.get(DcMotor.class,"intakeSlide");
+        leftMotor        = hwMap.get(DcMotor.class, "leftDrive");
+        rightMotor       = hwMap.get(DcMotor.class, "rightDrive");
+        linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
+        intakeSpinner    = hwMap.get(DcMotor.class, "intakeSpinner");
+        intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
+        intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -112,13 +112,13 @@ class Team6438HardwareMap
         intakeSlide.setPower(0);
 
         //------------------------------------------------------------------------------------------
-
         // Define and initialize ALL installed servos.
+
         teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");
         cameraMount = hwMap.get(Servo.class, "cameraMount");
 
         //------------------------------------------------------------------------------------------
-        //imu map
+        // Define and initialize ALL installed sensors.
         imu = hwMap.get(BNO055IMU.class, "imu");
     }
 }

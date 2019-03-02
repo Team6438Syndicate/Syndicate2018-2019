@@ -15,7 +15,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -31,6 +30,10 @@ public class TeleOp6438Test extends OpMode
     int tuckedPosition = 1;
     int verticalPosition = 1;
     int downPosition = 1;
+
+    //Positions for the slide
+    int extendedSlide = 1;
+    int retractedSlide = 1;
 
     //Boolean to determine if were in linear Mode
     public boolean linearMode = false;
@@ -72,8 +75,9 @@ public class TeleOp6438Test extends OpMode
     @Override
     public void start()
     {
-        //When the opmode starts tuck the servo to prevent damage during gameplay
+        //When the opmode starts tuck the servos in to prevent damage during gameplay
         robot.teamMarkerServo.setPosition(robot.tucked);
+        robot.cameraMount.setPosition(robot.cameraMountTucked);
     }
     @Override
     public void loop()

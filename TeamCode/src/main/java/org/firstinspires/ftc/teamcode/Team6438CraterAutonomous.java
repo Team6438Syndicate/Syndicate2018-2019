@@ -331,46 +331,45 @@ public class Team6438CraterAutonomous extends LinearOpMode
                                 telemetry.addData("mineralLocation ", recognition.getLeft());
                                 telemetry.update();
 
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
-                                {
-                                    telemetry.addData("Value", "Center");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.update();
-                                    sleep(100);
-                                    robot.tfod.shutdown();
+                                if (recognition.getRight() < 480 && recognition.getLeft() > 240) {
+                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                        telemetry.addData("Value", "Center");
+                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                        telemetry.update();
+                                        sleep(100);
+                                        robot.tfod.shutdown();
 
-                                    //block in the center
-                                    return 1;
-                                }
-                                else
-                                {
-                                    telemetry.addData("Moving", "Right");
-                                    telemetry.update();
-                                    encoderRobotDrive(.75, 9.17, -9.17);
-                                    sleep(100);
+                                        //block in the center
+                                        return 1;
+                                    } else {
+                                        telemetry.addData("Moving", "Right");
+                                        telemetry.update();
+                                        encoderRobotDrive(.75, 9.17, -9.17);
+                                        sleep(100);
 
-                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null) {
-                                        //noinspection LoopStatementThatDoesntLoop
-                                        for (Recognition recognition2 : updatedRecognitions2)
-                                        {
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                                telemetry.addData("value", "Right");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
+                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                        if (updatedRecognitions2 != null) {
+                                            //noinspection LoopStatementThatDoesntLoop
+                                            for (Recognition recognition2 : updatedRecognitions2) {
+                                                if (recognition2.getLeft() > 300) {
+                                                    if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                        telemetry.addData("value", "Right");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
 
-                                                //block on the right
-                                                return 2;
-                                            }
-                                            else {
-                                                telemetry.addData("value", "Left");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
+                                                        //block on the right
+                                                        return 2;
+                                                    } else {
+                                                        telemetry.addData("value", "Left");
+                                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                                        telemetry.update();
+                                                        robot.tfod.shutdown();
 
-                                                //block on the left
-                                                return 3;
+                                                        //block on the left
+                                                        return 3;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
