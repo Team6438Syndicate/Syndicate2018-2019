@@ -22,7 +22,7 @@ public class SingleControllerTeleOP extends OpMode
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //Add stuff for the actuator and
+        //Add stuff for the actuator and intake slide
 
 
 
@@ -32,8 +32,9 @@ public class SingleControllerTeleOP extends OpMode
     @Override
     public void start()
     {
+        //Ensures all servos are put away to ensure prevention from damage
         robot.cameraMount.setPosition(robot.cameraMountTucked);
-
+        robot.teamMarkerServo.setPosition(robot.tucked);
     }
 
     @Override
