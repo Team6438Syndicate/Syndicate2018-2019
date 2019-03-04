@@ -60,7 +60,7 @@ public class TeleOp6438 extends OpMode
         //Declaring power variables
         double leftPower, rightPower;
         double linearActuatorPower;
-        double intakeSpinnerPower;
+        //double intakeSpinnerPower;
         double intakeSlidePower;
 
         //Left power is the left stick up and down
@@ -73,7 +73,8 @@ public class TeleOp6438 extends OpMode
         linearActuatorPower = gamepad2.left_stick_y;
 
         //Intake spinner is the right gamepad 2  stick up and down
-        intakeSpinnerPower = gamepad2.right_stick_y;
+        //intakeSpinnerPower = gamepad2.right_stick_y;
+        robot.intakeMover.setPower(gamepad2.right_stick_y);
 
         //Intake slide is the right gamepad stick 2 left and right
         intakeSlidePower = gamepad2.left_stick_x;
@@ -82,14 +83,14 @@ public class TeleOp6438 extends OpMode
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
         robot.linearActuator.setPower(linearActuatorPower);
-        robot.intakeSpinner.setPower(intakeSpinnerPower);
+        //robot.intakeSpinner.setPower(intakeSpinnerPower);
         robot.intakeSlide.setPower(intakeSlidePower);
 
         //Telemetry
         telemetry.addData("Left Power: ", leftPower);
         telemetry.addData("Right Power: ", rightPower);
         telemetry.addData("Linear Actuator Power: ", linearActuatorPower);
-        telemetry.addData("Intake Power: ", intakeSpinnerPower);
+        telemetry.addData("Intake Power: ", robot.intakeMover.getPower());
         telemetry.addData("Intake Slide Power", intakeSlidePower);
         telemetry.addData("Intake Mover Currently At: ", robot.intakeMover.getCurrentPosition());
         telemetry.addData("Arm Linear Slide Currently At: ", robot.intakeSlide.getCurrentPosition());
@@ -102,7 +103,7 @@ public class TeleOp6438 extends OpMode
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             //Intake move method invocation
-            intakeMove(.5,  -1000);
+            intakeMove(.5,  1000);
 
             //Should be able to be deleted
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
