@@ -28,9 +28,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-@Deprecated
 @Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side", group = "Team 6438 Autonomous")
+@Autonomous(name = "Depot Side Drop ", group = "Team 6438 Autonomous")
 public class AutonomousTestChangedForFinals extends LinearOpMode
 {
     //First time evaluation
