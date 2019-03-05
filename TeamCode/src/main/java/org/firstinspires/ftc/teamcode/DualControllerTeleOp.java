@@ -96,7 +96,7 @@ public class DualControllerTeleOp extends OpMode
         {
             intakeSlide(1,robot.intakeMax);
         }
-        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.intake))
+        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.intakeMinimum))
 
         //Linear Actuator is controlled by the right stick up and down
         linearActuatorPower = -gamepad2.right_stick_y;
