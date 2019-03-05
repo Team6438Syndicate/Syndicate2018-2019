@@ -92,11 +92,14 @@ public class DualControllerTeleOp extends OpMode
         }
 
         //Logic for extending and retracting the slide
-        if ( (gamepad2.dpad_left && robot.intakeSlide.getCurrentPosition() < robot.intakeMax ) )
+        if ( (gamepad2.dpad_left && robot.intakeSlide.getCurrentPosition() < robot.slideUnExtended ) )
         {
-            intakeSlide(1,robot.intakeMax);
+            intakeSlide(1,robot.slideExtended);
         }
-        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.intake))
+        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.slideExtended))
+        {
+            intakeSlide(1,robot.slideUnExtended);
+        }
 
         //Linear Actuator is controlled by the right stick up and down
         linearActuatorPower = -gamepad2.right_stick_y;

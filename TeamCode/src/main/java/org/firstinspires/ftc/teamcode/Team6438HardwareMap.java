@@ -71,7 +71,7 @@ class Team6438HardwareMap
     //Positions for intake
     final int intakeOutPosition = 100;                  //This is the position just high enough to clear the crater
     final int intakeDunk = 400;                         //This is the position where the balls fall into the lander
-    final int intakeFloor = 600;                        //This is the positon where the intake is above the floor
+    final int intakeFloor = 600;                        //This is the position where the intake is above the floor
     final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
     final int intakeMax = 0;                            //This is the lowest the intake can be before causing the motor to lock.
 

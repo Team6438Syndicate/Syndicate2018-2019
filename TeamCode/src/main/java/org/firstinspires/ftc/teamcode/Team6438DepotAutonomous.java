@@ -18,6 +18,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,8 +28,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
-
-//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Deprecated
+@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Depot Side", group = "Team 6438 Autonomous")
 public class Team6438DepotAutonomous extends LinearOpMode
 {
@@ -81,7 +82,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
             if (firstTime)
             {
                 //move the actuator up and over
-                actuatorMove(1, 17800/robot.linearCPI);
+                actuatorMove(1, 17800/robot.linearActuatorCPI);
 
                 //Move forward to get a better view of the blocks
                 encoderRobotDrive(1, 5, 5);
@@ -161,8 +162,8 @@ public class Team6438DepotAutonomous extends LinearOpMode
         if (opModeIsActive())
         {
             //Using the current position and the new desired position send this to the motor
-            leftTarget = startLeftPosition + (int) (leftInches * robot.CPI);
-            rightTarget = startRightPosition + (int) (rightInches * robot.CPI);
+            leftTarget = startLeftPosition + (int) (leftInches * robot.hexCPI);
+            rightTarget = startRightPosition + (int) (rightInches * robot.hexCPI);
             robot.leftMotor.setTargetPosition(leftTarget);
             robot.rightMotor.setTargetPosition(rightTarget);
 
@@ -200,7 +201,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
         if (opModeIsActive())
         {
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
+            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearActuatorCPI);
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
@@ -270,7 +271,7 @@ public class Team6438DepotAutonomous extends LinearOpMode
     //Method to move the intake spinner (probably not necessary in autonomous)
     private void intakeSpin(double speed, long duration)
     {
-        robot.intakeSpinner.setPower(speed);
+        //robot.intakeSpinner.setPower(speed);
         telemetry.addData("Speed", speed);
         telemetry.update();
         sleep(duration);

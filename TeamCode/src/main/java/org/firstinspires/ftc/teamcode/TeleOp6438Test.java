@@ -18,6 +18,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+@Deprecated
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @TeleOp(name = "Team 6438 Driver Controlled (Test) ", group = "Team 6438 TeleOp (Test)")
 public class TeleOp6438Test extends OpMode
@@ -168,7 +169,7 @@ public class TeleOp6438Test extends OpMode
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
         robot.linearActuator.setPower(linearActuatorPower);
-        robot.intakeSpinner.setPower(intakeSpinnerPower);
+        //robot.intakeSpinner.setPower(intakeSpinnerPower);
         //robot.intakeSlide.setPower(intakeSlidePower);
 
         //Telemetry
