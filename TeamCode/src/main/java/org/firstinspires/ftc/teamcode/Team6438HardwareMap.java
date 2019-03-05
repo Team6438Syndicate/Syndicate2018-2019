@@ -24,23 +24,25 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 class Team6438HardwareMap
 {
+
     //Motor mapping
     DcMotor leftMotor        = null;
     DcMotor rightMotor       = null;
     DcMotor linearActuator   = null;
-    DcMotor intakeSpinner    = null;
     DcMotor intakeMover      = null;
     DcMotor intakeSlide      = null;
 
     //Servo mapping
     Servo teamMarkerServo   = null;
     Servo cameraMount = null;
+    CRServo leftIntake = null;
+    CRServo rightIntake = null;
 
     //Sensor Mapping
     BNO055IMU imu     = null;
 
     //Variables
-    private final double CPR = 288;
+    private final double hexCPR = 288;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
     private final double DGR = 1.0;
@@ -49,17 +51,17 @@ class Team6438HardwareMap
     private final double WDI = 3.8;
 
     //Counts per Inch
-    final double CPI = (CPR * DGR)
-            / (WDI * Math.PI);
+    final double hexCPI = (hexCPR * DGR)
+                        / (WDI * Math.PI);
 
     //CPR for linear and intake motors
-    private final double otherCPR = 1120;
+    private final double linearActuatorCPR = 1120;
 
     //Gear Reduction for linear slide
-    private final double GRL = 2.0;
+    private final double GRL = 1.0;
 
     // CPI for linear slide
-    final double linearCPI = otherCPR * GRL;
+    final double linearActuatorCPI = linearActuatorCPR * GRL;
 
     //Camera mount servo positions
     final double cameraMountTucked = 1;
@@ -76,6 +78,7 @@ class Team6438HardwareMap
     //Positions for the slides
     final int slideExtended = 0;                        //This is the motor encoder position when the slide is all the way out
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
+
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -102,7 +105,6 @@ class Team6438HardwareMap
         leftMotor        = hwMap.get(DcMotor.class, "leftDrive");
         rightMotor       = hwMap.get(DcMotor.class, "rightDrive");
         linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
-        intakeSpinner    = hwMap.get(DcMotor.class, "intakeSpinner");
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
@@ -110,7 +112,6 @@ class Team6438HardwareMap
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
         rightMotor.setDirection(DcMotor.Direction.FORWARD);
         linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeSpinner.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
@@ -118,7 +119,6 @@ class Team6438HardwareMap
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         linearActuator.setPower(0);
-        intakeSpinner.setPower(0);
         intakeMover.setPower(0);
         intakeSlide.setPower(0);
 
@@ -127,7 +127,11 @@ class Team6438HardwareMap
 
         teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");
         cameraMount = hwMap.get(Servo.class, "cameraMount");
+        leftIntake = hwMap.get(CRServo.class,"leftIntake");
+        rightIntake = hwMap.get(CRServo.class,"rightIntake");
 
+        //Maybe??
+        //rightIntake.setDirection(CRServo.Direction.REVERSE);
 
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed sensors.

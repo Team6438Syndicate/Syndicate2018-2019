@@ -4,16 +4,16 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "Single Controller TeleOp", group = "TeleOp 6438")
-public class SingleControllerTeleOP extends OpMode
+@TeleOp(name = "Dual Controller TeleOp", group = "TeleOp 6438")
+public class DualControllerTeleOp extends OpMode
 {
-    //Reference to our hardware map
+   //Reference to our hardware map
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
     @Override
     public void init()
     {
-        //Init the hardware
+        //init the hardware
         robot.init(hardwareMap);
 
         //Reset encoders
@@ -27,126 +27,87 @@ public class SingleControllerTeleOP extends OpMode
         //Add stuff for the actuator and intake slide
 
 
-        //Telemetry to let use know the hardware has been successfully mapped
+        //telemetry
         telemetry.addData("Hardware Status: ", "Mapped");
         telemetry.update();
-
-    }
-
-    @Override
-    public void start()
-    {
-        //Ensures all servos are put away to ensure prevention from damage
-        robot.cameraMount.setPosition(robot.cameraMountTucked);
-        robot.teamMarkerServo.setPosition(robot.tucked);
-
-        //in case tfod is on shut it down to prevent CPU overloading
-        if(robot.tfod != null)
-        {
-            robot.tfod.shutdown();
-        }
     }
 
     @Override
     public void loop()
     {
-        /*
-         * Logic for drive motors
-         */
         //Variables for power
         double leftPower, rightPower;
+        double leftIntakePower, rightIntakePower;
+        double linearActuatorPower = 0;
 
-        //Assigning said powers
-        leftPower = -gamepad1.left_stick_y;
-        rightPower = -gamepad1.right_stick_y;
 
-        robot.leftMotor.setPower(leftPower);
-        robot.rightMotor.setPower(rightPower);
-
-        /*
-          Control for actuator
-         */
-        while(gamepad1.left_stick_x > .25 || gamepad1.left_stick_x < .25)
+        //Logic for the intake
+        if(gamepad2.right_trigger > .01)
         {
-            robot.linearActuator.setPower(gamepad1.right_stick_x/2);
-            telemetry.addData("Linear Actuator Power: ", robot.linearActuator.getPower());
-            telemetry.update();
+            leftIntakePower = gamepad2.right_trigger;
+            rightIntakePower = gamepad2.right_trigger;
         }
-        if(gamepad2.y)
+        else if (gamepad2.left_trigger > .01)
         {
-            robotHang();
-        }
-
-
-        /*
-          Intake Spinner Logic
-         */
-        //Logic to control the spinner at the end of the intake
-        if ( gamepad1.a )
-        {
-            intakeSpin(1);
-        }
-        else if ( gamepad2.b )
-        {
-            intakeSpin(-1);
+            leftIntakePower = gamepad2.left_trigger;
+            rightIntakePower = -gamepad2.left_trigger;
         }
         else
         {
-            intakeSpin(0);
-        }
-
-        /*
-         * Intake Slide logic
-         */
-        if(gamepad1.dpad_left && (robot.intakeSlide.getCurrentPosition() < robot.slideExtended) )
-        {
-            intakeSlide(.5, robot.slideExtended);
-        }
-        else if (gamepad1.dpad_right && (robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) )
-        {
-            intakeSlide(.5,robot.slideUnExtended);
-        }
-        else if ( gamepad1.right_stick_x > .25 || gamepad1.right_stick_x > -.25)
-        {
-            robot.intakeSlide.setPower(gamepad1.right_stick_x);
-        }
-
-        /*
-          Intake Move logic
-         */
-        //Logic for moving the intake based on triggers
-        if(gamepad1.left_trigger > 0.01 && robot.intakeMover.getCurrentPosition() > robot.intakeMinimum )
-        {
-            intakeMove(1,robot.intakeMover.getCurrentPosition() + gamepad1.left_trigger * 100);
-        }
-        else if (gamepad1.right_trigger > 0.01 && robot.intakeMover.getCurrentPosition() < robot.intakeMax )
-        {
-            intakeMove(1,robot.intakeMover.getCurrentPosition() - gamepad1.right_trigger * 100);
-        }
-        else if (gamepad1.dpad_up && (robot.intakeMover.getCurrentPosition() != robot.intakeDunk) )
-        {
-            intakeMove(1,robot.intakeDunk);
-        }
-        else if (gamepad1.dpad_down && (robot.intakeMover.getCurrentPosition() != robot.intakeFloor))
-        {
-            intakeMove(1,robot.intakeFloor);
-        }
-        //If X is pressed pop the intake out
-        else if(gamepad1.x && robot.intakeMover.getCurrentPosition() == 0)
-        {
-            intakeMove(1,robot.intakeOutPosition);
+            leftIntakePower = 0;
+            rightIntakePower = 0;
         }
 
 
-    }
+        //Logic for the motors
+        if( (gamepad1.left_stick_y > .01 || gamepad1.left_stick_y < .01) || (gamepad1.right_stick_y >.01 || gamepad1.right_stick_y < .01) )
+        {
+            leftPower = -gamepad1.left_stick_y;
+            rightPower = -gamepad2.right_stick_y;
+        }
+        else if (gamepad1.left_trigger > .01)
+        {
+            leftPower = gamepad1.left_trigger;
+            rightPower = gamepad1.right_trigger;
+        }
+        else if (gamepad1.right_trigger > .01)
+        {
+            leftPower = gamepad1.right_trigger;
+            rightPower = gamepad1.right_trigger;
+        }
+        else
+        {
+            leftPower = 0;
+            rightPower = 0;
+        }
 
-    //Method to spin the intake
-    private void intakeSpin (double power)
-    {
-        robot.leftIntake.setPower(power);
+        //Logic for moving the intake
+        if ( (gamepad2.dpad_up && robot.intakeMover.getCurrentPosition() < robot.intakeMax ) )      //If the dpad is pressed and the intakeMover is at less than max move it up
+        {
+            intakeMove( 1,robot.intakeMover.getCurrentPosition() + 100);
+        }
+        else if ( (gamepad2.dpad_down && robot.intakeMover.getCurrentPosition() > robot.intakeMinimum) )
+        {
+            intakeMove(1,robot.intakeMover.getCurrentPosition() - 100);
+        }
 
-        //one of these might have to be negative power
-        robot.rightIntake.setPower(power);
+        //Logic for extending and retracting the slide
+        if ( (gamepad2.dpad_left && robot.intakeSlide.getCurrentPosition() < robot.intakeMax ) )
+        {
+            intakeSlide(1,robot.intakeMax);
+        }
+        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.intake))
+
+        //Linear Actuator is controlled by the right stick up and down
+        linearActuatorPower = -gamepad2.right_stick_y;
+
+        //Sets the power to the motors
+        robot.leftMotor.setPower(leftPower);
+        robot.rightMotor.setPower(rightPower);
+        robot.linearActuator.setPower(linearActuatorPower);
+        robot.leftIntake.setPower(leftIntakePower);
+        robot.rightIntake.setPower(rightIntakePower);
+
     }
 
     //Method to move the intake

@@ -104,7 +104,7 @@ public class Team6438AutonomousServo extends LinearOpMode
             robot.cameraMount.setPosition(robot.cameraMountTucked);
 
             //Moves the robot down
-            actuatorMove(1,18000/robot.linearCPI);
+            actuatorMove(1,18000/robot.linearActuatorCPI);
 
             //Block logic (separated into ifs because we need different motions depending on where the block is
             if (block == 1)
@@ -199,8 +199,8 @@ public class Team6438AutonomousServo extends LinearOpMode
         if (opModeIsActive())
         {
             //Using the current position and the new desired position send this to the motor
-            leftTarget = startLeftPosition + (int) (leftInches * robot.CPI);
-            rightTarget = startRightPosition + (int) (rightInches * robot.CPI);
+            leftTarget = startLeftPosition + (int) (leftInches * robot.hexCPI);
+            rightTarget = startRightPosition + (int) (rightInches * robot.hexCPI);
             robot.leftMotor.setTargetPosition(leftTarget);
             robot.rightMotor.setTargetPosition(rightTarget);
 
@@ -238,7 +238,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         if (opModeIsActive())
         {
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.linearCPI);
+            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.hexCPI);
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
@@ -308,8 +308,9 @@ public class Team6438AutonomousServo extends LinearOpMode
     //Method to move the intake spinner (probably not necessary in autonomous)
     private void intakeSpin(double speed, long duration)
     {
-        robot.intakeSpinner.setPower(speed);
-        telemetry.addData("Speed", speed);
+        robot.leftIntake.setPower(speed);
+        robot.rightIntake.setPower(speed);
+        telemetry.addData("Speed of Intake: ", speed);
         telemetry.update();
         sleep(duration);
     }
