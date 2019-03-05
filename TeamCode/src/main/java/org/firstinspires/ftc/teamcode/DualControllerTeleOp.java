@@ -49,7 +49,7 @@ public class DualControllerTeleOp extends OpMode
         }
         else if (gamepad2.left_trigger > .01)
         {
-            leftIntakePower = gamepad2.left_trigger;
+            leftIntakePower = -gamepad2.left_trigger;
             rightIntakePower = -gamepad2.left_trigger;
         }
         else
