@@ -66,6 +66,17 @@ class Team6438HardwareMap
     final double cameraMountCenter = .15;
     final double cameraMountRight = 0;
 
+    //Positions for intake
+    final int intakeOutPosition = 100;                  //This is the position just high enough to clear the crater
+    final int intakeDunk = 400;                         //This is the position where the balls fall into the lander
+    final int intakeFloor = 600;                        //This is the positon where the intake is above the floor
+    final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
+    final int intakeMax = 0;                            //This is the lowest the intake can be before causing the motor to lock.
+
+    //Positions for the slides
+    final int slideExtended = 0;                        //This is the motor encoder position when the slide is all the way out
+    final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
+
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     final String LABEL_SILVER_MINERAL = "Silver Mineral";
@@ -74,7 +85,7 @@ class Team6438HardwareMap
     TFObjectDetector tfod;
 
     //Place in a number 0.0 - 1.0
-    static final double confidence = .75;
+    static final double confidence = .5;
 
     //Positions for the team marker servo
     final double toss = 1.0;
@@ -116,6 +127,7 @@ class Team6438HardwareMap
 
         teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");
         cameraMount = hwMap.get(Servo.class, "cameraMount");
+
 
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed sensors.
