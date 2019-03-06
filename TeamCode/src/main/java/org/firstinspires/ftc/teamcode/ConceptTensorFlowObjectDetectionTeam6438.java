@@ -14,8 +14,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
+@Deprecated
 @TeleOp(name = "Camera View for TensorFlow", group = "Test")
-//@Disabled
+@Disabled
 public class ConceptTensorFlowObjectDetectionTeam6438 extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";

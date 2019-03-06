@@ -66,11 +66,15 @@ public class SingleControllerTeleOP extends OpMode
         /*
           Control for actuator
          */
-        while(gamepad1.left_stick_x > .25 || gamepad1.left_stick_x < .25)
+        if(gamepad1.left_stick_x > .25 || gamepad1.left_stick_x < -.25)
         {
-            robot.linearActuator.setPower(gamepad1.right_stick_x/2);
+            robot.linearActuator.setPower(-gamepad1.left_stick_x);
             telemetry.addData("Linear Actuator Power: ", robot.linearActuator.getPower());
             telemetry.update();
+        }
+        else
+        {
+            robot.linearActuator.setPower(0);
         }
         if(gamepad2.y)
         {
@@ -86,7 +90,7 @@ public class SingleControllerTeleOP extends OpMode
         {
             intakeSpin(1);
         }
-        else if ( gamepad2.b )
+        else if ( gamepad1.b )
         {
             intakeSpin(-1);
         }
@@ -98,11 +102,11 @@ public class SingleControllerTeleOP extends OpMode
         /*
          * Intake Slide logic
          */
-        if(gamepad1.dpad_left && (robot.intakeSlide.getCurrentPosition() < robot.slideExtended) )
+        if(gamepad1.dpad_left && (robot.intakeSlide.getCurrentPosition() < robot.slideExtended) && (robot.linearActuator.getCurrentPosition() < 16000) )
         {
             intakeSlide(.5, robot.slideExtended);
         }
-        else if (gamepad1.dpad_right && (robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) )
+        else if (gamepad1.dpad_right && (robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) && (robot.linearActuator.getCurrentPosition() < 16000) )
         {
             intakeSlide(.5,robot.slideUnExtended);
         }
@@ -115,13 +119,13 @@ public class SingleControllerTeleOP extends OpMode
           Intake Move logic
          */
         //Logic for moving the intake based on triggers
-        if(gamepad1.left_trigger > 0.01 && robot.intakeMover.getCurrentPosition() > robot.intakeMinimum )
+        if(gamepad1.left_trigger > 0.05)
         {
-            intakeMove(1,robot.intakeMover.getCurrentPosition() + gamepad1.left_trigger * 100);
+            intakeMove(1,gamepad1.left_trigger * 65);
         }
-        else if (gamepad1.right_trigger > 0.01 && robot.intakeMover.getCurrentPosition() < robot.intakeMax )
+        else if (gamepad1.right_trigger > 0.05)
         {
-            intakeMove(1,robot.intakeMover.getCurrentPosition() - gamepad1.right_trigger * 100);
+            intakeMove(1, -gamepad1.right_trigger * 65);
         }
         else if (gamepad1.dpad_up && (robot.intakeMover.getCurrentPosition() != robot.intakeDunk) )
         {
@@ -146,7 +150,7 @@ public class SingleControllerTeleOP extends OpMode
         robot.leftIntake.setPower(power);
 
         //one of these might have to be negative power
-        robot.rightIntake.setPower(power);
+        robot.rightIntake.setPower(-power);
     }
 
     //Method to move the intake

@@ -92,7 +92,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         while (opModeIsActive())
         {
             //move the actuator up and over
-            //actuatorMove(1, 17800/robot.linearCPI);  //This will go at the bottom
+            actuatorMove(1, 18000/robot.linearActuatorCPI);  //This will go at the bottom
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             block = queryTensorFlow();
@@ -102,9 +102,6 @@ public class Team6438AutonomousServo extends LinearOpMode
             //{
             //Tucks in the servo
             robot.cameraMount.setPosition(robot.cameraMountTucked);
-
-            //Moves the robot down
-            actuatorMove(1,18000/robot.linearActuatorCPI);
 
             //Block logic (separated into ifs because we need different motions depending on where the block is
             if (block == 1)
@@ -117,7 +114,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 sleep(10000);
 
                 //Encoder movements to run over the block
-                encoderRobotDrive(preciseSpeed, 47.875, 47.875);
+                encoderRobotDrive(quickSpeed, 53, 53);
                 tossMarker();
 
                 //Encoder movements to turn and run towards crater
@@ -139,9 +136,10 @@ public class Team6438AutonomousServo extends LinearOpMode
                 sleep(10000);
 
                 //Encoder movements to run over the block
-                encoderRobotDrive(preciseSpeed, 25.5, 25.5);
+                encoderRobotDrive(preciseSpeed, 19.5, -19.5);
+                encoderRobotDrive(quickSpeed, 25.5, 25.5);
                 encoderRobotDrive(preciseSpeed, -17, 17);
-                encoderRobotDrive(preciseSpeed, 27, 27);
+                encoderRobotDrive(quickSpeed, 27, 27);
                 tossMarker();
                 encoderRobotDrive(preciseSpeed, -4, 4);
                 encoderRobotDrive(quickSpeed, -125, -125);
@@ -158,7 +156,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 //These values will probably need changing
                 encoderRobotDrive(preciseSpeed, -19.5, 19.5);
                 encoderRobotDrive(quickSpeed, 24.5, 24.5);
-                encoderRobotDrive(preciseSpeed, 18/2, -18/2);
+                encoderRobotDrive(preciseSpeed, 9, -9);
                 encoderRobotDrive(quickSpeed, 24, 24);
                 tossMarker();
             }

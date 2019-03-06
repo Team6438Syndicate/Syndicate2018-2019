@@ -5,10 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "Dual Controller TeleOp", group = "TeleOp 6438")
-public class DualControllerTeleOp extends OpMode
+public class DualControllerTeleOP extends OpMode
 {
-   //Reference to our hardware map
+    //Reference to our hardware map
     Team6438HardwareMap robot = new Team6438HardwareMap();
+
+    private double intakePower = 0;
 
     @Override
     public void init()
@@ -37,79 +39,53 @@ public class DualControllerTeleOp extends OpMode
     {
         //Variables for power
         double leftPower, rightPower;
-        double leftIntakePower, rightIntakePower;
+
         double linearActuatorPower = 0;
 
 
         //Logic for the intake
-        if(gamepad2.right_trigger > .01)
+        if( gamepad2.a && intakePower == 0 )        //Tested
         {
-            leftIntakePower = gamepad2.right_trigger;
-            rightIntakePower = gamepad2.right_trigger;
+            intakePower = 1;
         }
-        else if (gamepad2.left_trigger > .01)
+        else if ( gamepad2.a && intakePower != 0)   //Tested
         {
-            leftIntakePower = gamepad2.left_trigger;
-            rightIntakePower = -gamepad2.left_trigger;
+            intakePower = 0;
         }
-        else
+        if (gamepad2.b)                             //Tested
         {
-            leftIntakePower = 0;
-            rightIntakePower = 0;
+            intakePower = -1;
         }
 
-
-        //Logic for the motors
-        if( (gamepad1.left_stick_y > .01 || gamepad1.left_stick_y < .01) || (gamepad1.right_stick_y >.01 || gamepad1.right_stick_y < .01) )
-        {
-            leftPower = -gamepad1.left_stick_y;
-            rightPower = -gamepad2.right_stick_y;
-        }
-        else if (gamepad1.left_trigger > .01)
-        {
-            leftPower = gamepad1.left_trigger;
-            rightPower = gamepad1.right_trigger;
-        }
-        else if (gamepad1.right_trigger > .01)
-        {
-            leftPower = gamepad1.right_trigger;
-            rightPower = gamepad1.right_trigger;
-        }
-        else
-        {
-            leftPower = 0;
-            rightPower = 0;
-        }
-
-        //Logic for moving the intake
-        if ( (gamepad2.dpad_up && robot.intakeMover.getCurrentPosition() < robot.intakeMax ) )      //If the dpad is pressed and the intakeMover is at less than max move it up
-        {
-            intakeMove( 1,robot.intakeMover.getCurrentPosition() + 100);
-        }
-        else if ( (gamepad2.dpad_down && robot.intakeMover.getCurrentPosition() > robot.intakeMinimum) )
-        {
-            intakeMove(1,robot.intakeMover.getCurrentPosition() - 100);
-        }
-
-        //Logic for extending and retracting the slide
-        if ( (gamepad2.dpad_left && robot.intakeSlide.getCurrentPosition() < robot.slideUnExtended ) )
+        //Logic for the intake slide
+        if ( gamepad2.dpad_up && robot.intakeSlide.getCurrentPosition() < robot.slideExtended )     //Untested
         {
             intakeSlide(1,robot.slideExtended);
         }
-        else if ( (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() > robot.slideExtended))
+        else if ( gamepad2.dpad_down && robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) //Untested
         {
-            intakeSlide(1,robot.slideUnExtended);
+            intakeSlide(.3,robot.slideUnExtended);
         }
 
-        //Linear Actuator is controlled by the right stick up and down
-        linearActuatorPower = -gamepad2.right_stick_y;
+        //Logic for intake itself
+        if( (gamepad2.x && !gamepad1.x) ||  (gamepad1.x && !gamepad2.x) )                           //Tested
+        {
+            telemetry.addData("TO COMPLETE PROCESS: ", "PRESS DOWN BOTH X BUTTONS");
+            telemetry.update();
+        }
+        if ( gamepad2.x && gamepad1.x && robot.linearActuator.getCurrentPosition()>10000)           //Untested
+        {
+            telemetry.addData("LOWER ACTUATOR BEFORE BEGINNING ","ASAP");
+        }
+        else if ( gamepad2.x && gamepad1.x && robot.linearActuator.getCurrentPosition() < 10000 )   //Untested
+        {
+            intakeMove(1,robot.intakeOutPosition);
+        }
 
-        //Sets the power to the motors
-        robot.leftMotor.setPower(leftPower);
-        robot.rightMotor.setPower(rightPower);
-        robot.linearActuator.setPower(linearActuatorPower);
-        robot.leftIntake.setPower(leftIntakePower);
-        robot.rightIntake.setPower(rightIntakePower);
+        while ( gamepad1.left_stick_y != 0 m)
+
+        telemetry.addData("Intake Power:", intakePower );
+        telemetry.update();
 
     }
 

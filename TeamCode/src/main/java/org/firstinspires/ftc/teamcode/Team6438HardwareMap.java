@@ -69,14 +69,14 @@ class Team6438HardwareMap
     final double cameraMountRight = 0;
 
     //Positions for intake
-    final int intakeOutPosition = 100;                  //This is the position just high enough to clear the crater
-    final int intakeDunk = 400;                         //This is the position where the balls fall into the lander
-    final int intakeFloor = 600;                        //This is the position where the intake is above the floor
+    final int intakeOutPosition = 2082;                  //This is the position just high enough to clear the crater
+    final int intakeDunk = 1450;                         //This is the position where the balls fall into the lander
+    final int intakeFloor = 2200;                        //This is the position where the intake is above the floor
     final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
-    final int intakeMax = 0;                            //This is the lowest the intake can be before causing the motor to lock.
+    final int intakeMax = 2400;                            //This is the lowest the intake can be before causing the motor to lock.
 
     //Positions for the slides
-    final int slideExtended = 0;                        //This is the motor encoder position when the slide is all the way out
+    final int slideExtended = 791;                        //This is the motor encoder position when the slide is all the way out
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
 
