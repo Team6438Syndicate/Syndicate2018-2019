@@ -76,11 +76,11 @@ public class Team6438AutonomousServo extends LinearOpMode
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
-        //Makes sure the camera is looking at the center
-        robot.cameraMount.setPosition(robot.cameraMountCenter);
-
         //Wait for the start button to be pressed by the driver
         waitForStart();
+
+        //Makes sure the camera is looking at the center
+        robot.cameraMount.setPosition(robot.cameraMountCenter);
 
         //Boolean to ensure we only run the block check the first time around
         firstTime = true;
@@ -92,7 +92,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         while (opModeIsActive())
         {
             //move the actuator up and over
-            actuatorMove(1, 18000/robot.linearActuatorCPI);  //This will go at the bottom
+            actuatorMove(1, 18000);  //This will go at the bottom
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             block = queryTensorFlow();
@@ -104,14 +104,14 @@ public class Team6438AutonomousServo extends LinearOpMode
             robot.cameraMount.setPosition(robot.cameraMountTucked);
 
             //Block logic (separated into ifs because we need different motions depending on where the block is
-            if (block == 1)
+            if (block == 1)                 //center
             {
-                //telemetery to show the user what path we're running
+                //telemetry to show the user what path we're running
                 telemetry.addData("Path running currently: ", "center");
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-                sleep(10000);
+                //sleep(10000);
 
                 //Encoder movements to run over the block
                 encoderRobotDrive(quickSpeed, 53, 53);
@@ -126,7 +126,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 //Add Methods to extend intake
 
             }
-            else if (block == 2)
+            else if (block == 2)                        //right
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "right");
@@ -144,7 +144,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 encoderRobotDrive(preciseSpeed, -4, 4);
                 encoderRobotDrive(quickSpeed, -125, -125);
             }
-            else if (block == 3)
+            else if (block == 3)                    //left
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "left");
@@ -221,25 +221,24 @@ public class Team6438AutonomousServo extends LinearOpMode
             //When done stop all the motion and turn off run to position
             robot.leftMotor.setPower(0);
             robot.rightMotor.setPower(0);
+
+            //Run using encoders
             robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //sleep after each move
+            if ( sleeps ) sleep(250);
         }
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches)
+    private void actuatorMove(double speed, int position)
     {
-        //Set up a new target variable
-        int newTarget;  //(x/robot.)
-
         // Ensure that the opmode is still active
         if (opModeIsActive())
         {
-            // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.hexCPI);
-
             //Passes this target
-            robot.linearActuator.setTargetPosition(newTarget);
+            robot.linearActuator.setTargetPosition(position);
 
             // Turn On RUN_TO_POSITION
             robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -251,8 +250,8 @@ public class Team6438AutonomousServo extends LinearOpMode
             while (opModeIsActive() && robot.linearActuator.isBusy())
             {
                 // Display it for the driver.
-                telemetry.addData("Actuator moving to", newTarget);
-                telemetry.addData("Actuator at", robot.linearActuator.getCurrentPosition());
+                telemetry.addData("Actuator moving to ", position);
+                telemetry.addData("Actuator at ", robot.linearActuator.getCurrentPosition());
                 telemetry.update();
             }
 
@@ -262,21 +261,6 @@ public class Team6438AutonomousServo extends LinearOpMode
             // Turn off RUN_TO_POSITION
             robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            //  sleep(250);   // optional pause after each move
-        }
-    }
-
-    //Method to move the actuator
-    @Deprecated
-    private void actuatorByTime(int time)
-    {
-        // Ensure that the opmode is still active
-        if (opModeIsActive())
-        {
-            // reset the timeout time and start motion.
-            robot.linearActuator.setPower(1);
-            sleep(time);
-            robot.linearActuator.setPower(0);
             //  sleep(250);   // optional pause after each move
         }
     }
@@ -317,13 +301,13 @@ public class Team6438AutonomousServo extends LinearOpMode
     private void tossMarker()
     {
         //Sleep for a quater second to make sure the servo can perform the action
-        sleep(250);
+        if(sleeps) sleep(250);
 
         //Toss the servo
         robot.teamMarkerServo.setPosition(robot.toss);
 
         //Sleep again to make sure markers is off
-        sleep(250);
+        if(sleeps) sleep(250);
     }
 
     /**
@@ -346,9 +330,6 @@ public class Team6438AutonomousServo extends LinearOpMode
     {
         while (opModeIsActive() )
         {
-            //int to determine gold block location: 1 = center, 2 = right, 3 = left
-            int goldLocation = 0;
-
             if (opModeIsActive())
             {
                 //Call the init TFod method to get block detection ready

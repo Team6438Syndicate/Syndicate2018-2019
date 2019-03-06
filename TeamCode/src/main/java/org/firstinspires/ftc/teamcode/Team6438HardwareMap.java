@@ -25,6 +25,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 class Team6438HardwareMap
 {
 
+
     //Motor mapping
     DcMotor leftMotor        = null;
     DcMotor rightMotor       = null;
@@ -54,14 +55,6 @@ class Team6438HardwareMap
     final double hexCPI = (hexCPR * DGR)
                         / (WDI * Math.PI);
 
-    //CPR for linear and intake motors
-    private final double linearActuatorCPR = 1120;
-
-    //Gear Reduction for linear slide
-    private final double GRL = 1.0;
-
-    // CPI for linear slide
-    final double linearActuatorCPI = linearActuatorCPR * GRL;
 
     //Camera mount servo positions
     final double cameraMountTucked = 1;
@@ -79,6 +72,8 @@ class Team6438HardwareMap
     final int slideExtended = 791;                        //This is the motor encoder position when the slide is all the way out
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
+    //Variables for the actuator
+    final int laInterference = 10000;                   //Min position where the linear actuator can be as to not cause damage
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
