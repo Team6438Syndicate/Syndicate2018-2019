@@ -32,8 +32,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side w/ Servo", group = "Team 6438 Autonomous")
-public class Team6438AutonomousServo extends LinearOpMode
+@Autonomous(name = "Crater Nut", group = "Team 6438 Autonomous")
+public class CraterNut extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -92,7 +92,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         while (opModeIsActive())
         {
             //move the actuator up and over
-            //actuatorMove(1, 18100);  //This will go at the bottom
+            //actuatorMove(1, 18100);
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             block = queryTensorFlow();
@@ -111,28 +111,30 @@ public class Team6438AutonomousServo extends LinearOpMode
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-                //sleep(10000);
 
-
-                //we have way too much time maybe extend intake or something like that
-
-                //Encoder movements to run over the block
-                encoderRobotDrive(quickSpeed, 53, 53);
-
+                //Hit Center Mineral
+                encoderRobotDrive(quickSpeed, 40, 40);
+                //Back Up Towards Lander
+                encoderRobotDrive(quickSpeed, -30, -30);
+                //Turn Towards Wall
+                encoderRobotDrive(quickSpeed, -17.5, 17.5);
+                //Move Towards Wall
+                encoderRobotDrive(quickSpeed, 41.5, 41.5);
+                //Turn Towards Depot
+                encoderRobotDrive(quickSpeed, -16.5, 16.5);
+                //Drive Into Depot
+                encoderRobotDrive(quickSpeed, 43, 43);
+                //Drop Team Marker
                 tossMarker();
-
-                //Encoder movements to turn and run towards crater
-                encoderRobotDrive(preciseSpeed, -15, 15);
-                encoderRobotDrive(quickSpeed, -25, -25);
-                encoderRobotDrive(1,5,-5);
-                encoderRobotDrive(1,-50,-50);
+                //Drive Into Crater
+                encoderRobotDrive(quickSpeed, -57, -57);
 
                 //If time allows double sample code here
 
                 //Add Methods to extend intake
 
             }
-            else if (block == 2)        //DOES NOT WORK
+            else if (block == 2)
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "right");
@@ -140,16 +142,26 @@ public class Team6438AutonomousServo extends LinearOpMode
                 //sleep(500);
                 firstTime = false;
 
-                //Encoder movements to run over the block
-                encoderRobotDrive(preciseSpeed, 19.5, -19.5);
-                encoderRobotDrive(quickSpeed, 25.5, 25.5);
-                encoderRobotDrive(preciseSpeed, -17, 17);
-                encoderRobotDrive(quickSpeed, 27, 27);
+                //Turn Right
+                encoderRobotDrive(quickSpeed, 0, 0);
+                //Hit Right Mineral
+                encoderRobotDrive(quickSpeed, 0, 0);
+                //Back Up Towards Lander
+                encoderRobotDrive(quickSpeed, 0, 0);
+                //Turn Towards Wall
+                encoderRobotDrive(quickSpeed, 0, 0);
+                //Move Towards Wall
+                encoderRobotDrive(quickSpeed, 42.5, 42.5);
+                //Turn Towards Depot
+                encoderRobotDrive(quickSpeed, -16.5, 16.5);
+                //Drive Into Depot
+                encoderRobotDrive(quickSpeed, 43, 43);
+                //Drop Team Marker
                 tossMarker();
-                encoderRobotDrive(preciseSpeed, -4, 4);
-                encoderRobotDrive(quickSpeed, -125, -125);
+                //Drive Into Crater
+                encoderRobotDrive(quickSpeed, -57, -57);
             }
-            else if (block == 3) //does not work
+            else if (block == 3)
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "left");
@@ -157,13 +169,27 @@ public class Team6438AutonomousServo extends LinearOpMode
                 //sleep(500);
                 firstTime = false;
 
-                encoderRobotDrive(1,5,5);
                 //These values will probably need changing
-                encoderRobotDrive(preciseSpeed, -19.5, 19.5);
-                encoderRobotDrive(quickSpeed, 24.5, 24.5);
-                encoderRobotDrive(preciseSpeed, 14, -14);
+
+                //Slight Move Forward
+                encoderRobotDrive(quickSpeed, 5, 5);
+                //Turn Towards Left Mineral
+                encoderRobotDrive(quickSpeed, -9.5, 9.5);
+                //Hits Left Mineral
                 encoderRobotDrive(quickSpeed, 24, 24);
+                //First Depot Turn
+                encoderRobotDrive(quickSpeed, -15, 15);
+                //Move Towards Wall
+                encoderRobotDrive(quickSpeed, 28, 28);
+                //Second Depot Turn
+                encoderRobotDrive(quickSpeed, -8.625, 8.625);
+                //Move Into Depot
+                encoderRobotDrive(quickSpeed, 38, 38);
+                //Drop Team Marker
                 tossMarker();
+                //Drive Into Crater
+                encoderRobotDrive(quickSpeed, -62, -62);
+
             }
 
             //Lets the user know the Autonomous is complete
@@ -232,7 +258,7 @@ public class Team6438AutonomousServo extends LinearOpMode
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches)
+    private void actuatorMove(double speed, int position)
     {
         //Set up a new target variable
         int newTarget;  //(x/robot.)
@@ -241,7 +267,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         if (opModeIsActive())
         {
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.hexCPI);
+            newTarget = robot.linearActuator.getCurrentPosition() + (int) (position);
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
@@ -373,6 +399,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 {
                     if (robot.tfod != null && firstTime)
                     {
+                        sleep(100);
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                         if (updatedRecognitions != null)
@@ -386,53 +413,50 @@ public class Team6438AutonomousServo extends LinearOpMode
                                 telemetry.addData( "mineralNumber", updatedRecognitions.size());
                                 telemetry.update();
                                 */
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getLeft() < 500 && recognition.getRight() > 300 )
-                                {
-                                    telemetry.addData("Value", "Center");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.update();
-                                    sleep(100);
-                                    robot.tfod.shutdown();
+                                if (recognition.getRight() > 200 && recognition.getLeft() < 500) {
+                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                        telemetry.addData("Value", "Center");
+                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                        telemetry.update();
+                                        sleep(100);
+                                        robot.tfod.shutdown();
 
-                                    //block in the center
-                                    return 1;
-                                }
-                                else
-                                {
-                                    robot.cameraMount.setPosition(robot.cameraMountRight);
-                                    telemetry.addData("Scanning Right", "Right");
-                                    telemetry.update();
-                                    sleep(100);
+                                        //block in the center
+                                        return 1;
+                                    } else {
+                                        robot.cameraMount.setPosition(robot.cameraMountRight);
+                                        telemetry.addData("Scanning Right", "Right");
+                                        telemetry.update();
+                                        sleep(100);
 
-                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null)
-                                    {
-                                        //noinspection LoopStatementThatDoesntLoop
-                                        for (Recognition recognition2 : updatedRecognitions2) {
+                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                        if (updatedRecognitions2 != null) {
+                                            //noinspection LoopStatementThatDoesntLoop
+                                            for (Recognition recognition2 : updatedRecognitions2) {
 
-                                            //telemetry.addData("imageWidth2 ", recognition2.getImageWidth());
-                                            //telemetry.addData("mineralLeft2 ", recognition2.getLeft());
-                                            //telemetry.addData( "mineralRight2 ", recognition2.getRight());
-                                            //telemetry.update();
-
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL) ) {
-                                                telemetry.addData("value", "Right");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.addData("imageWidth2 ", recognition2.getImageWidth());
+                                                telemetry.addData("mineralLeft2 ", recognition2.getLeft());
+                                                telemetry.addData( "mineralRight2 ", recognition2.getRight());
                                                 telemetry.update();
-                                                robot.tfod.shutdown();
 
-                                                //block on the right
-                                                return 2;
-                                            }
-                                            else
-                                            {
-                                                telemetry.addData("value", "Left");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
+                                                if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                    telemetry.addData("value", "Right");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
 
-                                                //block on the left
-                                                return 3;
+                                                    //block on the right
+                                                    return 2;
+                                                }
+                                                else {
+                                                    telemetry.addData("value", "Left");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
+
+                                                    //block on the left
+                                                    return 3;
+                                                }
                                             }
                                         }
                                     }
@@ -484,4 +508,6 @@ public class Team6438AutonomousServo extends LinearOpMode
         //Loads this years assets
         robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
     }
+
+    //End of class
 }

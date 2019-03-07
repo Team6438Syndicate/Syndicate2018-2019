@@ -69,6 +69,9 @@ public class CameraView extends LinearOpMode
                             int silverMineral2X = -1;
                             for (Recognition recognition : updatedRecognitions)
                             {
+                                telemetry.addData("Image Bound, ", recognition.getWidth() );
+                                telemetry.addData("Left Image Bound", recognition.getLeft());
+                                telemetry.addData("Right Image Bound", recognition.getRight());
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL))
                                 {
                                     goldMineralX = (int) recognition.getLeft();
