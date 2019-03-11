@@ -20,21 +20,37 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Temperature;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.ConceptGyro;
+
 import java.util.List;
+import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Nut", group = "Team 6438 Autonomous")
-public class DepotNut extends LinearOpMode
+@Autonomous(name = "Autonomous Hype", group = "Team 6438 Autonomous")
+public class AutonomousHype extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -43,6 +59,17 @@ public class DepotNut extends LinearOpMode
     private static boolean sleeps = true;           //we can potentially set this to false if we want to make autonomous faster
     private static double  preciseSpeed = 0.6;      //Speeds for any turns/precise movements where accuracy is key
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation  lastAngles = new Orientation();
+    Acceleration gravity;
+    Temperature temperature;
+    double globalAngle;
+    double power = .30;
+    double correction;
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -70,6 +97,25 @@ public class DepotNut extends LinearOpMode
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        //parameters.temperatureUnit     = BNO055IMU.TempUnit.CELSIUS ;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
         telemetry.update();
@@ -83,6 +129,9 @@ public class DepotNut extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        // Start the logging of measured acceleration
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
         //Boolean to ensure we only run the block check the first time around
         firstTime = true;
 
@@ -92,6 +141,9 @@ public class DepotNut extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
+            telemetry.addData("Temp ", imu.getTemperature());
+            telemetry.update();
+
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
@@ -112,20 +164,6 @@ public class DepotNut extends LinearOpMode
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-
-                //Hit Center Mineral
-                encoderRobotDrive(quickSpeed, 60, 60);
-                //Drop Team Marker
-                tossMarker();
-                //Turn Towards Crater
-                encoderRobotDrive(quickSpeed, -12.25, 12.25);
-                //Drive Into Crater
-                encoderRobotDrive(quickSpeed, -62, -62);
-
-                //If time allows double sample code here
-
-                //Add Methods to extend intake
-
             }
             else if (block == 2)
             {
@@ -134,21 +172,6 @@ public class DepotNut extends LinearOpMode
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-
-                //Slight Move Forward
-                encoderRobotDrive(quickSpeed, 5, 5);
-                //Turn Towards Right Mineral
-                encoderRobotDrive(quickSpeed, -9.5, 9.5);
-                //Hits Right Mineral
-                encoderRobotDrive(quickSpeed, 24, 24);
-                //Turn Towards Depot
-                encoderRobotDrive(quickSpeed, -7, 7);
-                //Drive Into Depot
-                encoderRobotDrive(quickSpeed, 10, 10);
-                //Drop Team Marker
-                tossMarker();
-                //Drive Into Crater
-                encoderRobotDrive(quickSpeed, -62, -62);
             }
             else if (block == 3)
             {
@@ -157,25 +180,6 @@ public class DepotNut extends LinearOpMode
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-
-                //These values will probably need changing
-
-                //Slight Move Forward
-                encoderRobotDrive(quickSpeed, 5, 5);
-                //Turn Towards Left Mineral
-                encoderRobotDrive(quickSpeed, 9.5, -9.5);
-                //Hits Left Mineral
-                encoderRobotDrive(quickSpeed, 24, 24);
-                //Turn Towards Depot
-                encoderRobotDrive(quickSpeed, 7, -7);
-                //Drive Into Depot
-                encoderRobotDrive(quickSpeed, 15, 15);
-                //Drop Team Marker
-                tossMarker();
-                //Turn Towards Crater
-                encoderRobotDrive(quickSpeed, -16, 16);
-                //Drive Into Crater
-                encoderRobotDrive(quickSpeed, -62, -62);
             }
 
             //Lets the user know the Autonomous is complete
@@ -197,6 +201,42 @@ public class DepotNut extends LinearOpMode
      *
      *  @param: Speed, inches for left and right
      */
+    //Direction needs to be either 1 for counterclockwise or -1 for clockwise "https://stemrobotics.cs.pdx.edu/node/7265"
+    private void gyroRobotTurn(double speed, int direction, double degrees)
+{
+    //Declaring new targets
+    int leftTarget, rightTarget;
+
+    //Gets the motors starting positions
+    int startLeftPosition = robot.leftMotor.getCurrentPosition();
+    int startRightPosition = robot.rightMotor.getCurrentPosition();
+
+    //Telemetry to show start position
+    telemetry.addData("Left Start Position", startLeftPosition);
+    telemetry.addData("Right Start Position", startRightPosition);
+
+    //Ensure we are in op mode
+    if (opModeIsActive())
+    {
+        //Sets the power to the absolute value of the speed of the method input
+        robot.leftMotor.setPower(Math.abs(speed));
+        robot.rightMotor.setPower(Math.abs(speed));
+
+        //While opMode is still active and the motors are going add telemetry to tell the user where its going
+        while (opModeIsActive() && robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+        {
+            telemetry.addData("Running to ", " %7d :%7d", leftTarget, rightTarget);
+            telemetry.addData("Currently At", " %7d :%7d", robot.leftMotor.getCurrentPosition(), robot.rightMotor.getCurrentPosition());
+            telemetry.update();
+        }
+
+        //When done stop all the motion and turn off run to position
+        robot.leftMotor.setPower(0);
+        robot.rightMotor.setPower(0);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+}
     private void encoderRobotDrive(double speed, double leftInches, double rightInches)
     {
         //Declaring new targets
@@ -242,7 +282,6 @@ public class DepotNut extends LinearOpMode
             robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
-
     //Method to move the actuator
     private void actuatorMove(double speed, int position)
     {
@@ -493,6 +532,36 @@ public class DepotNut extends LinearOpMode
 
         //Loads this years assets
         robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
+    }
+
+    private void resetAngle()
+    {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        globalAngle = 0;
+    }
+
+    private double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
     }
 
     //End of class
