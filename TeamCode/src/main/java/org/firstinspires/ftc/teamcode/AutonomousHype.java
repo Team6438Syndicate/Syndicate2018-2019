@@ -21,7 +21,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -63,13 +63,12 @@ public class AutonomousHype extends LinearOpMode
     // The IMU sensor object
     BNO055IMU imu;
 
-    // State used for updating telemetry
-    Orientation  lastAngles = new Orientation();
-    Acceleration gravity;
-    Temperature temperature;
-    double globalAngle;
-    double power = .30;
-    double correction;
+    // Used for gyro turns
+    Orientation  currentAngle = new Orientation();
+    double newAngle, turnSpeed;
+    int directionL, directionR;
+
+
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -84,15 +83,19 @@ public class AutonomousHype extends LinearOpMode
         robot.init(hardwareMap);
 
         //Sets them to use encoders
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Resets encoders
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -201,87 +204,168 @@ public class AutonomousHype extends LinearOpMode
      *
      *  @param: Speed, inches for left and right
      */
-    //@condition Direction needs to be either 1 for counterclockwise or -1 for clockwise "https://stemrobotics.cs.pdx.edu/node/7265"
-    private void gyroRobotTurn(double speed, double degrees)
-{
-    //Declaring new targets
-    int leftTarget, rightTarget;
 
-    //Gets the motors starting positions
-    int startLeftPosition = robot.leftMotor.getCurrentPosition();
-    int startRightPosition = robot.rightMotor.getCurrentPosition();
-
-    //Telemetry to show start position
-    telemetry.addData("Left Start Position", startLeftPosition);
-    telemetry.addData("Right Start Position", startRightPosition);
-
-    //Ensure we are in op mode
-    if (opModeIsActive())
+    private void getHeading()
     {
-        //Sets the power to the absolute value of the speed of the method input
-        robot.leftMotor.setPower(Math.abs(speed));
-        robot.rightMotor.setPower(Math.abs(speed));
-
-        //While opMode is still active and the motors are going add telemetry to tell the user where its going
-        while (opModeIsActive() && robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
-        {
-            telemetry.addData("Running to ", " %7d :%7d", leftTarget, rightTarget);
-            telemetry.addData("Currently At", " %7d :%7d", robot.leftMotor.getCurrentPosition(), robot.rightMotor.getCurrentPosition());
-            telemetry.update();
-        }
-
-        //When done stop all the motion and turn off run to position
-        robot.leftMotor.setPower(0);
-        robot.rightMotor.setPower(0);
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
-}
-    private void encoderRobotDrive(double speed, double leftInches, double rightInches)
+
+    public void checkAngle(int directionL, int directionR)
+    {
+      while (Math.round(currentAngle.firstAngle) != Math.round(newAngle)) {
+          robot.leftFrontMotor.setPower(turnSpeed * directionL);
+          robot.rightFrontMotor.setPower(turnSpeed * directionR);
+          robot.leftRearMotor.setPower(turnSpeed * directionL);
+          robot.rightRearMotor.setPower(turnSpeed * directionR);
+          telemetry.addData("Running to ", " %7d :%7d", newAngle);
+          telemetry.addData("Currently At", " %7d :%7d", currentAngle);
+          telemetry.update();
+      }
+    }
+
+    //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
+    private void gyroRobotTurn(double speed, double degrees)
+    {
+        getHeading();
+
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            if ((currentAngle.firstAngle + degrees) > 180) {
+                newAngle = currentAngle.firstAngle + degrees -360;
+            }
+            else if ((currentAngle.firstAngle + degrees) <-180) {
+                newAngle = currentAngle.firstAngle + degrees +360;
+            }
+            else {
+                newAngle = currentAngle.firstAngle + degrees;
+            }
+
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            turnSpeed = speed;
+            if (degrees < 0) {
+                directionL = 1;
+                directionR = -1;
+            }
+            else {
+                directionL = -1;
+                directionR = 1;
+            }
+            checkAngle(directionL, directionR);
+        }
+    }
+
+    private void encoderRobotDrive(double speed, double inches)
     {
         //Declaring new targets
-        int leftTarget, rightTarget;
+        int target;
 
         //Gets the motors starting positions
-        int startLeftPosition = robot.leftMotor.getCurrentPosition();
-        int startRightPosition = robot.rightMotor.getCurrentPosition();
+        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
 
         //Telemetry to show start position
-        telemetry.addData("Left Start Position", startLeftPosition);
-        telemetry.addData("Right Start Position", startRightPosition);
+        telemetry.addData("Front Left Start Position", startFLPosition);
+        telemetry.addData("Front Right Start Position", startFRPosition);
+        telemetry.addData("Rear Left Start Position", startRLPosition);
+        telemetry.addData("Rear Right Start Position", startRRPosition);
 
         //Ensure we are in op mode
         if (opModeIsActive())
         {
             //Using the current position and the new desired position send this to the motor
-            leftTarget = startLeftPosition + (int) (leftInches * robot.hexCPI);
-            rightTarget = startRightPosition + (int) (rightInches * robot.hexCPI);
-            robot.leftMotor.setTargetPosition(leftTarget);
-            robot.rightMotor.setTargetPosition(rightTarget);
+            target = startFLPosition + (int) (inches * robot.hexCPI);
+            robot.leftFrontMotor.setTargetPosition(target);
+            robot.rightFrontMotor.setTargetPosition(target);
+            robot.leftRearMotor.setTargetPosition(target);
+            robot.rightRearMotor.setTargetPosition(target);
 
             //Turns the motors to run to position mode
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             //Sets the power to the absolute value of the speed of the method input
-            robot.leftMotor.setPower(Math.abs(speed));
-            robot.rightMotor.setPower(Math.abs(speed));
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
 
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
-            while (opModeIsActive() && robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
             {
-                telemetry.addData("Running to ", " %7d :%7d", leftTarget, rightTarget);
-                telemetry.addData("Currently At", " %7d :%7d", robot.leftMotor.getCurrentPosition(), robot.rightMotor.getCurrentPosition());
+                telemetry.addData("Running to ", target);
+                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
                 telemetry.update();
             }
 
             //When done stop all the motion and turn off run to position
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
+
+    private void encoderRobotStrafeLeft(double speed, double inches)
+    {
+        //Declaring new targets
+        int fLTarget, fRTarget, rLTarget, rRTarget;
+
+        //Gets the motors starting positions
+        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            //Using the current position and the new desired position send this to the motor
+            fLTarget = startFLPosition - (int) (inches * robot.hexCPI);
+            fRTarget = startFRPosition + (int) (inches * robot.hexCPI);
+            rLTarget = startRLPosition + (int) (inches * robot.hexCPI);
+            rRTarget = startRRPosition - (int) (inches * robot.hexCPI);
+            robot.leftFrontMotor.setTargetPosition(fLTarget);
+            robot.rightFrontMotor.setTargetPosition(fRTarget);
+            robot.leftRearMotor.setTargetPosition(rLTarget);
+            robot.rightRearMotor.setTargetPosition(rRTarget);
+
+            //Turns the motors to run to position mode
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //Sets the power to the absolute value of the speed of the method input
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
+
+            //When done stop all the motion and turn off run to position
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
     //Method to move the actuator
     private void actuatorMove(double speed, int position)
     {
@@ -524,4 +608,15 @@ public class AutonomousHype extends LinearOpMode
         //creates a new parameters object
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
 
-        //Sets the minimum confidence for the progra
+        //Sets the minimum confidence for the program to read a block to the values stored in the Team6438HardwareMap
+        tfodParameters.minimumConfidence = robot.confidence;
+
+        //sets the tfod object equal to a new tfod object with parameters
+        robot.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, robot.vuforia);
+
+        //Loads this years assets
+        robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
+    }
+
+    //End of class
+}

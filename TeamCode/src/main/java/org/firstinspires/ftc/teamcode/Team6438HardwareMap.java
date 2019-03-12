@@ -27,8 +27,10 @@ class Team6438HardwareMap
 
 
     //Motor mapping
-    DcMotor leftMotor        = null;
-    DcMotor rightMotor       = null;
+    DcMotor leftFrontMotor   = null;
+    DcMotor rightFrontMotor  = null;
+    DcMotor leftRearMotor    = null;
+    DcMotor rightRearMotor   = null;
     DcMotor linearActuator   = null;
     DcMotor intakeMover      = null;
     DcMotor intakeSlide      = null;
@@ -97,22 +99,28 @@ class Team6438HardwareMap
         HardwareMap hwMap = ahwMap;
 
         //Define and Initialize Motors
-        leftMotor        = hwMap.get(DcMotor.class, "leftDrive");
-        rightMotor       = hwMap.get(DcMotor.class, "rightDrive");
+        leftFrontMotor        = hwMap.get(DcMotor.class, "leftFrontDrive");
+        rightFrontMotor       = hwMap.get(DcMotor.class, "rightFrontDrive");
+        leftRearMotor        = hwMap.get(DcMotor.class, "leftRearDrive");
+        rightRearMotor       = hwMap.get(DcMotor.class, "rightRearDrive");
         linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftRearMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightRearMotor.setDirection(DcMotor.Direction.FORWARD);
         linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
         //Set all motors to zero power to prevent unintended movement
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
+        leftFrontMotor.setPower(0);
+        rightFrontMotor.setPower(0);
+        leftRearMotor.setPower(0);
+        rightRearMotor.setPower(0);
         linearActuator.setPower(0);
         intakeMover.setPower(0);
         intakeSlide.setPower(0);
