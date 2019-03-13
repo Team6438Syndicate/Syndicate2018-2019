@@ -68,8 +68,6 @@ public class AutonomousHype extends LinearOpMode
     double newAngle, turnSpeed;
     int directionL, directionR;
 
-
-
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
