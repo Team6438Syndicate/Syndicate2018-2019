@@ -80,7 +80,7 @@ public class AutonomousHype extends LinearOpMode
         //Inits the hardware
         robot.init(hardwareMap);
 
-        //Sets them to use encoders
+        //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
         robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
