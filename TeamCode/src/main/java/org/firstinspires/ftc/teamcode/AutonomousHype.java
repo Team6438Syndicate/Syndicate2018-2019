@@ -20,20 +20,37 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Temperature;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.ConceptGyro;
+
 import java.util.List;
+import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Depot Side w/ Servo", group = "Team 6438 Autonomous")
-public class Team6438AutonomousServo extends LinearOpMode
+@Autonomous(name = "Autonomous Hype", group = "Team 6438 Autonomous")
+public class AutonomousHype extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -42,6 +59,14 @@ public class Team6438AutonomousServo extends LinearOpMode
     private static boolean sleeps = true;           //we can potentially set this to false if we want to make autonomous faster
     private static double  preciseSpeed = 0.6;      //Speeds for any turns/precise movements where accuracy is key
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // Used for gyro turns
+    Orientation  currentAngle = new Orientation();
+    double newAngle, turnSpeed;
+    int directionL, directionR;
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -55,19 +80,42 @@ public class Team6438AutonomousServo extends LinearOpMode
         //Inits the hardware
         robot.init(hardwareMap);
 
-        //Sets them to use encoders
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Resets encoders
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        //parameters.temperatureUnit     = BNO055IMU.TempUnit.CELSIUS ;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
@@ -82,6 +130,9 @@ public class Team6438AutonomousServo extends LinearOpMode
         //Wait for the start button to be pressed by the driver
         waitForStart();
 
+        // Start the logging of measured acceleration
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
         //Boolean to ensure we only run the block check the first time around
         firstTime = true;
 
@@ -91,8 +142,11 @@ public class Team6438AutonomousServo extends LinearOpMode
         //While the program is running
         while (opModeIsActive())
         {
+            telemetry.addData("Temp ", imu.getTemperature());
+            telemetry.update();
+
             //move the actuator up and over
-            //actuatorMove(1, 18100);  //This will go at the bottom
+            //actuatorMove(1, 18100);
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             block = queryTensorFlow();
@@ -111,59 +165,22 @@ public class Team6438AutonomousServo extends LinearOpMode
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-                //sleep(10000);
-
-
-                //we have way too much time maybe extend intake or something like that
-
-                //Encoder movements to run over the block
-                encoderRobotDrive(quickSpeed, 53, 53);
-
-                tossMarker();
-
-                //Encoder movements to turn and run towards crater
-                encoderRobotDrive(preciseSpeed, -15, 15);
-                encoderRobotDrive(quickSpeed, -25, -25);
-                encoderRobotDrive(1,5,-5);
-                encoderRobotDrive(1,-50,-50);
-
-                //If time allows double sample code here
-
-                //Add Methods to extend intake
-
             }
-            else if (block == 2)        //DOES NOT WORK
+            else if (block == 2)
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "right");
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-
-                //Encoder movements to run over the block
-                encoderRobotDrive(preciseSpeed, 19.5, -19.5);
-                encoderRobotDrive(quickSpeed, 25.5, 25.5);
-                encoderRobotDrive(preciseSpeed, -17, 17);
-                encoderRobotDrive(quickSpeed, 27, 27);
-                tossMarker();
-                encoderRobotDrive(preciseSpeed, -4, 4);
-                encoderRobotDrive(quickSpeed, -125, -125);
             }
-            else if (block == 3) //does not work
+            else if (block == 3)
             {
                 //telemetery to show the user what path we're running
                 telemetry.addData("Path running currently: ", "left");
                 telemetry.update();
                 //sleep(500);
                 firstTime = false;
-
-                encoderRobotDrive(1,5,5);
-                //These values will probably need changing
-                encoderRobotDrive(preciseSpeed, -19.5, 19.5);
-                encoderRobotDrive(quickSpeed, 24.5, 24.5);
-                encoderRobotDrive(preciseSpeed, 14, -14);
-                encoderRobotDrive(quickSpeed, 24, 24);
-                tossMarker();
             }
 
             //Lets the user know the Autonomous is complete
@@ -185,54 +202,170 @@ public class Team6438AutonomousServo extends LinearOpMode
      *
      *  @param: Speed, inches for left and right
      */
-    private void encoderRobotDrive(double speed, double leftInches, double rightInches)
+
+    private void getHeading()
+    {
+    currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    }
+
+    public void checkAngle(int directionL, int directionR)
+    {
+      while (Math.round(currentAngle.firstAngle) != Math.round(newAngle)) {
+          robot.leftFrontMotor.setPower(turnSpeed * directionL);
+          robot.rightFrontMotor.setPower(turnSpeed * directionR);
+          robot.leftRearMotor.setPower(turnSpeed * directionL);
+          robot.rightRearMotor.setPower(turnSpeed * directionR);
+          telemetry.addData("Running to ", " %7d :%7d", newAngle);
+          telemetry.addData("Currently At", " %7d :%7d", currentAngle);
+          telemetry.update();
+      }
+    }
+
+    //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
+    private void gyroRobotTurn(double speed, double degrees)
+    {
+        getHeading();
+
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            if ((currentAngle.firstAngle + degrees) > 180) {
+                newAngle = currentAngle.firstAngle + degrees -360;
+            }
+            else if ((currentAngle.firstAngle + degrees) <-180) {
+                newAngle = currentAngle.firstAngle + degrees +360;
+            }
+            else {
+                newAngle = currentAngle.firstAngle + degrees;
+            }
+
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            turnSpeed = speed;
+            if (degrees < 0) {
+                directionL = 1;
+                directionR = -1;
+            }
+            else {
+                directionL = -1;
+                directionR = 1;
+            }
+            checkAngle(directionL, directionR);
+        }
+    }
+
+    private void encoderRobotDrive(double speed, double inches)
     {
         //Declaring new targets
-        int leftTarget, rightTarget;
+        int target;
 
         //Gets the motors starting positions
-        int startLeftPosition = robot.leftMotor.getCurrentPosition();
-        int startRightPosition = robot.rightMotor.getCurrentPosition();
+        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
 
         //Telemetry to show start position
-        telemetry.addData("Left Start Position", startLeftPosition);
-        telemetry.addData("Right Start Position", startRightPosition);
+        telemetry.addData("Front Left Start Position", startFLPosition);
+        telemetry.addData("Front Right Start Position", startFRPosition);
+        telemetry.addData("Rear Left Start Position", startRLPosition);
+        telemetry.addData("Rear Right Start Position", startRRPosition);
 
         //Ensure we are in op mode
         if (opModeIsActive())
         {
             //Using the current position and the new desired position send this to the motor
-            leftTarget = startLeftPosition + (int) (leftInches * robot.hexCPI);
-            rightTarget = startRightPosition + (int) (rightInches * robot.hexCPI);
-            robot.leftMotor.setTargetPosition(leftTarget);
-            robot.rightMotor.setTargetPosition(rightTarget);
+            target = startFLPosition + (int) (inches * robot.hexCPI);
+            robot.leftFrontMotor.setTargetPosition(target);
+            robot.rightFrontMotor.setTargetPosition(target);
+            robot.leftRearMotor.setTargetPosition(target);
+            robot.rightRearMotor.setTargetPosition(target);
 
             //Turns the motors to run to position mode
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             //Sets the power to the absolute value of the speed of the method input
-            robot.leftMotor.setPower(Math.abs(speed));
-            robot.rightMotor.setPower(Math.abs(speed));
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
 
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
-            while (opModeIsActive() && robot.leftMotor.isBusy() && robot.rightMotor.isBusy())
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
             {
-                telemetry.addData("Running to ", " %7d :%7d", leftTarget, rightTarget);
-                telemetry.addData("Currently At", " %7d :%7d", robot.leftMotor.getCurrentPosition(), robot.rightMotor.getCurrentPosition());
+                telemetry.addData("Running to ", target);
+                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
                 telemetry.update();
             }
 
             //When done stop all the motion and turn off run to position
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    private void encoderRobotStrafeLeft(double speed, double inches)
+    {
+        //Declaring new targets
+        int fLTarget, fRTarget, rLTarget, rRTarget;
+
+        //Gets the motors starting positions
+        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            //Using the current position and the new desired position send this to the motor
+            fLTarget = startFLPosition - (int) (inches * robot.hexCPI);
+            fRTarget = startFRPosition + (int) (inches * robot.hexCPI);
+            rLTarget = startRLPosition + (int) (inches * robot.hexCPI);
+            rRTarget = startRRPosition - (int) (inches * robot.hexCPI);
+            robot.leftFrontMotor.setTargetPosition(fLTarget);
+            robot.rightFrontMotor.setTargetPosition(fRTarget);
+            robot.leftRearMotor.setTargetPosition(rLTarget);
+            robot.rightRearMotor.setTargetPosition(rRTarget);
+
+            //Turns the motors to run to position mode
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //Sets the power to the absolute value of the speed of the method input
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
+
+            //When done stop all the motion and turn off run to position
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 
     //Method to move the actuator
-    private void actuatorMove(double speed, double inches)
+    private void actuatorMove(double speed, int position)
     {
         //Set up a new target variable
         int newTarget;  //(x/robot.)
@@ -241,7 +374,7 @@ public class Team6438AutonomousServo extends LinearOpMode
         if (opModeIsActive())
         {
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (inches * robot.hexCPI);
+            newTarget = robot.linearActuator.getCurrentPosition() + (int) (position);
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
@@ -373,6 +506,7 @@ public class Team6438AutonomousServo extends LinearOpMode
                 {
                     if (robot.tfod != null && firstTime)
                     {
+                        sleep(100);
                         // getUpdatedRecognitions() will return null if no new information is available since the last time that call was made.
                         List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                         if (updatedRecognitions != null)
@@ -386,53 +520,50 @@ public class Team6438AutonomousServo extends LinearOpMode
                                 telemetry.addData( "mineralNumber", updatedRecognitions.size());
                                 telemetry.update();
                                 */
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getLeft() < 500 && recognition.getRight() > 300 )
-                                {
-                                    telemetry.addData("Value", "Center");
-                                    telemetry.addData("Confidence", recognition.getConfidence());
-                                    telemetry.update();
-                                    sleep(100);
-                                    robot.tfod.shutdown();
+                                if (recognition.getRight() > 200 && recognition.getLeft() < 500) {
+                                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                        telemetry.addData("Value", "Center");
+                                        telemetry.addData("Confidence", recognition.getConfidence());
+                                        telemetry.update();
+                                        sleep(100);
+                                        robot.tfod.shutdown();
 
-                                    //block in the center
-                                    return 1;
-                                }
-                                else
-                                {
-                                    robot.cameraMount.setPosition(robot.cameraMountRight);
-                                    telemetry.addData("Scanning Right", "Right");
-                                    telemetry.update();
-                                    sleep(100);
+                                        //block in the center
+                                        return 1;
+                                    } else {
+                                        robot.cameraMount.setPosition(robot.cameraMountRight);
+                                        telemetry.addData("Scanning Right", "Right");
+                                        telemetry.update();
+                                        sleep(100);
 
-                                    List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
-                                    if (updatedRecognitions2 != null)
-                                    {
-                                        //noinspection LoopStatementThatDoesntLoop
-                                        for (Recognition recognition2 : updatedRecognitions2) {
+                                        List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
+                                        if (updatedRecognitions2 != null) {
+                                            //noinspection LoopStatementThatDoesntLoop
+                                            for (Recognition recognition2 : updatedRecognitions2) {
 
-                                            //telemetry.addData("imageWidth2 ", recognition2.getImageWidth());
-                                            //telemetry.addData("mineralLeft2 ", recognition2.getLeft());
-                                            //telemetry.addData( "mineralRight2 ", recognition2.getRight());
-                                            //telemetry.update();
-
-                                            if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL) ) {
-                                                telemetry.addData("value", "Right");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
+                                                telemetry.addData("imageWidth2 ", recognition2.getImageWidth());
+                                                telemetry.addData("mineralLeft2 ", recognition2.getLeft());
+                                                telemetry.addData( "mineralRight2 ", recognition2.getRight());
                                                 telemetry.update();
-                                                robot.tfod.shutdown();
 
-                                                //block on the right
-                                                return 2;
-                                            }
-                                            else
-                                            {
-                                                telemetry.addData("value", "Left");
-                                                telemetry.addData("Confidence", recognition.getConfidence());
-                                                telemetry.update();
-                                                robot.tfod.shutdown();
+                                                if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                    telemetry.addData("value", "Right");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
 
-                                                //block on the left
-                                                return 3;
+                                                    //block on the right
+                                                    return 2;
+                                                }
+                                                else {
+                                                    telemetry.addData("value", "Left");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
+
+                                                    //block on the left
+                                                    return 3;
+                                                }
                                             }
                                         }
                                     }
@@ -484,4 +615,6 @@ public class Team6438AutonomousServo extends LinearOpMode
         //Loads this years assets
         robot.tfod.loadModelFromAsset(robot.TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, robot.LABEL_SILVER_MINERAL);
     }
+
+    //End of class
 }

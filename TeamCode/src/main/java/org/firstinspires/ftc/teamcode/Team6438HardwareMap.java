@@ -25,9 +25,12 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 class Team6438HardwareMap
 {
 
+
     //Motor mapping
-    DcMotor leftMotor        = null;
-    DcMotor rightMotor       = null;
+    DcMotor leftFrontMotor   = null;
+    DcMotor rightFrontMotor  = null;
+    DcMotor leftRearMotor    = null;
+    DcMotor rightRearMotor   = null;
     DcMotor linearActuator   = null;
     DcMotor intakeMover      = null;
     DcMotor intakeSlide      = null;
@@ -54,14 +57,6 @@ class Team6438HardwareMap
     final double hexCPI = (hexCPR * DGR)
                         / (WDI * Math.PI);
 
-    //CPR for linear and intake motors
-    private final double linearActuatorCPR = 1120;
-
-    //Gear Reduction for linear slide
-    private final double GRL = 1.0;
-
-    // CPI for linear slide
-    final double linearActuatorCPI = linearActuatorCPR * GRL;
 
     //Camera mount servo positions
     final double cameraMountTucked = 1;
@@ -69,16 +64,18 @@ class Team6438HardwareMap
     final double cameraMountRight = 0;
 
     //Positions for intake
-    final int intakeOutPosition = 100;                  //This is the position just high enough to clear the crater
-    final int intakeDunk = 400;                         //This is the position where the balls fall into the lander
-    final int intakeFloor = 600;                        //This is the positon where the intake is above the floor
+    final int intakeOutPosition = 2082;                  //This is the position just high enough to clear the crater
+    final int intakeDunk = 1450;                         //This is the position where the balls fall into the lander
+    final int intakeFloor = 2200;                        //This is the position where the intake is above the floor
     final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
-    final int intakeMax = 0;                            //This is the lowest the intake can be before causing the motor to lock.
+    final int intakeMax = 2400;                            //This is the lowest the intake can be before causing the motor to lock.
 
     //Positions for the slides
-    final int slideExtended = 0;                        //This is the motor encoder position when the slide is all the way out
+    final int slideExtended = 791;                        //This is the motor encoder position when the slide is all the way out
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
+    //Variables for the actuator
+    final int laInterference = 10000;                   //Min position where the linear actuator can be as to not cause damage
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -102,22 +99,28 @@ class Team6438HardwareMap
         HardwareMap hwMap = ahwMap;
 
         //Define and Initialize Motors
-        leftMotor        = hwMap.get(DcMotor.class, "leftDrive");
-        rightMotor       = hwMap.get(DcMotor.class, "rightDrive");
+        leftFrontMotor        = hwMap.get(DcMotor.class, "leftFrontDrive");
+        rightFrontMotor       = hwMap.get(DcMotor.class, "rightFrontDrive");
+        leftRearMotor        = hwMap.get(DcMotor.class, "leftRearDrive");
+        rightRearMotor       = hwMap.get(DcMotor.class, "rightRearDrive");
         linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftRearMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightRearMotor.setDirection(DcMotor.Direction.FORWARD);
         linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
         //Set all motors to zero power to prevent unintended movement
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
+        leftFrontMotor.setPower(0);
+        rightFrontMotor.setPower(0);
+        leftRearMotor.setPower(0);
+        rightRearMotor.setPower(0);
         linearActuator.setPower(0);
         intakeMover.setPower(0);
         intakeSlide.setPower(0);
