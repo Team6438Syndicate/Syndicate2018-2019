@@ -61,12 +61,12 @@ public class AutonomousHype extends LinearOpMode
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
 
     // The IMU sensor object
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
     // Used for gyro turns
-    Orientation  currentAngle = new Orientation();
-    double newAngle, turnSpeed;
-    int directionL, directionR;
+    private Orientation  currentAngle = new Orientation();
+    private double newAngle, turnSpeed;
+    private int directionL, directionR;
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -205,7 +205,7 @@ public class AutonomousHype extends LinearOpMode
 
     private void getHeading()
     {
-    currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
     public void checkAngle(int directionL, int directionR)
@@ -317,6 +317,54 @@ public class AutonomousHype extends LinearOpMode
     }
 
     private void encoderRobotStrafeLeft(double speed, double inches)
+{
+    //Declaring new targets
+    int fLTarget, fRTarget, rLTarget, rRTarget;
+
+    //Gets the motors starting positions
+    int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+    int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+    int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+    int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
+    //Ensure we are in op mode
+    if (opModeIsActive())
+    {
+        //Using the current position and the new desired position send this to the motor
+        fLTarget = startFLPosition - (int) (inches * robot.hexCPI);
+        fRTarget = startFRPosition + (int) (inches * robot.hexCPI);
+        rLTarget = startRLPosition + (int) (inches * robot.hexCPI);
+        rRTarget = startRRPosition - (int) (inches * robot.hexCPI);
+        robot.leftFrontMotor.setTargetPosition(fLTarget);
+        robot.rightFrontMotor.setTargetPosition(fRTarget);
+        robot.leftRearMotor.setTargetPosition(rLTarget);
+        robot.rightRearMotor.setTargetPosition(rRTarget);
+
+        //Turns the motors to run to position mode
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Sets the power to the absolute value of the speed of the method input
+        robot.leftFrontMotor.setPower(Math.abs(speed));
+        robot.rightFrontMotor.setPower(Math.abs(speed));
+        robot.leftRearMotor.setPower(Math.abs(speed));
+        robot.rightRearMotor.setPower(Math.abs(speed));
+
+        //When done stop all the motion and turn off run to position
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftRearMotor.setPower(0);
+        robot.rightRearMotor.setPower(0);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+}
+
+    private void encoderRobotStrafeRight(double speed, double inches)
     {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
@@ -331,10 +379,10 @@ public class AutonomousHype extends LinearOpMode
         if (opModeIsActive())
         {
             //Using the current position and the new desired position send this to the motor
-            fLTarget = startFLPosition - (int) (inches * robot.hexCPI);
-            fRTarget = startFRPosition + (int) (inches * robot.hexCPI);
-            rLTarget = startRLPosition + (int) (inches * robot.hexCPI);
-            rRTarget = startRRPosition - (int) (inches * robot.hexCPI);
+            fLTarget = startFLPosition + (int) (inches * robot.hexCPI);
+            fRTarget = startFRPosition - (int) (inches * robot.hexCPI);
+            rLTarget = startRLPosition - (int) (inches * robot.hexCPI);
+            rRTarget = startRRPosition + (int) (inches * robot.hexCPI);
             robot.leftFrontMotor.setTargetPosition(fLTarget);
             robot.rightFrontMotor.setTargetPosition(fRTarget);
             robot.leftRearMotor.setTargetPosition(rLTarget);
@@ -365,6 +413,7 @@ public class AutonomousHype extends LinearOpMode
     }
 
     //Method to move the actuator
+    //Shouldn't this just be move to position
     private void actuatorMove(double speed, int position)
     {
         //Set up a new target variable
@@ -374,7 +423,7 @@ public class AutonomousHype extends LinearOpMode
         if (opModeIsActive())
         {
             // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int) (position);
+            newTarget = robot.linearActuator.getCurrentPosition() + position;
 
             //Passes this target
             robot.linearActuator.setTargetPosition(newTarget);
