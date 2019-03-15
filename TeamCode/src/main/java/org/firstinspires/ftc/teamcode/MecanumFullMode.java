@@ -79,5 +79,4 @@ public class MecanumFullMode extends OpMode {
         telemetry.addData("Rear Right Power: ", rRPower);
         telemetry.update();
     }
-
 }
