@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 //@Disabled
-@TeleOp(name = "Basic Mecanum Drive", group = "TeleOp 6438")
-public class MecanumDriveTeleOp extends OpMode {
+@TeleOp(name = "Mecanum Full", group = "TeleOp 6438")
+public class MecanumFullMode extends OpMode {
     //Reference to our hardware map
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
