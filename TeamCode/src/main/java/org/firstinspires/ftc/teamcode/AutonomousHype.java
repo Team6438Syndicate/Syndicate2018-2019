@@ -43,7 +43,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Temperature;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.ConceptGyro;
 
 import java.util.List;
 import java.util.Locale;
@@ -64,8 +63,8 @@ public class AutonomousHype extends LinearOpMode
     private BNO055IMU imu;
 
     // Used for gyro turns
-    private Orientation  currentAngle = new Orientation();
-    private double newAngle, turnSpeed;
+    private Orientation  lastAngle = new Orientation();
+    private double newAngle, turnSpeed, currentAngle;
     private int directionL, directionR;
 
     //Reference to our hardware map
@@ -125,7 +124,7 @@ public class AutonomousHype extends LinearOpMode
         initVuforia();
 
         //Makes sure the camera is looking at the center
-        robot.cameraMount.setPosition(robot.cameraMountCenter);
+        //robot.cameraMount.setPosition(robot.cameraMountCenter);
 
         //Wait for the start button to be pressed by the driver
         waitForStart();
@@ -137,7 +136,7 @@ public class AutonomousHype extends LinearOpMode
         firstTime = true;
 
         //Sets the block int to 0 (default value)
-        int block;
+        int block = 0;
 
         //While the program is running
         while (opModeIsActive())
@@ -145,17 +144,19 @@ public class AutonomousHype extends LinearOpMode
             telemetry.addData("Temp ", imu.getTemperature());
             telemetry.update();
 
+            gyroRobotTurn(0.15, 90);
+
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
             //Query the tensorFlowEngine and set the block variable equal to the result
-            block = queryTensorFlow();
+            //block = queryTensorFlow();
 
             //Might not need the first time provision
             //if (firstTime)
             //{
             //Tucks in the servo
-            robot.cameraMount.setPosition(robot.cameraMountTucked);
+            //robot.cameraMount.setPosition(robot.cameraMountTucked);
 
             //Block logic (separated into ifs because we need different motions depending on where the block is
             if (block == 1)
@@ -205,20 +206,35 @@ public class AutonomousHype extends LinearOpMode
 
     private void getHeading()
     {
-        currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        lastAngle =  imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        currentAngle = lastAngle.firstAngle;
+        telemetry.addData ("Current Angle: ", currentAngle);
+        telemetry.update();
     }
 
     public void checkAngle(int directionL, int directionR)
     {
-      while (Math.round(currentAngle.firstAngle) != Math.round(newAngle)) {
-          robot.leftFrontMotor.setPower(turnSpeed * directionL);
-          robot.rightFrontMotor.setPower(turnSpeed * directionR);
-          robot.leftRearMotor.setPower(turnSpeed * directionL);
-          robot.rightRearMotor.setPower(turnSpeed * directionR);
-          telemetry.addData("Running to ", " %7d :%7d", newAngle);
-          telemetry.addData("Currently At", " %7d :%7d", currentAngle);
-          telemetry.update();
-      }
+        while ( Math.round(currentAngle) != Math.round(newAngle) ) {
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftFrontMotor.setPower(turnSpeed * directionL);
+            robot.rightFrontMotor.setPower(turnSpeed * directionR);
+            robot.leftRearMotor.setPower(turnSpeed * directionL);
+            robot.rightRearMotor.setPower(turnSpeed * directionR);
+            telemetry.addData("Direction L", directionL);
+            telemetry.addData("Direction R", directionR);
+            telemetry.addData("Speed: ", turnSpeed);
+            telemetry.addData("Running to ", newAngle);
+            telemetry.addData("Currently At", currentAngle);
+            telemetry.update();
+            getHeading();
+        }
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftRearMotor.setPower(0);
+        robot.rightRearMotor.setPower(0);
     }
 
     //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
@@ -229,20 +245,16 @@ public class AutonomousHype extends LinearOpMode
         //Ensure we are in op mode
         if (opModeIsActive())
         {
-            if ((currentAngle.firstAngle + degrees) > 180) {
-                newAngle = currentAngle.firstAngle + degrees -360;
+            if ((currentAngle + degrees) > 180) {
+                newAngle = currentAngle + degrees -360;
             }
-            else if ((currentAngle.firstAngle + degrees) <-180) {
-                newAngle = currentAngle.firstAngle + degrees +360;
+            else if ((currentAngle + degrees) <-180) {
+                newAngle = currentAngle + degrees +360;
             }
             else {
-                newAngle = currentAngle.firstAngle + degrees;
+                newAngle = currentAngle + degrees;
             }
 
-            robot.leftFrontMotor.setPower(0);
-            robot.rightFrontMotor.setPower(0);
-            robot.leftRearMotor.setPower(0);
-            robot.rightRearMotor.setPower(0);
             turnSpeed = speed;
             if (degrees < 0) {
                 directionL = 1;
@@ -252,7 +264,7 @@ public class AutonomousHype extends LinearOpMode
                 directionL = -1;
                 directionR = 1;
             }
-            checkAngle(directionL, directionR);
+                checkAngle(directionL, directionR);
         }
     }
 
@@ -640,7 +652,7 @@ public class AutonomousHype extends LinearOpMode
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        //parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
