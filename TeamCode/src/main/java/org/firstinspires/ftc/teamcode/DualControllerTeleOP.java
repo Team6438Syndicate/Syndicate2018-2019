@@ -13,7 +13,8 @@ public class DualControllerTeleOP extends OpMode
     Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Creating the intake power variable
-    private double intakePower = 0;
+    private double intakePowerL = 0;
+    private double intakePowerR = 0;
 
     @Override
     public void init()
@@ -28,8 +29,10 @@ public class DualControllerTeleOP extends OpMode
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Drive Motors should drive without encoders
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //telemetry
         telemetry.addData("Hardware Status: ", "Mapped");
@@ -40,38 +43,55 @@ public class DualControllerTeleOP extends OpMode
     public void loop()
     {
         //Variables for power
-        double leftPower, rightPower;
+        double fLPower, fRPower, rLPower, rRPower;
 
         //Logic for the intake
-        if( gamepad2.a && intakePower == 0 )                                                        //Tested
+        if( gamepad2.a && intakePowerL == 0 && intakePowerR == 0 )                                                        //Tested
         {
-            intakePower = 1;
+            intakePowerL = 1;
+            intakePowerR = 1;
         }
-        else if ( gamepad2.a && intakePower != 0)                                                   //Tested
+        else if ( gamepad2.y)                                                                       //Tested
         {
-            intakePower = 0;
+            intakePowerL = 0;
+            intakePowerR = 0;
         }
         else if (gamepad2.b)                                                                        //Tested
         {
-            intakePower = -1;
+            intakePowerL = -1;
+            intakePowerR = -1;
+        }
+        else if( gamepad1.a)
+        {
+            intakePowerL = 0.5;
+            intakePowerR = -0.5;
+        }
+        else if ( gamepad1.b)
+        {
+            intakePowerL = -0.5;
+            intakePowerR = 0.5;
         }
 
         //Logic for the intake slide
-        if ( gamepad2.right_bumper && robot.intakeSlide.getCurrentPosition() < robot.slideExtended )         //Untested
+        if (gamepad2.dpad_right && robot.intakeSlide.getCurrentPosition() < robot.slideExtended)         //Untested
         {
             intakeSlide(1,robot.slideExtended);
         }
-        else if ( gamepad2.left_bumper && (robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) ) //Untested
+        else if (gamepad2.dpad_left && (robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended) ) //Untested
         {
             intakeSlide(.3,robot.slideUnExtended);
         }
-        else if ( gamepad2.dpad_up && robot.intakeSlide.getCurrentPosition() < robot.slideExtended  && (robot.linearActuator.getCurrentPosition() < robot.laInterference) && robot.intakeMover.getCurrentPosition() > 300 )        //Untested
+        else if (gamepad2.dpad_up && robot.intakeSlide.getCurrentPosition() + 100 <= robot.slideExtended && robot.intakeMover.getCurrentPosition() > 300 )        //Untested
         {
             intakeSlide(1,robot.intakeSlide.getCurrentPosition() + 100);
         }
-        else if ( gamepad2.dpad_down && robot.intakeSlide.getCurrentPosition() > robot.slideUnExtended && (robot.intakeMover.getCurrentPosition() > 300) )     //Untested
+        else if (gamepad2.dpad_down && robot.intakeSlide.getCurrentPosition() - 100 >= robot.slideUnExtended && (robot.intakeMover.getCurrentPosition() > 300) )     //Untested
         {
             intakeSlide(1,robot.intakeSlide.getCurrentPosition() - 100);
+        }
+        else
+        {
+            robot.intakeSlide.setPower(0);
         }
 
         //Logic for intake itself
@@ -80,20 +100,20 @@ public class DualControllerTeleOP extends OpMode
             telemetry.addData("TO COMPLETE PROCESS: ", "PRESS DOWN BOTH X BUTTONS");
             telemetry.update();
         }
-        if ( gamepad2.x && gamepad1.x && robot.linearActuator.getCurrentPosition() > robot.laInterference)           //Untested
+        if (gamepad2.x && gamepad1.x && robot.linearActuator.getCurrentPosition() == robot.laInterference)           //Untested
         {
             telemetry.addData("LOWER ACTUATOR BEFORE BEGINNING ","ASAP");             //Untested
         }
-        else if ( gamepad2.x && gamepad1.x && robot .linearActuator.getCurrentPosition() < robot.laInterference )   //Untested
+        else if (gamepad2.x && gamepad1.x && robot .linearActuator.getCurrentPosition() != robot.laInterference )   //Untested
         {
             intakeMove(1,robot.intakeOutPosition);
         }
 
-        if(gamepad2.right_trigger > .05 && robot.intakeMover.getCurrentPosition() > robot.intakeMinimum && robot.linearActuator.getCurrentPosition() > robot.laInterference)     //untested
+        if(gamepad2.right_trigger > .05 && robot.intakeMover.getCurrentPosition() != robot.intakeMinimum && robot.linearActuator.getCurrentPosition() != robot.laInterference)     //untested
         {
             intakeMove(1,robot.intakeMover.getCurrentPosition() + 100);
         }
-        else if (gamepad2.left_trigger > .05 && robot.intakeMover.getCurrentPosition() < robot.intakeMax && robot.linearActuator.getCurrentPosition() > robot.laInterference )  //untested
+        else if (gamepad2.left_trigger > .05 && robot.intakeMover.getCurrentPosition() != robot.intakeMax && robot.linearActuator.getCurrentPosition() != robot.laInterference )  //untested
         {
             intakeMove ( 1, robot.intakeMover.getCurrentPosition() - 100);
         }
@@ -106,32 +126,41 @@ public class DualControllerTeleOP extends OpMode
         double linearActuatorPower = gamepad2.left_stick_y;                                         //Could need to be negated
 
         //Controls for tank treads
-        if( gamepad1.right_trigger > .01)                                                           //Tested
-        {
-            leftPower = gamepad1.right_trigger;
-            rightPower = gamepad1.right_trigger;
+        if ( Math.abs(gamepad1.left_stick_y) > .075 && Math.abs(gamepad1.left_stick_x) > .075) {                                                                                       //Tested
+            fLPower = -( (gamepad1.left_stick_y + gamepad1.left_stick_x)/Math.sqrt(2) );
+            fRPower = -( (gamepad1.left_stick_y - gamepad1.left_stick_x)/Math.sqrt(2) );
+            rLPower = -( (gamepad1.left_stick_y - gamepad1.left_stick_x)/Math.sqrt(2) );
+            rRPower = -( (gamepad1.left_stick_y + gamepad1.left_stick_x)/Math.sqrt(2) );
         }
-        else if ( gamepad1.left_trigger > .01)                                                      //Tested
-        {
-            leftPower = -gamepad1.left_trigger;
-            rightPower = -gamepad1.left_trigger;
+        else {
+            fLPower = 0;
+            fRPower = 0;
+            rLPower = 0;
+            rRPower = 0;
         }
-        else                                                                                        //Tested
-        {
-            leftPower = -gamepad1.left_stick_y;
-            rightPower = -gamepad1.right_stick_y;
-        }
+
+        robot.linearActuator.setPower(linearActuatorPower);
+
+        robot.leftIntake.setPower(-intakePowerL);
+        robot.rightIntake.setPower(-intakePowerR);
+
+        robot.leftFrontMotor.setPower(fLPower);
+        robot.rightFrontMotor.setPower(fRPower);
+        robot.leftRearMotor.setPower(rLPower);
+        robot.rightRearMotor.setPower(rRPower);
 
         //Telemetry to constantly refresh data to update user
-        telemetry.addData("Left Power: ", leftPower);
-        telemetry.addData("Right Power: ", rightPower);
-        telemetry.addData("Intake Servos Power:", intakePower );
+        telemetry.addData("Front Left Power: ", fLPower);
+        telemetry.addData("Front Right Power: ", fRPower);
+        telemetry.addData("Rear Left Power: ", rLPower);
+        telemetry.addData("Rear Right Power: ", rRPower);
+        telemetry.addData("Intake Servo Left Power:", intakePowerL );
+        telemetry.addData("Intake Servo Right Power:", intakePowerR );
         telemetry.addData("Linear Actuator Power ", linearActuatorPower);
         telemetry.addData("Linear Actuator Position ", robot.linearActuator.getCurrentPosition());
-        telemetry.addData("Intake Mover Power", robot.intakeMover.getCurrentPosition());
-        telemetry.addData("Intake Slide Power ", robot.intakeSlide.getCurrentPosition());
+        telemetry.addData("Intake Mover Position", robot.intakeMover.getCurrentPosition());
+        telemetry.addData("Intake Slide Position ", robot.intakeSlide.getCurrentPosition());
         telemetry.update();
-
     }
 
     //Method to move the intake
