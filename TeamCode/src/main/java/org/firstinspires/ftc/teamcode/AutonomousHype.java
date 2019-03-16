@@ -150,7 +150,7 @@ public class AutonomousHype extends LinearOpMode
             telemetry.addData("Temp ", imu.getTemperature());
             telemetry.update();
 
-            gyroRobotTurn(1, -45);
+            gyroRobotTurn(.30, -90);
 
             //move the actuator up and over
             //actuatorMove(1, 18100);
@@ -220,7 +220,8 @@ public class AutonomousHype extends LinearOpMode
 
     public void checkAngle(int directionL, int directionR)
     {
-        while ( Math.round(currentAngle) < Math.round(newAngle*1000.0)/1000.0 - 1.5 || Math.round(currentAngle*1000.0)/1000.0 > Math.round(newAngle) + 1.5 ) {
+        getHeading();
+        while ( Math.round(currentAngle) < Math.round(newAngle*1000.0)/1000.0 - 1 || Math.round(currentAngle*1000.0)/1000.0 > Math.round(newAngle) + 1 ) {
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -229,13 +230,16 @@ public class AutonomousHype extends LinearOpMode
             robot.rightFrontMotor.setPower(turnSpeed * directionR);
             robot.leftRearMotor.setPower(turnSpeed * directionL);
             robot.rightRearMotor.setPower(turnSpeed * directionR);
-            telemetry.addData("Direction L", directionL);
-            telemetry.addData("Direction R", directionR);
-            telemetry.addData("Speed: ", turnSpeed);
-            telemetry.addData("Running to ", newAngle);
-            telemetry.addData("Currently At", currentAngle);
-            telemetry.update();
             getHeading();
+            if (currentAngle > 0 && Math.abs(currentAngle/newAngle) < 0.75) {
+                turnSpeed = 1 - currentAngle/newAngle;
+            }
+            else if (currentAngle < 0 && Math.abs(currentAngle/newAngle) < 0.75) {
+                turnSpeed = 1 - currentAngle/newAngle;
+            }
+            else {
+                turnSpeed = 0.25;
+            }
         }
         robot.leftFrontMotor.setPower(0);
         robot.rightFrontMotor.setPower(0);
@@ -260,6 +264,8 @@ public class AutonomousHype extends LinearOpMode
             else {
                 newAngle = currentAngle + degrees;
             }
+
+
 
             turnSpeed = speed;
             if (degrees < 0) {
