@@ -43,13 +43,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Temperature;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.ConceptGyro;
 
 import java.util.List;
 import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Autonomous Hype", group = "Team 6438 Autonomous")
-public class AutonomousHype extends LinearOpMode
+@Autonomous(name = "Autonomous Hype V2", group = "Team 6438 Autonomous")
+public class AutonomousHype2 extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -64,8 +65,8 @@ public class AutonomousHype extends LinearOpMode
 
     // Used for gyro turns
     private Orientation  currentAngle = new Orientation();
-    private double newAngle, turnSpeed;
-    private int directionL, directionR;
+    private double turnTarget;
+    private int direction;
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
@@ -207,17 +208,53 @@ public class AutonomousHype extends LinearOpMode
         currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
-    public void checkAngle(int directionL, int directionR)
+    private double getTarget(double degrees) {
+
+        double newAngle;
+
+        if ((currentAngle.firstAngle + turnTarget) > 180) {
+            newAngle = currentAngle.firstAngle + turnTarget -360;
+        }
+        else if ((currentAngle.firstAngle + turnTarget) <-180) {
+            newAngle = currentAngle.firstAngle + turnTarget +360;
+        }
+        else {
+            newAngle = currentAngle.firstAngle + turnTarget;
+        }
+        return newAngle;
+    }
+
+    private double getSpeed() {
+        double speed;
+
+        if (Math.abs(currentAngle.firstAngle/turnTarget) > 0.25 ) {
+            speed = Math.abs(currentAngle.firstAngle/turnTarget);
+        }
+        else {
+            speed = 0.25;
+        }
+        return speed;
+    }
+
+    public void checkAngle(int direction)
     {
-        while (Math.round(currentAngle.firstAngle) != Math.round(newAngle)) {
-            robot.leftFrontMotor.setPower(turnSpeed * directionL);
-            robot.rightFrontMotor.setPower(turnSpeed * directionR);
-            robot.leftRearMotor.setPower(turnSpeed * directionL);
-            robot.rightRearMotor.setPower(turnSpeed * directionR);
-            telemetry.addData("Running to ", " %7d :%7d", newAngle);
+        double speed;
+        speed = getSpeed();
+
+        while (Math.round(currentAngle.firstAngle * 1000.0)/1000.0 < Math.round(turnTarget * 1000.0)/1000.0 - 1.5 || Math.round(currentAngle.firstAngle * 1000.0)/1000.0 > Math.round(turnTarget * 1000.0)/1000.0 + 1.5) {
+            robot.leftFrontMotor.setPower(speed * direction);
+            robot.rightFrontMotor.setPower(speed * -direction);
+            robot.leftRearMotor.setPower(speed * direction);
+            robot.rightRearMotor.setPower(speed * -direction);
+            telemetry.addData("Running to ", " %7d :%7d", turnTarget);
             telemetry.addData("Currently At", " %7d :%7d", currentAngle);
             telemetry.update();
+            speed = getSpeed();
         }
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftRearMotor.setPower(0);
+        robot.rightRearMotor.setPower(0);
     }
 
     //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
@@ -228,30 +265,15 @@ public class AutonomousHype extends LinearOpMode
         //Ensure we are in op mode
         if (opModeIsActive())
         {
-            if ((currentAngle.firstAngle + degrees) > 180) {
-                newAngle = currentAngle.firstAngle + degrees -360;
-            }
-            else if ((currentAngle.firstAngle + degrees) <-180) {
-                newAngle = currentAngle.firstAngle + degrees +360;
-            }
-            else {
-                newAngle = currentAngle.firstAngle + degrees;
-            }
+            turnTarget = getTarget(degrees);
 
-            robot.leftFrontMotor.setPower(0);
-            robot.rightFrontMotor.setPower(0);
-            robot.leftRearMotor.setPower(0);
-            robot.rightRearMotor.setPower(0);
-            turnSpeed = speed;
             if (degrees < 0) {
-                directionL = 1;
-                directionR = -1;
+                direction = 1;
             }
             else {
-                directionL = -1;
-                directionR = 1;
+                direction = -1;
             }
-            checkAngle(directionL, directionR);
+            checkAngle(direction);
         }
     }
 
