@@ -124,7 +124,7 @@ public class AutonomousHype2 extends LinearOpMode
         initVuforia();
 
         //Makes sure the camera is looking at the center
-        robot.cameraMount.setPosition(robot.cameraMountCenter);
+        //robot.cameraMount.setPosition(robot.cameraMountCenter);
 
         //Wait for the start button to be pressed by the driver
         waitForStart();
@@ -136,7 +136,7 @@ public class AutonomousHype2 extends LinearOpMode
         firstTime = true;
 
         //Sets the block int to 0 (default value)
-        int block;
+        int block = 0;
 
         //While the program is running
         while (opModeIsActive())
@@ -147,14 +147,16 @@ public class AutonomousHype2 extends LinearOpMode
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
+            gyroRobotTurn(0.75, -45);
+
             //Query the tensorFlowEngine and set the block variable equal to the result
-            block = queryTensorFlow();
+            //block = queryTensorFlow();
 
             //Might not need the first time provision
             //if (firstTime)
             //{
             //Tucks in the servo
-            robot.cameraMount.setPosition(robot.cameraMountTucked);
+            //robot.cameraMount.setPosition(robot.cameraMountTucked);
 
             //Block logic (separated into ifs because we need different motions depending on where the block is
             if (block == 1)
