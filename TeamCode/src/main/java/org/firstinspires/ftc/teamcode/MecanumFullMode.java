@@ -43,29 +43,23 @@ public class MecanumFullMode extends OpMode {
 
         //Controls for tank treads
         if (gamepad1.left_bumper) {
-            fLPower = (1);
-            fRPower = (0.5);
-            rLPower = (1);
-            rRPower = (-0.5);
+            fLPower = -1;
+            fRPower = -0.2;
+            rLPower = -1;
+            rRPower = -0.2;
         }
         else if (gamepad1.right_bumper) {
-            fLPower = (-0.5);
-            fRPower = (-1);
-            rLPower = (0.5);
-            rRPower = (-1);
+            fLPower = -0.2;
+            fRPower = 1;
+            rLPower = -0.2;
+            rRPower = 1;
         }
         else {
-            fLPower = -(gamepad1.left_stick_y + gamepad1.left_stick_x);
-            fRPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
-            rLPower = -(gamepad1.left_stick_y - gamepad1.left_stick_x);
-            rRPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
+            fLPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
+            fRPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
+            rLPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
+            rRPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
         }
-
-        fLPower += -gamepad1.right_stick_x;
-        fRPower += -gamepad1.right_stick_x;
-        rLPower += -gamepad1.right_stick_x;
-        rRPower += -gamepad1.right_stick_x;
-
 
         robot.leftFrontMotor.setPower(fLPower);
         robot.rightFrontMotor.setPower(fRPower);
@@ -79,4 +73,5 @@ public class MecanumFullMode extends OpMode {
         telemetry.addData("Rear Right Power: ", rRPower);
         telemetry.update();
     }
+
 }
