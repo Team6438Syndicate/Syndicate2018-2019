@@ -97,6 +97,12 @@ public class AutonomousHype extends LinearOpMode
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        //Set 0 power behavior
+        robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
         // provide positional information.
@@ -144,7 +150,7 @@ public class AutonomousHype extends LinearOpMode
             telemetry.addData("Temp ", imu.getTemperature());
             telemetry.update();
 
-            gyroRobotTurn(0.15, 90);
+            gyroRobotTurn(1, -45);
 
             //move the actuator up and over
             //actuatorMove(1, 18100);
@@ -214,7 +220,7 @@ public class AutonomousHype extends LinearOpMode
 
     public void checkAngle(int directionL, int directionR)
     {
-        while ( Math.round(currentAngle) != Math.round(newAngle) ) {
+        while ( Math.round(currentAngle) < Math.round(newAngle*1000.0)/1000.0 - 1.5 || Math.round(currentAngle*1000.0)/1000.0 > Math.round(newAngle) + 1.5 ) {
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -264,7 +270,7 @@ public class AutonomousHype extends LinearOpMode
                 directionL = -1;
                 directionR = 1;
             }
-                checkAngle(directionL, directionR);
+            checkAngle(directionL, directionR);
         }
     }
 
