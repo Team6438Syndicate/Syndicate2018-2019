@@ -20,6 +20,8 @@
 package org.firstinspires.ftc.teamcode;
 
 //Imports
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -27,10 +29,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -58,9 +63,19 @@ public class AutonomousHype2 extends LinearOpMode
     private static boolean sleeps = true;           //we can potentially set this to false if we want to make autonomous faster
     private static double  preciseSpeed = 0.6;      //Speeds for any turns/precise movements where accuracy is key
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
+    private static double  pauseDistance = 20;
+    private static long    pauseTime = 100;
 
     // The IMU sensor object
     private BNO055IMU imu;
+
+    //Distance sensor object
+    private DistanceSensor sensorRange;
+    private ColorSensor sensorColor;
+
+    //Used for distance stops
+    private boolean firstDetection = true;
+    private double encoderRemainingDistance;
 
     // Used for gyro turns
     private Orientation  currentAngle = new Orientation();
@@ -97,9 +112,14 @@ public class AutonomousHype2 extends LinearOpMode
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Set up the parameters with which we will use our IMU. Note that integration
-        // algorithm here just reports accelerations to the logcat log; it doesn't actually
-        // provide positional information.
+        //Set 0 behavior to breaking
+        robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        // Set up the parameters with which we will use our IMU. Note that integration algorithm here just reports accelerations to the logcat log; it doesn't actually provide positional information.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -109,6 +129,12 @@ public class AutonomousHype2 extends LinearOpMode
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+        //Set up color/distance sensor
+        sensorRange = robot.sensorDistance;
+        sensorColor = robot.sensorColor;
+
+        //Turn on LED for color/distance sensor
+        sensorColor.enableLed(true);
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
@@ -125,6 +151,9 @@ public class AutonomousHype2 extends LinearOpMode
 
         //Makes sure the camera is looking at the center
         //robot.cameraMount.setPosition(robot.cameraMountCenter);
+
+        //Turns on distance sensor LED
+
 
         //Wait for the start button to be pressed by the driver
         waitForStart();
@@ -147,7 +176,9 @@ public class AutonomousHype2 extends LinearOpMode
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
-            gyroRobotTurn(0.75, -45);
+            encoderRobotDrive(0.3, 150);
+            gyroRobotTurn(45);
+            gyroRobotTurn(-45);
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             //block = queryTensorFlow();
@@ -204,6 +235,49 @@ public class AutonomousHype2 extends LinearOpMode
      *  @param: Speed, inches for left and right
      */
 
+    public void pauseAutonomous (long time, int encoderRemainingDistanceFL, int encoderRemainingDistanceFR, int encoderRemainingDistanceBL, int encoderRemainingDistanceBR,
+                                 double motorPowerOriginalFL, double motorPowerOriginalFR, double motorPowerOriginalBL, double motorPowerOriginalBR)
+    {
+        robot.leftFrontMotor.setPower(Math.abs(0));
+        robot.rightFrontMotor.setPower(Math.abs(0));
+        robot.leftRearMotor.setPower(Math.abs(0));
+        robot.rightRearMotor.setPower(Math.abs(0));
+        sleep(time);
+        if (firstDetection) {
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.leftFrontMotor.setPower(-motorPowerOriginalFL);
+            robot.rightFrontMotor.setPower(-motorPowerOriginalFR);
+            robot.leftRearMotor.setPower(-motorPowerOriginalBL);
+            robot.rightRearMotor.setPower(-motorPowerOriginalBR);
+            sleep(500);
+            firstDetection = false;
+
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+        if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+            pauseAutonomous(pauseTime, 0, 0, 0, 0,
+                            motorPowerOriginalFL, motorPowerOriginalFR, motorPowerOriginalBL, motorPowerOriginalBR);
+        }
+        robot.leftFrontMotor.setTargetPosition(encoderRemainingDistanceFL);
+        robot.rightFrontMotor.setTargetPosition(encoderRemainingDistanceFR);
+        robot.leftRearMotor.setTargetPosition(encoderRemainingDistanceBL);
+        robot.rightRearMotor.setTargetPosition(encoderRemainingDistanceBR);
+
+        robot.leftFrontMotor.setPower(motorPowerOriginalFL);
+        robot.rightFrontMotor.setPower(motorPowerOriginalFR);
+        robot.leftRearMotor.setPower(motorPowerOriginalBL);
+        robot.rightRearMotor.setPower(motorPowerOriginalBR);
+        firstDetection = true;
+    }
+
     private void getHeading()
     {
         currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -212,6 +286,7 @@ public class AutonomousHype2 extends LinearOpMode
     private double getTarget(double degrees) {
 
         double newAngle;
+        turnTarget = degrees;
 
         if ((currentAngle.firstAngle + turnTarget) > 180) {
             newAngle = currentAngle.firstAngle + turnTarget -360;
@@ -225,41 +300,55 @@ public class AutonomousHype2 extends LinearOpMode
         return newAngle;
     }
 
-    private double getSpeed() {
-        double speed;
-
-        if (Math.abs(currentAngle.firstAngle/turnTarget) > 0.25 ) {
-            speed = Math.abs(currentAngle.firstAngle/turnTarget);
-        }
-        else {
-            speed = 0.25;
-        }
-        return speed;
-    }
-
     public void checkAngle(int direction)
     {
         double speed;
-        speed = getSpeed();
+        speed = 0.5;
 
-        while (Math.round(currentAngle.firstAngle * 1000.0)/1000.0 < Math.round(turnTarget * 1000.0)/1000.0 - 1.5 || Math.round(currentAngle.firstAngle * 1000.0)/1000.0 > Math.round(turnTarget * 1000.0)/1000.0 + 1.5) {
-            robot.leftFrontMotor.setPower(speed * direction);
-            robot.rightFrontMotor.setPower(speed * -direction);
-            robot.leftRearMotor.setPower(speed * direction);
-            robot.rightRearMotor.setPower(speed * -direction);
-            telemetry.addData("Running to ", " %7d :%7d", turnTarget);
-            telemetry.addData("Currently At", " %7d :%7d", currentAngle);
+        //Run by power
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robot.leftFrontMotor.setPower(speed * direction);
+        robot.rightFrontMotor.setPower(speed * -direction);
+        robot.leftRearMotor.setPower(speed * direction);
+        robot.rightRearMotor.setPower(speed * -direction);
+
+        while (currentAngle.firstAngle < turnTarget - 1 || currentAngle.firstAngle > turnTarget + 1) {
+            telemetry.addData("Speed", speed);
+            telemetry.addData("Running to ", turnTarget);
+            telemetry.addData("Currently At ", currentAngle.firstAngle);
             telemetry.update();
-            speed = getSpeed();
+            getHeading();
         }
         robot.leftFrontMotor.setPower(0);
         robot.rightFrontMotor.setPower(0);
         robot.leftRearMotor.setPower(0);
         robot.rightRearMotor.setPower(0);
+
+        //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //Resets encoders
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
-    private void gyroRobotTurn(double speed, double degrees)
+    private void gyroRobotTurn(double degrees)
     {
         getHeading();
 
@@ -282,6 +371,7 @@ public class AutonomousHype2 extends LinearOpMode
     {
         //Declaring new targets
         int target;
+        int remainingDistance;
 
         //Gets the motors starting positions
         int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
@@ -321,9 +411,15 @@ public class AutonomousHype2 extends LinearOpMode
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
             {
-                telemetry.addData("Running to ", target);
+                remainingDistance = target - robot.leftFrontMotor.getCurrentPosition();
+                telemetry.addData("Remaining Distance: ", remainingDistance);
                 telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
                 telemetry.update();
+
+                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    pauseAutonomous(pauseTime, remainingDistance, remainingDistance, remainingDistance, remainingDistance,
+                                    speed, speed, speed, speed);
+                }
             }
 
             //When done stop all the motion and turn off run to position
@@ -342,6 +438,7 @@ public class AutonomousHype2 extends LinearOpMode
     {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
+        int fLRemainingDistance, fRRemainingDistance;
 
         //Gets the motors starting positions
         int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
@@ -374,6 +471,21 @@ public class AutonomousHype2 extends LinearOpMode
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
 
+            //While opMode is still active and the motors are going add telemetry to tell the user where its going
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
+            {
+                fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
+                fRRemainingDistance = fRTarget - robot.rightFrontMotor.getCurrentPosition();
+                telemetry.addData("Running to ", fRTarget);
+                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.update();
+
+                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fLRemainingDistance, fRRemainingDistance,
+                                    speed, speed, speed, speed);
+                }
+            }
+
             //When done stop all the motion and turn off run to position
             robot.leftFrontMotor.setPower(0);
             robot.rightFrontMotor.setPower(0);
@@ -390,6 +502,7 @@ public class AutonomousHype2 extends LinearOpMode
     {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
+        int fLRemainingDistance, fRRemainingDistance;
 
         //Gets the motors starting positions
         int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
@@ -421,6 +534,21 @@ public class AutonomousHype2 extends LinearOpMode
             robot.rightFrontMotor.setPower(Math.abs(speed));
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
+
+            //While opMode is still active and the motors are going add telemetry to tell the user where its going
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
+            {
+                fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
+                fRRemainingDistance = fRTarget - robot.rightFrontMotor.getCurrentPosition();
+                telemetry.addData("Running to ", fRTarget);
+                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.update();
+
+                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fLRemainingDistance, fRRemainingDistance,
+                            speed, speed, speed, speed);
+                }
+            }
 
             //When done stop all the motion and turn off run to position
             robot.leftFrontMotor.setPower(0);
@@ -662,7 +790,7 @@ public class AutonomousHype2 extends LinearOpMode
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        //parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);

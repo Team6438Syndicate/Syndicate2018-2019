@@ -14,9 +14,12 @@ package org.firstinspires.ftc.teamcode;
 //Imports
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -43,15 +46,17 @@ class Team6438HardwareMap
 
     //Sensor Mapping
     BNO055IMU imu     = null;
+    DistanceSensor sensorDistance;
+    ColorSensor sensorColor;
 
     //Variables
     private final double hexCPR = 288;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    private final double DGR = 1.0;
+    private final double DGR = 0.5;
 
     //Wheel Diameter Inches
-    private final double WDI = 3.8;
+    private final double WDI = 5;
 
     //Counts per Inch
     final double hexCPI = (hexCPR * DGR)
@@ -108,10 +113,10 @@ class Team6438HardwareMap
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
-        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftRearMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightRearMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
         linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
@@ -139,6 +144,8 @@ class Team6438HardwareMap
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed sensors.
         imu = hwMap.get(BNO055IMU.class, "imu");
+        sensorDistance = hwMap.get(DistanceSensor.class, "distanceSensor");
+        sensorColor = hwMap.get(ColorSensor.class, "distanceSensor");
     }
 }
 
