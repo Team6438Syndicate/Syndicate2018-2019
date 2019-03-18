@@ -63,8 +63,8 @@ public class AutonomousHype2 extends LinearOpMode
     private static boolean sleeps = true;           //we can potentially set this to false if we want to make autonomous faster
     private static double  preciseSpeed = 0.6;      //Speeds for any turns/precise movements where accuracy is key
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
-    private static double  pauseDistance = 20;
-    private static long    pauseTime = 100;
+    private static double  pauseDistance = 100;
+    private static long    pauseTime = 50;
 
     // The IMU sensor object
     private BNO055IMU imu;
@@ -176,7 +176,7 @@ public class AutonomousHype2 extends LinearOpMode
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
-            encoderRobotDrive(0.3, 150);
+            //encoderRobotDrive(0.3, 150);
             gyroRobotTurn(45);
             gyroRobotTurn(-45);
 
@@ -236,46 +236,47 @@ public class AutonomousHype2 extends LinearOpMode
      */
 
     public void pauseAutonomous (long time, int encoderRemainingDistanceFL, int encoderRemainingDistanceFR, int encoderRemainingDistanceBL, int encoderRemainingDistanceBR,
-                                 double motorPowerOriginalFL, double motorPowerOriginalFR, double motorPowerOriginalBL, double motorPowerOriginalBR)
-    {
-        robot.leftFrontMotor.setPower(Math.abs(0));
-        robot.rightFrontMotor.setPower(Math.abs(0));
-        robot.leftRearMotor.setPower(Math.abs(0));
-        robot.rightRearMotor.setPower(Math.abs(0));
-        sleep(time);
-        if (firstDetection) {
-            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                                 double motorPowerOriginalFL, double motorPowerOriginalFR, double motorPowerOriginalBL, double motorPowerOriginalBR) {
+        while (opModeIsActive()) {
+            if (firstDetection) {
+                robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-            robot.leftFrontMotor.setPower(-motorPowerOriginalFL);
-            robot.rightFrontMotor.setPower(-motorPowerOriginalFR);
-            robot.leftRearMotor.setPower(-motorPowerOriginalBL);
-            robot.rightRearMotor.setPower(-motorPowerOriginalBR);
-            sleep(500);
-            firstDetection = false;
+                robot.leftFrontMotor.setPower(-1);
+                robot.rightFrontMotor.setPower(-1);
+                robot.leftRearMotor.setPower(-1);
+                robot.rightRearMotor.setPower(-1);
+                sleep(time);
+                firstDetection = false;
 
-            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            sleep(time);
+
+            if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                pauseAutonomous(pauseTime, encoderRemainingDistanceFL, encoderRemainingDistanceFR, encoderRemainingDistanceBL, encoderRemainingDistanceBR,
+                        motorPowerOriginalFL, motorPowerOriginalFR, motorPowerOriginalBL, motorPowerOriginalBR);
+            }
+            robot.leftFrontMotor.setTargetPosition(encoderRemainingDistanceFL);
+            robot.rightFrontMotor.setTargetPosition(encoderRemainingDistanceFR);
+            robot.leftRearMotor.setTargetPosition(encoderRemainingDistanceBL);
+            robot.rightRearMotor.setTargetPosition(encoderRemainingDistanceBR);
+
+            robot.leftFrontMotor.setPower(motorPowerOriginalFL);
+            robot.rightFrontMotor.setPower(motorPowerOriginalFR);
+            robot.leftRearMotor.setPower(motorPowerOriginalBL);
+            robot.rightRearMotor.setPower(motorPowerOriginalBR);
+            firstDetection = true;
         }
-
-        if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
-            pauseAutonomous(pauseTime, 0, 0, 0, 0,
-                            motorPowerOriginalFL, motorPowerOriginalFR, motorPowerOriginalBL, motorPowerOriginalBR);
-        }
-        robot.leftFrontMotor.setTargetPosition(encoderRemainingDistanceFL);
-        robot.rightFrontMotor.setTargetPosition(encoderRemainingDistanceFR);
-        robot.leftRearMotor.setTargetPosition(encoderRemainingDistanceBL);
-        robot.rightRearMotor.setTargetPosition(encoderRemainingDistanceBR);
-
-        robot.leftFrontMotor.setPower(motorPowerOriginalFL);
-        robot.rightFrontMotor.setPower(motorPowerOriginalFR);
-        robot.leftRearMotor.setPower(motorPowerOriginalBL);
-        robot.rightRearMotor.setPower(motorPowerOriginalBR);
-        firstDetection = true;
     }
 
     private void getHeading()
@@ -300,51 +301,52 @@ public class AutonomousHype2 extends LinearOpMode
         return newAngle;
     }
 
-    public void checkAngle(int direction)
-    {
-        double speed;
-        speed = 0.5;
+    public void checkAngle(int direction) {
+        while (opModeIsActive()) {
+            double speed;
+            speed = 0.5;
 
-        //Run by power
-        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //Run by power
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        robot.leftFrontMotor.setPower(speed * direction);
-        robot.rightFrontMotor.setPower(speed * -direction);
-        robot.leftRearMotor.setPower(speed * direction);
-        robot.rightRearMotor.setPower(speed * -direction);
+            robot.leftFrontMotor.setPower(speed * direction);
+            robot.rightFrontMotor.setPower(speed * -direction);
+            robot.leftRearMotor.setPower(speed * direction);
+            robot.rightRearMotor.setPower(speed * -direction);
 
-        while (currentAngle.firstAngle < turnTarget - 1 || currentAngle.firstAngle > turnTarget + 1) {
-            telemetry.addData("Speed", speed);
-            telemetry.addData("Running to ", turnTarget);
-            telemetry.addData("Currently At ", currentAngle.firstAngle);
-            telemetry.update();
-            getHeading();
+            while (currentAngle.firstAngle < turnTarget - 1 || currentAngle.firstAngle > turnTarget + 1) {
+                telemetry.addData("Speed", speed);
+                telemetry.addData("Running to ", turnTarget);
+                telemetry.addData("Currently At ", currentAngle.firstAngle);
+                telemetry.update();
+                getHeading();
+            }
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+
+            //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //Resets encoders
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        robot.leftFrontMotor.setPower(0);
-        robot.rightFrontMotor.setPower(0);
-        robot.leftRearMotor.setPower(0);
-        robot.rightRearMotor.setPower(0);
-
-        //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
-        robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //Resets encoders
-        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     //@condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
@@ -417,8 +419,13 @@ public class AutonomousHype2 extends LinearOpMode
                 telemetry.update();
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    robot.leftFrontMotor.setPower(0);
+                    robot.rightFrontMotor.setPower(0);
+                    robot.leftRearMotor.setPower(0);
+                    robot.rightRearMotor.setPower(0);
+                    sleep(pauseTime);
                     pauseAutonomous(pauseTime, remainingDistance, remainingDistance, remainingDistance, remainingDistance,
-                                    speed, speed, speed, speed);
+                            speed, speed, speed, speed);
                 }
             }
 
@@ -482,7 +489,7 @@ public class AutonomousHype2 extends LinearOpMode
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fLRemainingDistance, fRRemainingDistance,
-                                    speed, speed, speed, speed);
+                            speed, speed, speed, speed);
                 }
             }
 
