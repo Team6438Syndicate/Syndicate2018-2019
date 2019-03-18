@@ -55,12 +55,12 @@ class Team6438HardwareMap
 
     //Counts per Inch
     final double hexCPI = (hexCPR * DGR)
-                        / (WDI * Math.PI);
+            / (WDI * Math.PI);
 
 
     //Camera mount servo positions
     final double cameraMountTucked = 1;
-    final double cameraMountCenter = .15;
+    final double cameraMountCenter = .22;
     final double cameraMountRight = 0;
 
     //Positions for intake
@@ -71,8 +71,8 @@ class Team6438HardwareMap
     final int intakeMax = 2400;                            //This is the lowest the intake can be before causing the motor to lock.
 
     //Positions for the slides
-    final int slideExtended = 791;                        //This is the motor encoder position when the slide is all the way out
-    final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
+    final int slideExtended = 820;                        //This is the motor encoder position when the slide is all the way out
+    final int slideUnExtended = 170;                      //This is the motor encoder position when the slide is all the way in
 
     //Variables for the actuator
     final int laInterference = 10000;                   //Min position where the linear actuator can be as to not cause damage
@@ -85,11 +85,11 @@ class Team6438HardwareMap
     TFObjectDetector tfod;
 
     //Place in a number 0.0 - 1.0
-    static final double confidence = .5;
+    static final double confidence = .4;
 
     //Positions for the team marker servo
     final double toss = 1.0;
-    final double tucked = 0.0;
+    final double tucked = 0.82;
 
     //Method to initialize standard Hardware interfaces
     void init(HardwareMap ahwMap)
@@ -99,10 +99,10 @@ class Team6438HardwareMap
         HardwareMap hwMap = ahwMap;
 
         //Define and Initialize Motors
-        leftFrontMotor        = hwMap.get(DcMotor.class, "leftFrontDrive");
-        rightFrontMotor       = hwMap.get(DcMotor.class, "rightFrontDrive");
-        leftRearMotor        = hwMap.get(DcMotor.class, "leftRearDrive");
-        rightRearMotor       = hwMap.get(DcMotor.class, "rightRearDrive");
+        leftFrontMotor   = hwMap.get(DcMotor.class, "leftFrontDrive");
+        rightFrontMotor  = hwMap.get(DcMotor.class, "rightFrontDrive");
+        leftRearMotor    = hwMap.get(DcMotor.class, "leftRearDrive");
+        rightRearMotor   = hwMap.get(DcMotor.class, "rightRearDrive");
         linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
@@ -134,7 +134,7 @@ class Team6438HardwareMap
         rightIntake = hwMap.get(CRServo.class,"rightIntake");
 
         //Maybe??
-        //rightIntake.setDirection(CRServo.Direction.REVERSE);
+        rightIntake.setDirection(CRServo.Direction.REVERSE);
 
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed sensors.

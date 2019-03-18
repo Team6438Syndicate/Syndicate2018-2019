@@ -310,8 +310,6 @@ public class Team6438DepotAutonomous extends LinearOpMode
     {
         while (opModeIsActive() )
         {
-            //int to determine gold block location: 1 = center, 2 = right, 3 = left
-            int goldLocation = 0;
 
             if (opModeIsActive())
             {
