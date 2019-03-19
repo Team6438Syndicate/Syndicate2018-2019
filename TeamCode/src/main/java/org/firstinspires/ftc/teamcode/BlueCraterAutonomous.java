@@ -68,7 +68,8 @@ public class BlueCraterAutonomous extends LinearOpMode
 
 
     //Grid value variables for CURRENT Position
-     double mapX, mapY;
+    //Starting values go as follows: Red Depot- 86.5, 57.5; Red Crater- 86.5, 86.5; Blue Crater- 57.5, 57.5; Blue Depot- 57.5, 86.5
+     double mapX = 57.5, mapY = 86.5;
 
     // The IMU sensor object
     private BNO055IMU imu;
@@ -145,6 +146,7 @@ public class BlueCraterAutonomous extends LinearOpMode
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+        imu.cali
 
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
@@ -241,11 +243,32 @@ public class BlueCraterAutonomous extends LinearOpMode
      *  @param: Speed, inches for left and right
      */
 
-    private void mapMove(double speed, double x, double y )
+    private void mapStraightMove(double speed, double x, double y )
     {
         double targetX, targetY;
         targetX = x - mapX;
         targetY = y - mapY;
+
+        while(opModeIsActive())
+        {
+            encoderRobotDrive(speed,targetY);
+            encoderRobotStrafe(speed, targetX);
+            mapX = targetX;
+            mapY = targetY;
+        }
+        telemetry.addData("Map X: ", mapX);
+        telemetry.addData("Map Y: ", mapY);
+        telemetry.update();
+    }
+
+    private void mapTurnMove(double speed, double x, double y )
+    {
+        double newAngle, targetX, targetY;
+        targetX = x - mapX;
+        targetY = y - mapY;
+        if (y > mapY) {
+            newAngle = -Math.sin(y - mapY);
+        }
 
         while(opModeIsActive())
         {
