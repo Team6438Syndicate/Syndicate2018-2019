@@ -149,7 +149,7 @@ public class BlueCraterAutonomous extends LinearOpMode
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
         telemetry.addData("Map X: ", mapX);
-        telemetry.addData("Map Y: ", mapY);
+        telemetry.addData("Map Y: ", map);
         telemetry.update();
 
         //init the vuforia engine when the class is called forward (selected on DS)
