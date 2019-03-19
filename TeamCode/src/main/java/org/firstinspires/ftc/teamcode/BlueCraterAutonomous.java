@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Autonomous Hype V2", group = "Team 6438 Autonomous")
-public class AutonomousHype2 extends LinearOpMode
+@Autonomous(name = "Blue Crater", group = "Team 6438 Autonomous")
+public class BlueCraterAutonomous extends LinearOpMode
 {
     //First time evaluation
     private static boolean firstTime = true;
@@ -302,7 +302,7 @@ public class AutonomousHype2 extends LinearOpMode
         return newAngle;
     }
 
-    /* 
+    /*
      *  method to check our angle
      */
     private void checkAngle(int direction) {
@@ -355,7 +355,7 @@ public class AutonomousHype2 extends LinearOpMode
     /*
      * @condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
      * method to turn the robot a certain amount of degrees using the gyro
-     * @param: degrees as a double 
+     * @param: degrees as a double
      */
     private void gyroRobotTurn(double degrees)
     {
