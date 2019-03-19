@@ -69,7 +69,7 @@ public class BlueCraterAutonomous extends LinearOpMode
 
     //Grid value variables for CURRENT Position
     //Starting values go as follows: Red Depot- 86.5, 57.5; Red Crater- 86.5, 86.5; Blue Crater- 57.5, 57.5; Blue Depot- 57.5, 86.5
-     double mapX = 57.5, mapY = 86.5;
+    double mapX = 57.5, mapY = 86.5;
 
     // The IMU sensor object
     private BNO055IMU imu;
@@ -128,7 +128,7 @@ public class BlueCraterAutonomous extends LinearOpMode
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        //parameters.temperatureUnit     = BNO055IMU.TempUnit.CELSIUS ;
+        //parameters.temperatureUnit     = BNO055IMU.TempUnit.CELSIUS;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
@@ -146,7 +146,6 @@ public class BlueCraterAutonomous extends LinearOpMode
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-        imu.cali
 
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
@@ -261,21 +260,28 @@ public class BlueCraterAutonomous extends LinearOpMode
         telemetry.update();
     }
 
-    private void mapTurnMove(double speed, double x, double y )
+    private void mapAngleMove (double speed, double x, double y )
     {
-        double newAngle, targetX, targetY;
-        targetX = x - mapX;
-        targetY = y - mapY;
+        double newAngle, distance;
+        distance = Math.sqrt( (y - mapY)*(y - mapY) + (x - mapX)*(x - mapX) );
+
         if (y > mapY) {
-            newAngle = -Math.sin(y - mapY);
+            newAngle = -Math.toDegrees(Math.tan((y - mapY)/(x - mapX)));
+        }
+        else {
+            newAngle = Math.toDegrees(Math.tan((y - mapY)/(x - mapX)));
         }
 
         while(opModeIsActive())
         {
-            encoderRobotDrive(speed,targetY);
-            encoderRobotStrafe(speed, targetX);
-            mapX = targetX;
-            mapY = targetY;
+            getHeading();
+            if (newAngle != currentAngle.firstAngle) {
+                gyroRobotTurn(newAngle);
+            }
+            encoderRobotDrive(speed,distance);
+            mapX = x - mapX;
+            mapY = y - mapY;
+
         }
         telemetry.addData("Map X: ", mapX);
         telemetry.addData("Map Y: ", mapY);
