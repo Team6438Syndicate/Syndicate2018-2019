@@ -66,6 +66,10 @@ public class BlueCraterAutonomous extends LinearOpMode
     private static double  pauseDistance = 100;
     private static long    pauseTime = 50;
 
+
+    //Grid value variables for CURRENT Position
+     double mapX, mapY;
+
     // The IMU sensor object
     private BNO055IMU imu;
 
@@ -144,6 +148,8 @@ public class BlueCraterAutonomous extends LinearOpMode
 
         //Telemetry to let user know robot init
         telemetry.addData("Status: ", "Ready to Run");
+        telemetry.addData("Map X: ", mapX);
+        telemetry.addData("Map Y: ", mapY);
         telemetry.update();
 
         //init the vuforia engine when the class is called forward (selected on DS)
@@ -234,6 +240,24 @@ public class BlueCraterAutonomous extends LinearOpMode
      *
      *  @param: Speed, inches for left and right
      */
+
+    private void mapMove(double speed, double x, double y )
+    {
+        double targetX, targetY;
+        targetX = x - mapX;
+        targetY = y - mapY;
+
+        while(opModeIsActive())
+        {
+            encoderRobotDrive(speed,targetY);
+            encoderRobotStrafe(speed, targetX);
+            mapX = targetX;
+            mapY = targetY;
+        }
+        telemetry.addData("Map X: ", mapX);
+        telemetry.addData("Map Y: ", mapY);
+        telemetry.update();
+    }
 
     private void pauseAutonomous(long time, int encoderRemainingDistanceFL, int encoderRemainingDistanceFR, int encoderRemainingDistanceBL, int encoderRemainingDistanceBR,
                                  double motorPowerOriginalFL, double motorPowerOriginalFR, double motorPowerOriginalBL, double motorPowerOriginalBR) {
@@ -435,7 +459,6 @@ public class BlueCraterAutonomous extends LinearOpMode
                             speed, speed, speed, speed);
                 }
             }
-
             //When done stop all the motion and turn off run to position
             robot.leftFrontMotor.setPower(0);
             robot.rightFrontMotor.setPower(0);
@@ -448,7 +471,8 @@ public class BlueCraterAutonomous extends LinearOpMode
         }
     }
 
-    private void encoderRobotStrafeLeft(double speed, double inches)
+    //Positive inches is right, negative inches is left
+    private void encoderRobotStrafe(double speed, double inches)
     {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
@@ -511,71 +535,6 @@ public class BlueCraterAutonomous extends LinearOpMode
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
-
-    private void encoderRobotStrafeRight(double speed, double inches)
-    {
-        //Declaring new targets
-        int fLTarget, fRTarget, rLTarget, rRTarget;
-        int fLRemainingDistance, fRRemainingDistance;
-
-        //Gets the motors starting positions
-        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
-        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
-        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
-        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
-
-        //Ensure we are in op mode
-        if (opModeIsActive())
-        {
-            //Using the current position and the new desired position send this to the motor
-            fLTarget = startFLPosition + (int) (inches * robot.hexCPI);
-            fRTarget = startFRPosition - (int) (inches * robot.hexCPI);
-            rLTarget = startRLPosition - (int) (inches * robot.hexCPI);
-            rRTarget = startRRPosition + (int) (inches * robot.hexCPI);
-            robot.leftFrontMotor.setTargetPosition(fLTarget);
-            robot.rightFrontMotor.setTargetPosition(fRTarget);
-            robot.leftRearMotor.setTargetPosition(rLTarget);
-            robot.rightRearMotor.setTargetPosition(rRTarget);
-
-            //Turns the motors to run to position mode
-            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            //Sets the power to the absolute value of the speed of the method input
-            robot.leftFrontMotor.setPower(Math.abs(speed));
-            robot.rightFrontMotor.setPower(Math.abs(speed));
-            robot.leftRearMotor.setPower(Math.abs(speed));
-            robot.rightRearMotor.setPower(Math.abs(speed));
-
-            //While opMode is still active and the motors are going add telemetry to tell the user where its going
-            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy())
-            {
-                fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
-                fRRemainingDistance = fRTarget - robot.rightFrontMotor.getCurrentPosition();
-                telemetry.addData("Running to ", fRTarget);
-                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
-                telemetry.update();
-
-                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
-                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fLRemainingDistance, fRRemainingDistance,
-                            speed, speed, speed, speed);
-                }
-            }
-
-            //When done stop all the motion and turn off run to position
-            robot.leftFrontMotor.setPower(0);
-            robot.rightFrontMotor.setPower(0);
-            robot.leftRearMotor.setPower(0);
-            robot.rightRearMotor.setPower(0);
-            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-    }
-
     /*
      *  Method to move the actuator
      *  @param speed and position
