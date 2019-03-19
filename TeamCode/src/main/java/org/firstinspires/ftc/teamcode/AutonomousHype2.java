@@ -279,6 +279,7 @@ public class AutonomousHype2 extends LinearOpMode
         }
     }
 
+    //Method to get the current heading
     private void getHeading()
     {
         currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
