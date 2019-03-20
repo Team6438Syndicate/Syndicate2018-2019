@@ -4,7 +4,7 @@
  *          Currently the actions (in order) are: Raise the linear slide to unlatch
  *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
  * Author: Bradley Abelman
- * Contributors: Matthew Batkiewicz, Matthew Kaboolian
+ * Contributors: Matthew Batkiewicz, Matthew Kaboolian, David Stekol
  * Creation: 11/8/18
  * Last Edit: 1/2/19
  * Additional Notes: TO DO
