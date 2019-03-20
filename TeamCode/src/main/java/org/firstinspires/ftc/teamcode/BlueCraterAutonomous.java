@@ -48,6 +48,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Temperature;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,6 +56,13 @@ import java.util.Locale;
 @Autonomous(name = "Blue Crater", group = "Team 6438 Autonomous")
 public class BlueCraterAutonomous extends LinearOpMode
 {
+
+    //Reference to our hardware map
+    private Team6438HardwareMap robot = new Team6438HardwareMap();
+
+    //Reference to our coordinate object
+    private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
+
     //First time evaluation
     private static boolean firstTime = true;
 
@@ -64,7 +72,6 @@ public class BlueCraterAutonomous extends LinearOpMode
     private static double  quickSpeed = 1;          //Speeds for any straight line/imprecise movements where speed is key
     private static double  pauseDistance = 100;
     private static long    pauseTime = 50;
-
 
     //Grid value variables for CURRENT Position
     //Starting values go as follows: Red Depot- 86.5, 57.5; Red Crater- 86.5, 86.5; Blue Crater- 57.5, 57.5; Blue Depot- 57.5, 86.5
@@ -85,9 +92,6 @@ public class BlueCraterAutonomous extends LinearOpMode
     private Orientation  currentAngle = new Orientation();
     private double turnTarget;
     private int direction;
-
-    //Reference to our hardware map
-    private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -125,12 +129,12 @@ public class BlueCraterAutonomous extends LinearOpMode
 
         // Set up the parameters with which we will use our IMU. Note that integration algorithm here just reports accelerations to the logcat log; it doesn't actually provide positional information.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        //parameters.temperatureUnit     = BNO055IMU.TempUnit.CELSIUS;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        //parameters.temperatureUnit    = BNO055IMU.TempUnit.CELSIUS;
+        parameters.calibrationDataFile  = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled       = true;
+        parameters.loggingTag           = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         //Set up color/distance sensor
@@ -182,7 +186,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             //move the actuator up and over
             //actuatorMove(1, 18100);
 
-            //encoderRobotDrive(0.3, 150);
+            encoderRobotDrive(0.3, 20);
             gyroRobotTurn(45);
             gyroRobotTurn(-45);
 

@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 //@Disabled
 @TeleOp(name = "Basic Mecanum Drive", group = "TeleOp 6438")
@@ -17,6 +19,8 @@ public class MecanumDriveTeleOp extends OpMode {
         robot.rightFrontMotor       = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
         robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
+        robot.leftIntake            = hardwareMap.get(CRServo.class, "leftIntake");
+        robot.rightIntake           = hardwareMap.get(CRServo.class, "rightIntake");
 
         //Reset encoders
 
@@ -39,9 +43,23 @@ public class MecanumDriveTeleOp extends OpMode {
     @Override
     public void loop() {
         //Variables for power
-        double fLPower, fRPower, rLPower, rRPower;
+        double fLPower, fRPower, rLPower, rRPower,
+                intakeLPower, intakeRPower;
 
         //Controls for tank treads
+        if (gamepad1.right_trigger >= 0.1 && gamepad1.left_trigger == 0) {
+            intakeLPower = 1;
+            intakeRPower = 1;
+        }
+        else if (gamepad1.left_trigger >= 0.1 && gamepad1.right_trigger == 0) {
+            intakeLPower = -1;
+            intakeRPower = -1;
+        }
+        else {
+            intakeLPower = 0;
+            intakeRPower = 0;
+        }
+
         fLPower = -(gamepad1.left_stick_y + gamepad1.left_stick_x);
         fRPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
         rLPower = -(gamepad1.left_stick_y - gamepad1.left_stick_x);
@@ -57,6 +75,9 @@ public class MecanumDriveTeleOp extends OpMode {
         robot.rightFrontMotor.setPower(fRPower);
         robot.leftRearMotor.setPower(rLPower);
         robot.rightRearMotor.setPower(rRPower);
+
+        robot.leftIntake.setPower(intakeLPower);
+        robot.rightIntake.setPower(intakeRPower);
 
         //Telemetry to constantly refresh data to update user
         telemetry.addData("Front Left Power: ", fLPower);
