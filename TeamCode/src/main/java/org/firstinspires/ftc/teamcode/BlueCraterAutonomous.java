@@ -293,8 +293,10 @@ public class BlueCraterAutonomous extends LinearOpMode
 
     private void pauseAutonomous(long time, int encoderRemainingDistanceFL, int encoderRemainingDistanceFR, int encoderRemainingDistanceBL, int encoderRemainingDistanceBR,
                                  double motorPowerOriginalFL, double motorPowerOriginalFR, double motorPowerOriginalBL, double motorPowerOriginalBR) {
-        while (opModeIsActive()) {
-            if (firstDetection) {
+        while (opModeIsActive())
+        {
+            if (firstDetection)
+            {
                 robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -318,7 +320,8 @@ public class BlueCraterAutonomous extends LinearOpMode
             robot.rightRearMotor.setPower(0);
             sleep(time);
 
-            if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+            if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance)
+            {
                 pauseAutonomous(pauseTime, encoderRemainingDistanceFL, encoderRemainingDistanceFR, encoderRemainingDistanceBL, encoderRemainingDistanceBR,
                         motorPowerOriginalFL, motorPowerOriginalFR, motorPowerOriginalBL, motorPowerOriginalBR);
             }
@@ -332,7 +335,9 @@ public class BlueCraterAutonomous extends LinearOpMode
             robot.leftRearMotor.setPower(motorPowerOriginalBL);
             robot.rightRearMotor.setPower(motorPowerOriginalBR);
             firstDetection = true;
+
         }
+
     }
 
     //Method to get the current heading
