@@ -202,7 +202,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             //Block logic (separated into ifs because we need different motions depending on where the block is
             if (block == 1)
             {
-                //telemetery to show the user what path we're running
+                //telemetry to show the user what path we're running
                 telemetry.addData("Path running currently: ", "center");
                 telemetry.update();
                 //sleep(500);
@@ -210,7 +210,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             }
             else if (block == 2)
             {
-                //telemetery to show the user what path we're running
+                //telemetry to show the user what path we're running
                 telemetry.addData("Path running currently: ", "right");
                 telemetry.update();
                 //sleep(500);
@@ -218,7 +218,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             }
             else if (block == 3)
             {
-                //telemetery to show the user what path we're running
+                //telemetry to show the user what path we're running
                 telemetry.addData("Path running currently: ", "left");
                 telemetry.update();
                 //sleep(500);
