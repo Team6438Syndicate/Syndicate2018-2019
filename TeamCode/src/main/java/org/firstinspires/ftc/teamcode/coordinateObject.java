@@ -5,16 +5,17 @@ import java.util.ArrayList;
 public class coordinateObject
 {
     //variables
-    ArrayList<coordinateObject> history = new ArrayList<>();
+
     private double x , y;
 
     double mapX = 57.5, mapY = 86.5;
 
-    public coordinateObject(double startX, double startY)
+    public coordinateObject(final double x, final double y)
     {
-        x = startX;
-        y = startY;
+        this.x = x;
+        this.y = y;
     }
+
 
     coordinateObject(double location)
     {
@@ -63,23 +64,20 @@ public class coordinateObject
         return y;
     }
 
-    public void setX(double x, double y)
+    public void setX(double x)
     {
         this.x = x;
-        this.y = y;
-        history.add(coordinateObject);
+
     }
 
     public void setY(double y)
     {
         this.y = y;
-        history.add(y);
+
     }
 
-    public String getHistory()
-    {
-        return history.toString();
-    }
+
+
 
     public String toString()
     {
