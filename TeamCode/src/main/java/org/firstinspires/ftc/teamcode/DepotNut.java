@@ -31,8 +31,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.ConceptGyro;
 import java.util.List;
-
-//@Disabled    //Uncomment this if the op mode needs to not show up on the DS
+@Deprecated
+@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Depot Nut", group = "Team 6438 Autonomous")
 public class DepotNut extends LinearOpMode
 {
