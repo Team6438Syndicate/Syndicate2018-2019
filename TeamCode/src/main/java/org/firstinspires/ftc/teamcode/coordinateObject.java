@@ -16,6 +16,12 @@ public class coordinateObject
         this.y = y;
     }
 
+    public coordinateObject()
+    {
+        this.x = getX();
+        this.y = getY();
+    }
+
 
     coordinateObject(double location)
     {

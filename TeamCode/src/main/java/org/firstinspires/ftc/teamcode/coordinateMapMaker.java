@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class coordinateMapMaker extends LinearOpMode
 {
+    int spacing = 100;
    ArrayList<coordinateObject> history = new ArrayList<>();
 
     @Override
@@ -24,9 +25,9 @@ public class coordinateMapMaker extends LinearOpMode
         while (opModeIsActive()) {
             telemetry.addData("time right now = ", etime.now(TimeUnit.MILLISECONDS));
             telemetry.update();
-            if(etime.now(TimeUnit.MILLISECONDS) % 10 == 0)
+            if(etime.now(TimeUnit.MILLISECONDS) % spacing == 0)
             {
-
+                newCoord();
             }
         }
     }
@@ -34,9 +35,9 @@ public class coordinateMapMaker extends LinearOpMode
 
 
     //adds new coordinateObject objects to the arrayList
-    public void newCoord (double x, double y)
+    public void newCoord ()
     {
-        coordinateObject newPoint = new coordinateObject(x,y);
+        coordinateObject newPoint = new coordinateObject();
         history.add(newPoint);
     }
 
