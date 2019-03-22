@@ -84,7 +84,7 @@ public class coordinateObject
 
 
 
-
+    //to string method overrides default
     public String toString()
     {
         return ("x,y" + x + y);
