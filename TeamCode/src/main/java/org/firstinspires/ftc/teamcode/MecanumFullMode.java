@@ -23,7 +23,7 @@ public class MecanumFullMode extends OpMode {
         robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
         robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
 
-        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
+        //sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
 
         //Drive Motors should drive without encoders
         robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -97,7 +97,7 @@ public class MecanumFullMode extends OpMode {
         telemetry.addData("Front Right Power: ", fRPower);
         telemetry.addData("Rear Left Power: ", rLPower);
         telemetry.addData("Rear Right Power: ", rRPower);
-        telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
+        //telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
         telemetry.addData("Full Speed: ", fullSpeed);
         telemetry.update();
     }
