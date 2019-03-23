@@ -162,10 +162,7 @@ public class BlueCraterAutonomous extends LinearOpMode
         //Makes sure the camera is looking at the center
         //robot.cameraMount.setPosition(robot.cameraMountCenter);
 
-        //Turns on distance sensor LED
-
-
-        //Wait for the start button to be pressed by the driver
+       //Wait for the start button to be pressed by the driver
         waitForStart();
 
         // Start the logging of measured acceleration
@@ -185,10 +182,6 @@ public class BlueCraterAutonomous extends LinearOpMode
 
             //move the actuator up and over
             //actuatorMove(1, 18100);
-
-            encoderRobotDrive(0.3, 20);
-            gyroRobotTurn(45);
-            gyroRobotTurn(-45);
 
             //Query the tensorFlowEngine and set the block variable equal to the result
             //block = queryTensorFlow();
@@ -738,7 +731,7 @@ public class BlueCraterAutonomous extends LinearOpMode
                                         //block in the center
                                         return 1;
                                     } else {
-                                        robot.cameraMount.setPosition(robot.cameraMountRight);
+                                        encoderRobotStrafe(1, 17);
                                         telemetry.addData("Scanning Right", "Right");
                                         telemetry.update();
                                         sleep(100);
