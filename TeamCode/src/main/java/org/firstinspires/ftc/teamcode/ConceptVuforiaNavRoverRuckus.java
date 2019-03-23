@@ -82,7 +82,7 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
      */
 
     Team6438HardwareMap robot = new Team6438HardwareMap();
-
+    private float x,y;
     private static final String VUFORIA_KEY = Team6438HardwareMap.VUFORIA_KEY;
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
@@ -93,7 +93,7 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
 
     // Select which camera you want use.  The FRONT camera is the one on the same side as the screen.
     // Valid choices are:  BACK or FRONT
-    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
+
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
@@ -102,6 +102,7 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
      */
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     VuforiaLocalizer vuforia;
 
     @Override public void runOpMode() {
@@ -111,11 +112,13 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
          * If no camera monitor is desired, use the parameterless constructor instead (commented out below).
          */
 
+
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.cameraName = hardwareMap.get(WebcamName .class, "Webcam 1");
 
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        //VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY ;
         parameters.cameraDirection   = CAMERA_CHOICE;
@@ -250,19 +253,23 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
 
         /** Start tracking the data sets we care about. */
         targetsRoverRuckus.activate();
-        while (opModeIsActive()) {
+        while (opModeIsActive())
+        {
 
             // check all the trackable target to see which one (if any) is visible.
             targetVisible = false;
-            for (VuforiaTrackable trackable : allTrackables) {
-                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+            for (VuforiaTrackable trackable : allTrackables)
+            {
+                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible())
+                {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
 
                     // getUpdatedRobotLocation() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
-                    if (robotLocationTransform != null) {
+                    if (robotLocationTransform != null)
+                    {
                         lastLocation = robotLocationTransform;
                     }
                     break;
@@ -270,20 +277,34 @@ public class ConceptVuforiaNavRoverRuckus extends LinearOpMode {
             }
 
             // Provide feedback as to where the robot is located (if we know).
-            if (targetVisible) {
+            if (targetVisible)
+            {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-
+                        x = translation.get(0);
+                        y = translation.get(1);
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             }
-            else {
+            else
+            {
                 telemetry.addData("Visible Target", "none");
             }
             telemetry.update();
         }
     }
+    public float getX()
+    {
+
+        return x;
+    }
+
+    public float getY()
+    {
+        return y;
+    }
+
 }
