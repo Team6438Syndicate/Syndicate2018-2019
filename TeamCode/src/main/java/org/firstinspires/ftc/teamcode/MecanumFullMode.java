@@ -14,6 +14,7 @@ public class MecanumFullMode extends OpMode {
     Team6438HardwareMap robot = new Team6438HardwareMap();
     private boolean fullSpeed = false;
     private DistanceSensor sensorRange;
+    private DcMotor intakeSlide;
 
     @Override
     public void init() {
@@ -22,6 +23,10 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor       = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
         robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
+
+
+        //this is test for now
+        intakeSlide = hardwareMap.dcMotor.get("linearSlide");
 
         //sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
 
@@ -45,6 +50,22 @@ public class MecanumFullMode extends OpMode {
     public void loop() {
         //Variables for power
         double fLPower, fRPower, rLPower, rRPower;
+
+
+        //more test
+        double linearSlidePower = gamepad2.right_stick_y;
+        intakeSlide.setPower(linearSlidePower);
+
+        if (gamepad2.x)
+        {
+            intakeSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            intakeSlide.setTargetPosition(intakeSlide.getCurrentPosition());
+
+            intakeSlide.setPower(.5);
+
+            while()
+        }
 
         //Controls for tank treads
         if (gamepad1.left_bumper) {
