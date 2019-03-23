@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
@@ -44,6 +45,9 @@ class Team6438HardwareMap
     Servo cameraMount = null;
     CRServo leftIntake = null;
     CRServo rightIntake = null;
+
+    //Webcam mapping
+    WebcamName camera;
 
     //Sensor Mapping
     BNO055IMU imu     = null;
@@ -144,6 +148,9 @@ class Team6438HardwareMap
         rightIntake.setDirection(CRServo.Direction.REVERSE);
 
         //------------------------------------------------------------------------------------------
+        // Define webcam
+        camera = hwMap.get(WebcamName.class, "Webcam 1");
+
         // Define and initialize ALL installed sensors.
         imu = hwMap.get(BNO055IMU.class, "imu");
         sensorDistance = hwMap.get(DistanceSensor.class, "distanceSensor");
