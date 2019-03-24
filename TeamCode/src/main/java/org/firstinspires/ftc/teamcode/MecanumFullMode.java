@@ -14,20 +14,27 @@ public class MecanumFullMode extends OpMode {
     Team6438HardwareMap robot = new Team6438HardwareMap();
     private boolean fullSpeed = false;
     private DistanceSensor sensorRange;
-    private DcMotor intakeSlide;
+    DcMotor intakeSlide;
+    DcMotor intakeMover;
     private double powerFactor = 1;
+
+    int linearSlidePosition = 0;
+    double linearSlidePower = 0;
 
     @Override
     public void init() {
         //init the hardware
+        //robot.init(hardwareMap);
+
         robot.leftFrontMotor        = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         robot.rightFrontMotor       = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
         robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
-
+        intakeSlide                 = hardwareMap.get(DcMotor.class, "intakeSlide");
+        intakeMover                 = hardwareMap.get(DcMotor.class, "intakeMover");
 
         //this is test for now
-        intakeSlide = hardwareMap.dcMotor.get("linearSlide");
+
 
         //sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
 
@@ -36,15 +43,20 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //telemetry
         telemetry.addData("Hardware Status: ", "Mapped");
         telemetry.update();
+
+
     }
 
 
@@ -56,9 +68,9 @@ public class MecanumFullMode extends OpMode {
         double fLPower, fRPower, rLPower, rRPower;
 
         //more test
-        double linearSlidePower = gamepad2.right_stick_y;
-        intakeSlide.setPower(linearSlidePower);
-
+        //linearSlidePower = gamepad2.right_stick_y;
+        //intakeSlide.setPower(linearSlidePower);
+/*
         if (gamepad2.x)
         {
             intakeSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -74,6 +86,21 @@ public class MecanumFullMode extends OpMode {
                 telemetry.update();
             }
         }
+*/
+        //Controls for intake
+        if (gamepad2.right_bumper)
+        {
+            moveIntakeSlide(1,intakeSlide.getCurrentPosition()+100);
+        }
+
+        if(gamepad2.right_trigger > .05)     //untested
+        {
+            intakeMove(1,intakeMover.getCurrentPosition() + 100);
+        }
+        else if (gamepad2.left_trigger > .05)  //untested
+        {
+            intakeMove ( 1, intakeMover.getCurrentPosition() - 100);
+        }
 
         //Controls for tank treads
         if (gamepad1.left_bumper) {
@@ -88,23 +115,23 @@ public class MecanumFullMode extends OpMode {
             rLPower = -1;
             rRPower = -0.2;
         }
-        else if (gamepad1.left_stick_y > 0.1 && gamepad1.left_stick_x < 0.3) {
-            fLPower = gamepad1.left_stick_y;
-            fRPower = -gamepad1.left_stick_y;
-            rLPower = gamepad1.left_stick_y;
-            rRPower = -gamepad1.left_stick_y;
-        }
-        else if (gamepad1.left_stick_x > 0.1 && gamepad1.left_stick_y < 0.3) {
-            fLPower = gamepad1.left_stick_y;
+        else if ( (gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3) ) {
+            fLPower = -gamepad1.left_stick_y;
             fRPower = gamepad1.left_stick_y;
             rLPower = -gamepad1.left_stick_y;
-            rRPower = -gamepad1.left_stick_y;
+            rRPower = gamepad1.left_stick_y;
         }
-        else if (gamepad1.left_stick_x > 0.2 && gamepad1.left_stick_y > 0.2) {
-            fLPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
-            fRPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
-            rLPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
-            rRPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
+        else if ( (gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3) ) {
+            fLPower = gamepad1.left_stick_x;
+            fRPower = gamepad1.left_stick_x;
+            rLPower = -gamepad1.left_stick_x;
+            rRPower = -gamepad1.left_stick_x;
+        }
+        else if ( (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3) ){
+            fLPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
+            fRPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
+            rLPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
+            rRPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
         }
         else {
             fLPower = 0;
@@ -125,7 +152,7 @@ public class MecanumFullMode extends OpMode {
 
         if( gamepad2.x && gamepad2.y )
         {
-            powerFactor = Math.abs(gamepad2.right_stick_x);
+            powerFactor = Math.abs(gamepad2.right_stick_y);
         }
 
         if (fullSpeed !=  true) {
@@ -148,6 +175,48 @@ public class MecanumFullMode extends OpMode {
         //telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
         telemetry.addData("Full Speed Enabled: ", fullSpeed);
         telemetry.addData("Speed Factor: ", powerFactor);
+        //telemetry.addData("Linear Position:", linearSlidePosition);
         telemetry.update();
+    }
+
+    //Method to move the intake slide
+    private void moveIntakeSlide(double speed, int position)
+    {
+
+        //Set the target
+        intakeSlide.setTargetPosition(position);
+
+        //Turn On RUN_TO_POSITION
+        intakeSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Start motion
+        intakeSlide.setPower(1);
+
+        while (intakeSlide.isBusy())
+        {
+            telemetry.addData("Moving to", intakeSlide.getTargetPosition());
+            telemetry.addData("Currently At", intakeSlide.getCurrentPosition());
+            telemetry.update();
+        }
+    }
+
+    //Method to move the intake
+    private void intakeMove(double speed, int position)
+    {
+        //Set the target
+        intakeMover.setTargetPosition(position);
+
+        // Turn On RUN_TO_POSITION
+        intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // start motion.
+        intakeMover.setPower(Math.abs(speed));
+
+        while (intakeMover.isBusy())
+        {
+            telemetry.addData("Currently at ", intakeMover.getTargetPosition());
+            telemetry.addData("Going to ", intakeMover.getCurrentPosition());
+            telemetry.update();
+        }
     }
 }

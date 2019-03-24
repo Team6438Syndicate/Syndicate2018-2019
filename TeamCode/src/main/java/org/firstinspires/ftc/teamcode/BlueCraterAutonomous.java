@@ -21,6 +21,7 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import android.graphics.Color;
+import java.util.Map;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -61,7 +62,7 @@ public class BlueCraterAutonomous extends LinearOpMode
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
     //Reference to our coordinate object
-    private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
+    //private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
 
     //First time evaluation
     private static boolean firstTime = true;
@@ -162,7 +163,7 @@ public class BlueCraterAutonomous extends LinearOpMode
         //Makes sure the camera is looking at the center
         //robot.cameraMount.setPosition(robot.cameraMountCenter);
 
-       //Wait for the start button to be pressed by the driver
+        //Wait for the start button to be pressed by the driver
         waitForStart();
 
         // Start the logging of measured acceleration
@@ -182,7 +183,10 @@ public class BlueCraterAutonomous extends LinearOpMode
 
             //move the actuator up and over
             //actuatorMove(1, 18100);
-
+            //gyroRobotTurn(90);
+            gyroRobotTurn(-90);
+            telemetry.addData("test", "test" );
+            telemetry.update();
             //Query the tensorFlowEngine and set the block variable equal to the result
             //block = queryTensorFlow();
 
@@ -344,25 +348,43 @@ public class BlueCraterAutonomous extends LinearOpMode
         double newAngle;
         turnTarget = degrees;
 
-        if ((currentAngle.firstAngle + turnTarget) > 180) {
-            newAngle = currentAngle.firstAngle + turnTarget -360;
+        if ((currentAngle.firstAngle + turnTarget) > 180)
+        {
+            newAngle = currentAngle.firstAngle + turnTarget - 360;
         }
-        else if ((currentAngle.firstAngle + turnTarget) <-180) {
-            newAngle = currentAngle.firstAngle + turnTarget +360;
+        else if ((currentAngle.firstAngle + turnTarget) < -180 )
+        {
+            newAngle = currentAngle.firstAngle + turnTarget + 360;
         }
-        else {
+        else
+        {
             newAngle = currentAngle.firstAngle + turnTarget;
         }
         return newAngle;
     }
 
     /*
-     *  method to check our angle
+     * @condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
+     * method to turn the robot a certain amount of degrees using the gyro
+     * @param: degrees as a double
      */
-    private void checkAngle(int direction) {
-        while (opModeIsActive()) {
-            double speed = 0.5;
+    private void gyroRobotTurn(double degrees)
+    {
+        getHeading();
 
+        //Ensure we are in op mode
+        if (opModeIsActive())
+        {
+            double speed = 0.4;
+            turnTarget = getTarget(degrees);
+
+            if (degrees < 0) {
+                direction = 1;
+            }
+            else
+            {
+                direction = -1;
+            }
             //Run by power
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -374,6 +396,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             robot.leftRearMotor.setPower(speed * direction);
             robot.rightRearMotor.setPower(speed * -direction);
 
+
             while (currentAngle.firstAngle < turnTarget - 1 || currentAngle.firstAngle > turnTarget + 1) {
                 telemetry.addData("Speed", speed);
                 telemetry.addData("Running to ", turnTarget);
@@ -381,12 +404,12 @@ public class BlueCraterAutonomous extends LinearOpMode
                 telemetry.update();
                 getHeading();
             }
+
             robot.leftFrontMotor.setPower(0);
             robot.rightFrontMotor.setPower(0);
             robot.leftRearMotor.setPower(0);
             robot.rightRearMotor.setPower(0);
 
-            //Sets them to use encoders  //THIS MAY NOT BE NECESSARY
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -403,30 +426,6 @@ public class BlueCraterAutonomous extends LinearOpMode
             robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-    }
-
-    /*
-     * @condition degrees must be between -180 and 180 "https://stemrobotics.cs.pdx.edu/node/7265"
-     * method to turn the robot a certain amount of degrees using the gyro
-     * @param: degrees as a double
-     */
-    private void gyroRobotTurn(double degrees)
-    {
-        getHeading();
-
-        //Ensure we are in op mode
-        if (opModeIsActive())
-        {
-            turnTarget = getTarget(degrees);
-
-            if (degrees < 0) {
-                direction = 1;
-            }
-            else {
-                direction = -1;
-            }
-            checkAngle(direction);
         }
     }
 
@@ -618,6 +617,7 @@ public class BlueCraterAutonomous extends LinearOpMode
             //  sleep(250);   // optional pause after each move
         }
     }
+
 
     //Method to move the intake
     private void intakeMove(double speed, int position)

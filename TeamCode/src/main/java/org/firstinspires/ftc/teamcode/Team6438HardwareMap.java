@@ -53,7 +53,7 @@ class Team6438HardwareMap
     BNO055IMU imu     = null;
     DistanceSensor sensorDistance;
     ColorSensor sensorColor;
-    ModernRoboticsI2cRangeSensor rangeSensor;
+    //ModernRoboticsI2cRangeSensor rangeSensor;
 
     //Variables
     private final double hexCPR = 288;
@@ -155,7 +155,7 @@ class Team6438HardwareMap
         imu = hwMap.get(BNO055IMU.class, "imu");
         sensorDistance = hwMap.get(DistanceSensor.class, "distanceSensor");
         sensorColor = hwMap.get(ColorSensor.class, "distanceSensor");
-        rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangeSensor");
+        //rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangeSensor");
     }
 }
 
