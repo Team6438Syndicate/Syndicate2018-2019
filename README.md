@@ -1,3 +1,6 @@
+## WE ARE SYNDICATE
+Hello everyone, this is Syndicate repository for their code for the 2018-2019 FTC Rover Ruckus challenge. We are Team 6438 one of 6 Syosset Teams. We are going to Worlds this year and are incredibly grateful for all the opportunities FIRST and Syosset have provided us.
+
 ## Welcome!
 This GitHub repository contains the source code that is used to build an Android app to control a *FIRST* Tech Challenge competition robot.  To use this SDK, download/clone the entire project to your local computer.
 
