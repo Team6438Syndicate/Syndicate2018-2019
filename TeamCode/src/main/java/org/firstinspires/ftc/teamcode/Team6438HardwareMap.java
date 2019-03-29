@@ -35,15 +35,15 @@ class Team6438HardwareMap
     DcMotor leftRearMotor    = null;
     DcMotor rightRearMotor   = null;
     DcMotor linearActuator   = null;
-    DcMotor intakeMoverLeft  = null;
-    DcMotor intakeMoverRight = null;
+    DcMotor intakeMover      = null;
     DcMotor intakeSlide      = null;
 
     //Servo mapping
-    Servo teamMarkerServo   = null;
-    Servo cameraMount = null;
-    CRServo leftIntake = null;
-    CRServo rightIntake = null;
+    Servo teamMarkerServo    = null;
+    Servo intakeSpin         = null;
+    Servo cameraMount        = null;
+    CRServo leftIntake       = null;
+    CRServo rightIntake      = null;
     //Webcam mapping
     WebcamName camera;
 
@@ -113,8 +113,7 @@ class Team6438HardwareMap
         leftRearMotor    = hwMap.get(DcMotor.class, "leftRearDrive");
         rightRearMotor   = hwMap.get(DcMotor.class, "rightRearDrive");
         linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
-        intakeMoverLeft  = hwMap.get(DcMotor.class, "intakeMoverLeft");
-        intakeMoverRight = hwMap.get(DcMotor.class, "intakeMotorRight");
+        intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
         //Reverse the right Motor and linear slide motor to make code operation easier
@@ -123,8 +122,7 @@ class Team6438HardwareMap
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
         linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeMoverLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeMoverRight.setDirection(DcMotorSimple.Direction.FORWARD);                           //could oppose left
+        intakeMover.setDirection(DcMotorSimple.Direction.REVERSE);         //could oppose left
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
         //Set all motors to zero power to prevent unintended movement
@@ -133,8 +131,7 @@ class Team6438HardwareMap
         leftRearMotor.setPower(0);
         rightRearMotor.setPower(0);
         linearActuator.setPower(0);
-        intakeMoverLeft.setPower(0);
-        intakeMoverRight.setPower(0);
+        intakeMover.setPower(0);
         intakeSlide.setPower(0);
 
         //------------------------------------------------------------------------------------------

@@ -51,10 +51,19 @@ public class MecanumFullMode2 extends OpMode
 
     //read this https://ftctechnh.github.io/ftc_app/doc/javadoc/index.html
     @Override
-    public void loop()
+    public void loop() {
+        if(gamepad2.y) {
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+        } else loop1();
+    }
+
+    public void loop1()
     {
         //Variables for power
-        double fLPower, fRPower, rLPower, rRPower;
+        double fLPower, fRPower, rLPower, rRPower, actuatorPower;
         double linearActuatorPower;
 
         //Controls for intake slide
@@ -78,51 +87,43 @@ public class MecanumFullMode2 extends OpMode
         }
 
         //Controls for MECANUMS
-        if (gamepad1.left_bumper) {
-            fLPower = 0.2;
-            fRPower = 1;
-            rLPower = 0.2;
-            rRPower = 1;
-        }
-        else if (gamepad1.right_bumper) {
-            fLPower = -1;
-            fRPower = -0.2;
-            rLPower = -1;
-            rRPower = -0.2;
-        }
-        else if ( (gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3) ) {
+        if ( (gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3) )
+        {
             fLPower = -gamepad1.left_stick_y;
             fRPower = gamepad1.left_stick_y;
             rLPower = -gamepad1.left_stick_y;
             rRPower = gamepad1.left_stick_y;
         }
-        else if ( (gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3) ) {
+        else if ( (gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3) )
+        {
             fLPower = gamepad1.left_stick_x;
             fRPower = gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_x;
             rRPower = -gamepad1.left_stick_x;
         }
-        else if ( (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3) ){
+        else if ( (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3) )
+        {
             fLPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
             fRPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
             rRPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
         }
-        else {
+        else
+            {
             fLPower = 0;
             fRPower = 0;
             rLPower = 0;
             rRPower = 0;
         }
 
-        //sets the power levels
+        //sets the power for turns
         fLPower -= gamepad1.right_stick_x;
         fRPower -= gamepad1.right_stick_x;
         rLPower -= gamepad1.right_stick_x;
         rRPower -= gamepad1.right_stick_x;
 
         //Enables or disables fullspeed
-        if(gamepad2.x && !gamepad2.y)
+        if(gamepad2.x) //&& !gamepad2.y)
         {
             fullSpeed = !fullSpeed;
         }

@@ -49,9 +49,9 @@ public class coordinateMapMaker extends LinearOpMode
     // Select which camera you want use.  The FRONT camera is the one on the same side as the screen.
     // Valid choices are:  BACK or FRONT
 
-
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
+
     @Override public void runOpMode() {
 
 
