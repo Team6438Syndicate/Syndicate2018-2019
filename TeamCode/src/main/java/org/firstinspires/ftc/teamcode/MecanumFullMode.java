@@ -44,9 +44,6 @@ public class MecanumFullMode extends OpMode {
 
         intakeSpin = hardwareMap.get(Servo.class, "cameraMount");
 
-        //this is test for now
-
-
         //sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         */
 
