@@ -122,19 +122,19 @@ public class MecanumFullMode extends OpMode {
         //Controls for tank treads
         if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3)) {
             fLPower = -gamepad1.left_stick_y;
-            fRPower = gamepad1.left_stick_y;
+            fRPower = -gamepad1.left_stick_y;
             rLPower = -gamepad1.left_stick_y;
-            rRPower = gamepad1.left_stick_y;
+            rRPower = -gamepad1.left_stick_y;
         } else if ((gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3)) {
             fLPower = gamepad1.left_stick_x;
-            fRPower = gamepad1.left_stick_x;
+            fRPower = -gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_x;
-            rRPower = -gamepad1.left_stick_x;
+            rRPower = gamepad1.left_stick_x;
         } else if ((gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3)) {
             fLPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
-            fRPower = gamepad1.left_stick_y + gamepad1.left_stick_x;
+            fRPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
-            rRPower = gamepad1.left_stick_y - gamepad1.left_stick_x;
+            rRPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
         } else {
             fLPower = 0;
             fRPower = 0;
@@ -142,9 +142,9 @@ public class MecanumFullMode extends OpMode {
             rRPower = 0;
         }
 
-        fLPower -= gamepad1.right_stick_x;
+        fLPower += gamepad1.right_stick_x;
         fRPower -= gamepad1.right_stick_x;
-        rLPower -= gamepad1.right_stick_x;
+        rLPower += gamepad1.right_stick_x;
         rRPower -= gamepad1.right_stick_x;
 
         if (gamepad2.x && !gamepad2.y) {

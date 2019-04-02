@@ -173,12 +173,12 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //While the program is running
         while (opModeIsActive()) {
 
-            if (!firstTime) {
+            if (firstTime) {
                 telemetry.addData("Temp ", imu.getTemperature());
                 telemetry.update();
 
                 //Move the robot off of the lander and drive into position to scan the minerals
-                pinionMove(1, 500);
+                //pinionMove(1, 500);
                 encoderRobotStrafe(1, 5);
                 encoderRobotDrive(1, 5);
                 encoderRobotStrafe(1, -5);
@@ -328,6 +328,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
+            //Sleep to prepare for next action
+            sleep(250);
         }
         //Method to strafe the robot (Positive inches is right, negative inches is left)
         private void encoderRobotStrafe ( double speed, double inches)
@@ -390,6 +392,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
+            //Sleep to prepare for next action
+            sleep(250);
         }
         //Method to extend the intake
         private void intakeExtend ( double speed)
