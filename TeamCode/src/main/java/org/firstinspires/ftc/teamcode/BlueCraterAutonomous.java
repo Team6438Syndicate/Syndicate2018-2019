@@ -12,7 +12,7 @@
  *                  Distance from landing to gems: Approximately 34 inches
  *
  *                  Do we want to double sample??????
- *                  How much time are we dealing with
+ *                  How much time are we dealing with?
  **/
 package org.firstinspires.ftc.teamcode;
 
