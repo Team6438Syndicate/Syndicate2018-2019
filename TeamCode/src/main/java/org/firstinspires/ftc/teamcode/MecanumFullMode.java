@@ -31,7 +31,7 @@ public class MecanumFullMode extends OpMode {
         robot.init(hardwareMap);
 
         //Map motors
-    /*    robot.leftFrontMotor        = hardwareMap.get(DcMotor.class, "leftFrontDrive");
+    /*  robot.leftFrontMotor        = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         robot.rightFrontMotor       = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
         robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
