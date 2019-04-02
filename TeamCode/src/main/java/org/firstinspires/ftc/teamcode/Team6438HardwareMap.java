@@ -77,11 +77,12 @@ class Team6438HardwareMap
     final int intakeDunk = 1450;                         //This is the position where the balls fall into the lander
     final int intakeFloor = 2200;                        //This is the position where the intake is above the floor
     final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
-    final int intakeMax = 2400;                            //This is the lowest the intake can be before causing the motor to lock.
+    final int intakeMax = 2400;
+    //This is the lowest the intake can be before causing the motor to lock.
 
     //Positions for the slides
-    final int slideExtended = 820;                        //This is the motor encoder position when the slide is all the way out
-    final int slideUnExtended = 170;                      //This is the motor encoder position when the slide is all the way in
+    final int slideExtended = 1500;                     //This is the motor encoder position when the slide is out
+    final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
     //Variables for the actuator
     final int laInterference = 10000;                   //Min position where the linear actuator can be as to not cause damage
