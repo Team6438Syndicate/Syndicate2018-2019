@@ -55,7 +55,7 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

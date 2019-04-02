@@ -103,7 +103,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -112,7 +112,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -436,27 +436,27 @@ public class BlueCraterAutonomous extends LinearOpMode {
             // Ensure that the opmode is still active
             if (opModeIsActive()) {
                 //Passes this target
-                robot.linearActuator.setTargetPosition(position);
+                robot.pinionLift.setTargetPosition(position);
 
                 // Turn On RUN_TO_POSITION
-                robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.pinionLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                 // reset the timeout time and start motion.
-                robot.linearActuator.setPower(Math.abs(speed));
+                robot.pinionLift.setPower(Math.abs(speed));
 
                 // keep looping while we are still active, and the motor is running.
-                while (opModeIsActive() && robot.linearActuator.isBusy()) {
+                while (opModeIsActive() && robot.pinionLift.isBusy()) {
                     // Display it for the driver.
-                    telemetry.addData("Actuator moving to", robot.linearActuator.getTargetPosition());
-                    telemetry.addData("Actuator at", robot.linearActuator.getCurrentPosition());
+                    telemetry.addData("Pinion moving to", robot.pinionLift.getTargetPosition());
+                    telemetry.addData("Pinion at", robot.pinionLift.getCurrentPosition());
                     telemetry.update();
                 }
 
                 // Stop all motion;
-                robot.linearActuator.setPower(0);
+                robot.pinionLift.setPower(0);
 
                 // Turn off RUN_TO_POSITION
-                robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
                 //  sleep(250);   // optional pause after each move
             }
@@ -599,7 +599,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -608,7 +608,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }

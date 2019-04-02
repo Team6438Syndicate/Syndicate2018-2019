@@ -34,16 +34,15 @@ class Team6438HardwareMap
     DcMotor rightFrontMotor  = null;
     DcMotor leftRearMotor    = null;
     DcMotor rightRearMotor   = null;
-    DcMotor linearActuator   = null;
+    DcMotor pinionLift       = null;
     DcMotor intakeMover      = null;
     DcMotor intakeSlide      = null;
 
     //Servo mapping
-    Servo teamMarkerServo    = null;
-    Servo intakeSpin         = null;
     Servo cameraMount        = null;
     CRServo leftIntake       = null;
     CRServo rightIntake      = null;
+
     //Webcam mapping
     WebcamName camera;
 
@@ -76,7 +75,7 @@ class Team6438HardwareMap
     final int intakeOutPosition = 2082;                  //This is the position just high enough to clear the crater
     final int intakeDunk = 1450;                         //This is the position where the balls fall into the lander
     final int intakeFloor = 2200;                        //This is the position where the intake is above the floor
-    final int intakeMinimum = 0;                        //This is the value closest to the linear Actuator before causing problems
+    final int intakeMinimum = 0;                        //This is the value closest to the pinion before causing problems
     final int intakeMax = 2400;
     //This is the lowest the intake can be before causing the motor to lock.
 
@@ -85,7 +84,7 @@ class Team6438HardwareMap
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
     //Variables for the actuator
-    final int laInterference = 10000;                   //Min position where the linear actuator can be as to not cause damage
+    final int laInterference = 1000;                   //Min position where the pinion actuator can be as to not cause damage
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -113,7 +112,7 @@ class Team6438HardwareMap
         rightFrontMotor  = hwMap.get(DcMotor.class, "rightFrontDrive");
         leftRearMotor    = hwMap.get(DcMotor.class, "leftRearDrive");
         rightRearMotor   = hwMap.get(DcMotor.class, "rightRearDrive");
-        linearActuator   = hwMap.get(DcMotor.class, "linearActuator");
+        pinionLift       = hwMap.get(DcMotor.class, "pinionLift");
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
@@ -122,7 +121,7 @@ class Team6438HardwareMap
         rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
-        linearActuator.setDirection(DcMotorSimple.Direction.FORWARD);
+        pinionLift.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMover.setDirection(DcMotorSimple.Direction.REVERSE);         //could oppose left
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
 
@@ -131,14 +130,12 @@ class Team6438HardwareMap
         rightFrontMotor.setPower(0);
         leftRearMotor.setPower(0);
         rightRearMotor.setPower(0);
-        linearActuator.setPower(0);
+        pinionLift.setPower(0);
         intakeMover.setPower(0);
         intakeSlide.setPower(0);
 
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed servos.
-
-        teamMarkerServo = hwMap.get(Servo.class, "teamMarkerServo");    //may no longer exists
         cameraMount = hwMap.get(Servo.class, "cameraMount");            //may no longer exist
 
         //intake
