@@ -5,7 +5,7 @@
  * Author: Matthew Batkiewicz
  * Contributors: Bradley Abelman, Matthew Kaboolian
  * Creation: 11/8/18
- * Last Edit: 1/20/19
+ * Last Edit: 4/2/19
  * Additional Notes: https://docs.google.com/spreadsheets/d/13nvS4GjjWdywcON7hg1URirm_IHWoOywUKIuTGDfaUs/edit
  *                   ^^Spreadsheet to check our hardware
  **/
@@ -160,5 +160,3 @@ class Team6438HardwareMap
         //rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangeSensor");
     }
 }
-
-

@@ -1,18 +1,15 @@
 /**
- * Name: Team6438AutonomousDepotSide
+ * Name: Team6438BlueCraterAutonomous
  * Purpose: This class contains instructions for autonomous
- *          Currently the actions (in order) are: Raise the linear slide to unlatch
- *          Sample Blocks, Drive to the Depot, and run to the crater - want to add fling the team marker.
+ *          Currently the actions (in order) are: Raise the pinion slide to unlatch
+ *          Sample Blocks, Drive to the Depot, Drop the Team Marker, Run to the Crater, and Extend Intake.
  * Author: Bradley Abelman
  * Contributors: Matthew Batkiewicz, Matthew Kaboolian, David Stekol
  * Creation: 11/8/18
- * Last Edit: 1/2/19
+ * Last Edit: 4/2/19
  * Additional Notes: TO DO
- *                  Find linearCPI
- *                  Test encoder based driving
- *                  Integrate way to control linearActuator in OpMode
+ *                  Find Mecanum CPI
  *                  Distance from landing to gems: Approximately 34 inches
- *                  Height of bracket off the ground: 19 inches
  *
  *                  Do we want to double sample??????
  *                  How much time are we dealing with
@@ -175,81 +172,84 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
         //While the program is running
         while (opModeIsActive()) {
-            telemetry.addData("Temp ", imu.getTemperature());
-            telemetry.update();
 
-            //Move the actuator up and over
-            pinionMove(1, 500);
-
-            //Drive to tile corner
-            encoderRobotDrive(1, 5);
-
-            //Check Block
-            //queryTensorFlow();
-            block = 1;
-
-            //Block logic (separated into ifs because we need different motions depending on where the block is
-            if (block == 1) {
-
-                //Telemetry to show the user what path we're running
-                telemetry.addData("Path running currently: ", "center");
+            if (!firstTime) {
+                telemetry.addData("Temp ", imu.getTemperature());
                 telemetry.update();
 
-                //Movement to hit the block and return
-                encoderRobotDrive(1, 15);
-                encoderRobotDrive(1, -15);
-                //sleep(500);
-                firstTime = false;
-            }
-            else if (block == 2) {
-                //Telemetry to show the user what path we're running
-                telemetry.addData("Path running currently: ", "right");
+                //Move the robot off of the lander and drive into position to scan the minerals
+                pinionMove(1, 500);
+                encoderRobotStrafe(1, 5);
+                encoderRobotDrive(1, 5);
+                encoderRobotStrafe(1, -5);
+
+                //Check Block
+                //queryTensorFlow();
+                block = 1;
+
+                //Block logic (separated into ifs because we need different motions depending on where the block is
+                if (block == 1) {
+
+                    //Telemetry to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "center");
+                    telemetry.update();
+
+                    //Movement to hit the block and return
+                    encoderRobotDrive(1, 15);
+                    encoderRobotDrive(1, -15);
+                    //sleep(500);
+                    firstTime = false;
+                }
+                else if (block == 2) {
+                    //Telemetry to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "right");
+                    telemetry.update();
+
+                    //Movement to hit the block and return
+                    encoderRobotStrafe(1, 40);
+                    encoderRobotDrive(1, 15);
+                    encoderRobotDrive(1, -15);
+                    encoderRobotStrafe(1, -20);
+                    //sleep(500);
+                    firstTime = false;
+                }
+                else if (block == 3) {
+                    //Telemetry to show the user what path we're running
+                    telemetry.addData("Path running currently: ", "left");
+                    telemetry.update();
+
+                    //Movement to hit the block and return
+                    encoderRobotDrive(1, 15);
+                    encoderRobotDrive(1, -15);
+                    encoderRobotStrafe(1, 20);
+                    //sleep(500);
+                    firstTime = false;
+                }
+
+                //Turn and towards wall
+                gyroRobotTurn(45);
+                encoderRobotStrafe(1, 10);
+
+                //Move to depot, extend intake and drop marker
+                encoderRobotDrive(1, -50);
+                tossMarker(1500);
+
+                //Move to crater and extend arm
+                encoderRobotDrive(1, 40);
+                intakeRotate(.4, 1700);
+                intakeExtend(1);
+
+                //Lets the user know the Autonomous is complete
+                telemetry.addData("Autonomous Complete", "True");
                 telemetry.update();
 
-                //Movement to hit the block and return
-                encoderRobotStrafe(1, 40);
-                encoderRobotDrive(1, 15);
-                encoderRobotDrive(1, -15);
-                encoderRobotStrafe(1, -20);
-                //sleep(500);
-                firstTime = false;
-            }
-            else if (block == 3) {
-                //Telemetry to show the user what path we're running
-                telemetry.addData("Path running currently: ", "left");
+                //End the opMode
+                requestOpModeStop();
+
+                //add diagnostic telemetry, this should never be shown
+                telemetry.addData("If you see this: ", "it's too late");
                 telemetry.update();
-
-                //Movement to hit the block and return
-                encoderRobotDrive(1, 15);
-                encoderRobotDrive(1, -15);
-                encoderRobotStrafe(1, 20);
-                //sleep(500);
-                firstTime = false;
             }
-
-            //Turn and towards wall
-            gyroRobotTurn(45);
-            encoderRobotStrafe(1, 10);
-
-            //Move to depot, extend intake and drop marker
-            encoderRobotDrive(1, -50);
-            tossMarker(1500);
-
-            //Move to crater and extend arm
-            encoderRobotDrive(1, 40);
-            intakeRotate(.4, 1700);
-            intakeExtend(1);
-
-            //Lets the user know the Autonomous is complete
-            telemetry.addData("Autonomous Complete", "True");
-            telemetry.update();
-
-            //End the opMode
-            requestOpModeStop();
-
-            //add diagnostic telemetry, this should never be shown
-            telemetry.addData("If you see this: ", "it's too late");
-            telemetry.update();
         }
     }
 
