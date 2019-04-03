@@ -53,10 +53,10 @@ class Team6438HardwareMap
     //ModernRoboticsI2cRangeSensor rangeSensor;
 
     //Variables
-    private final double hexCPR = 288;
+    private final double hexCPR = 2240;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    private final double DGR = 0.5;
+    private final double DGR = 0.75;
 
     //Wheel Diameter Inches
     private final double WDI = 5;
