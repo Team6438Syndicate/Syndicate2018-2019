@@ -56,7 +56,7 @@ class Team6438HardwareMap
     private final double hexCPR = 2240;
 
     //Drive Gear Reduction - This is < 1.0 if geared UP
-    private final double DGR = 0.75;
+    private final double DGR = 0.375;
 
     //Wheel Diameter Inches
     private final double WDI = 5;
@@ -64,6 +64,9 @@ class Team6438HardwareMap
     //Counts per Inch
     final double hexCPI = (hexCPR * DGR)
             / (WDI * Math.PI);
+
+    //Strafing distance multiplier
+    final double mecanumMultiplier = 1.25;
 
 
     //Camera mount servo positions

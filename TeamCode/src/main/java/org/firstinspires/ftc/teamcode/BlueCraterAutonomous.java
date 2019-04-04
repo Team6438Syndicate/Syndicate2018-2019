@@ -179,7 +179,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
                 //Move the robot off of the lander and drive into position to scan the minerals
                 //pinionMove(1, 500);
-                encoderRobotStrafe(1, 5);
+                encoderRobotStrafe(1, 24);
+                sleep(10000);
                 encoderRobotDrive(1, 5);
                 encoderRobotStrafe(1, -5);
 
@@ -266,27 +267,24 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //Declaring new targets
         int targetFL, targetFR, targetBL, targetBR;
         int remainingDistance;
+        double direction;
+
+        getHeading();
+        direction = currentAngle.firstAngle;
 
         //Gets the motors starting positions
-        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
-        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
-        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
-        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
-
-
-        //Telemetry to show start position
-        telemetry.addData("Front Left Start Position", startFLPosition);
-        telemetry.addData("Front Right Start Position", startFRPosition);
-        telemetry.addData("Rear Left Start Position", startRLPosition);
-        telemetry.addData("Rear Right Start Position", startRRPosition);
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Ensure we are in op mode
         if (opModeIsActive()) {
             //Using the current position and the new desired position send this to the motor
-            targetFL = startFLPosition + (int) (inches * robot.hexCPI);
-            targetFR = startFRPosition + (int) (inches * robot.hexCPI);
-            targetBL = startRLPosition + (int) (inches * robot.hexCPI);
-            targetBR = startRRPosition + (int) (inches * robot.hexCPI);
+            targetFL = (int) (inches * robot.hexCPI);
+            targetFR = (int) (inches * robot.hexCPI);
+            targetBL = (int) (inches * robot.hexCPI);
+            targetBR = (int) (inches * robot.hexCPI);
             robot.leftFrontMotor.setTargetPosition(targetFL);
             robot.rightFrontMotor.setTargetPosition(targetFR);
             robot.leftRearMotor.setTargetPosition(targetBL);
@@ -307,9 +305,102 @@ public class BlueCraterAutonomous extends LinearOpMode {
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 remainingDistance = targetFL - robot.leftFrontMotor.getCurrentPosition();
-                telemetry.addData("Remaining Distance: ", remainingDistance);
-                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
+                getHeading();
+
+                telemetry.addData("Direction Heading ", direction);
+                telemetry.addData("Direction Facing ", currentAngle.firstAngle);
+                telemetry.addData("Currently At ", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.addData("Running To ", targetFL);
+                telemetry.addData("Remaining Distance ", remainingDistance);
                 telemetry.update();
+
+                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
+                {
+                    gyroRobotTurn(direction - currentAngle.firstAngle);
+                    getHeading();
+                    direction = currentAngle.firstAngle;
+                    encoderRobotDriveRestart(speed, remainingDistance);
+                }
+
+                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    robot.leftFrontMotor.setPower(0);
+                    robot.rightFrontMotor.setPower(0);
+                    robot.leftRearMotor.setPower(0);
+                    robot.rightRearMotor.setPower(0);
+                    sleep(pauseTime);
+                    pauseAutonomous(pauseTime, remainingDistance, remainingDistance, remainingDistance, remainingDistance,
+                            speed, speed, speed, speed);
+                }
+            }
+            //When done stop all the motion and turn off run to position
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        //Sleep to prepare for next action
+        sleep(250);
+    }
+    //Method for when the robot needs to correct its course
+    private void encoderRobotDriveRestart ( double speed, int distance)
+    {
+        //Declaring new targets
+        int targetFL, targetFR, targetBL, targetBR;
+        int remainingDistance;
+        double direction;
+
+        getHeading();
+        direction = currentAngle.firstAngle;
+
+        //Gets the motors starting positions
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Ensure we are in op mode
+        if (opModeIsActive()) {
+            //Using the current position and the new desired position send this to the motor
+            robot.leftFrontMotor.setTargetPosition(distance);
+            robot.rightFrontMotor.setTargetPosition(distance);
+            robot.leftRearMotor.setTargetPosition(distance);
+            robot.rightRearMotor.setTargetPosition(distance);
+
+            //Turns the motors to run to position mode
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //Sets the power to the absolute value of the speed of the method input
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
+
+            //While opMode is still active and the motors are going add telemetry to tell the user where its going
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
+                remainingDistance = distance - robot.leftFrontMotor.getCurrentPosition();
+                getHeading();
+
+                telemetry.addData("Direction Heading ", direction);
+                telemetry.addData("Direction Facing ", currentAngle.firstAngle);
+                telemetry.addData("Currently At ", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.addData("Running To ", distance);
+                telemetry.addData("Remaining Distance ", remainingDistance);
+                telemetry.update();
+
+                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
+                {
+                    gyroRobotTurn(direction - currentAngle.firstAngle);
+                    getHeading();
+                    direction = currentAngle.firstAngle;
+                    encoderRobotDriveRestart(speed, remainingDistance);
+                }
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     robot.leftFrontMotor.setPower(0);
@@ -350,10 +441,10 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //Ensure we are in op mode
         if (opModeIsActive()) {
             //Using the current position and the new desired position send this to the motor
-            fLTarget = startFLPosition - (int) (inches * robot.hexCPI);
-            fRTarget = startFRPosition + (int) (inches * robot.hexCPI);
-            rLTarget = startRLPosition + (int) (inches * robot.hexCPI);
-            rRTarget = startRRPosition - (int) (inches * robot.hexCPI);
+            fLTarget = startFLPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            fRTarget = startFRPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            rLTarget = startRLPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            rRTarget = startRRPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
             robot.leftFrontMotor.setTargetPosition(fLTarget);
             robot.rightFrontMotor.setTargetPosition(fRTarget);
             robot.leftRearMotor.setTargetPosition(rLTarget);
@@ -569,7 +660,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
         //Ensure we are in op mode
         if (opModeIsActive()) {
-            double speed = 0.4;
+            double speed = 0.2;
             turnTarget = getTarget(degrees);
 
             if (degrees < 0) {
@@ -589,7 +680,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
             robot.rightRearMotor.setPower(speed * -direction);
 
 
-            while (currentAngle.firstAngle < turnTarget - 1 || currentAngle.firstAngle > turnTarget + 1) {
+            while (currentAngle.firstAngle < turnTarget - 1.5 || currentAngle.firstAngle > turnTarget + 1.5) {
                 telemetry.addData("Speed", speed);
                 telemetry.addData("Running to ", turnTarget);
                 telemetry.addData("Currently At ", currentAngle.firstAngle);
@@ -606,18 +697,13 @@ public class BlueCraterAutonomous extends LinearOpMode {
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            //Resets encoders
             robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            sleep(100);
         }
     }
 
