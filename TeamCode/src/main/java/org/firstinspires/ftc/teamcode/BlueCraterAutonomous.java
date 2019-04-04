@@ -179,8 +179,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
                 //Move the robot off of the lander and drive into position to scan the minerals
                 //pinionMove(1, 500);
-                encoderRobotStrafe(1, 24);
-                sleep(10000);
+                encoderRobotStrafe(1, 5);
                 encoderRobotDrive(1, 5);
                 encoderRobotStrafe(1, -5);
 
