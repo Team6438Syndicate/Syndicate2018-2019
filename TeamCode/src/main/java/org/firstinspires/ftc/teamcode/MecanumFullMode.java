@@ -75,7 +75,8 @@ public class MecanumFullMode extends OpMode {
 
     //read this https://ftctechnh.github.io/ftc_app/doc/javadoc/index.html
     @Override
-    public void loop() {
+    public void loop()
+    {
         //Variables for power
         double fLPower, fRPower, rLPower, rRPower, pinionPower;
 
@@ -84,18 +85,25 @@ public class MecanumFullMode extends OpMode {
         //intakeSlide.setPower(linearSlidePower);
 
         //Control for intake mineral grabbing and scoring
-        if (gamepad2.a) {
+        if (gamepad2.a)
+        {
             intakeUp(1);
-        } else if (gamepad2.b) {
+        }
+        else if (gamepad2.b)
+        {
             intakeDown(1);
-        } else if (gamepad2.right_trigger > .05)     //untested
+        }
+        else if (gamepad2.right_trigger > .05)     //untested
         {
             intakeMove(0.6, robot.intakeMover.getCurrentPosition() - 250);
-        } else if (gamepad2.left_trigger > .05)  //untested
+        }
+        else if (gamepad2.left_trigger > .05)  //untested
         {
             intakeMove(1, robot.intakeMover.getCurrentPosition() + 250);
         }
-/*   David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
+
+    /*
+        David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
         if (robot.intakeMover.getCurrentPosition() > 2200)
         {
             robot.intakeMover.setPower(1);
@@ -106,11 +114,14 @@ public class MecanumFullMode extends OpMode {
             robot.intakeMover.setPower(1);
             robot.intakeMover.setTargetPosition(robot.intakeMover.getCurrentPosition() + 1);
         }
-*/
+    */
         //Controls for intake arm
-        if (gamepad2.right_bumper) {
+        if (gamepad2.right_bumper)
+        {
             moveIntakeSlide(1, 1500);
-        } else if (gamepad2.left_bumper) {
+        }
+        else if (gamepad2.left_bumper)
+        {
             moveIntakeSlide(1, 0);
         }
 
@@ -120,22 +131,28 @@ public class MecanumFullMode extends OpMode {
         pinionPower = gamepad2.left_stick_y;
 
         //Controls for tank treads
-        if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3)) {
+        if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3))
+        {
             fLPower = -gamepad1.left_stick_y;
             fRPower = -gamepad1.left_stick_y;
             rLPower = -gamepad1.left_stick_y;
             rRPower = -gamepad1.left_stick_y;
-        } else if ((gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3)) {
+        }
+        else if ((gamepad1.left_stick_x > 0.1 || gamepad1.left_stick_x < -0.1) && (gamepad1.left_stick_y < 0.3 && gamepad1.left_stick_y > -0.3))
+        {
             fLPower = gamepad1.left_stick_x;
             fRPower = -gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_x;
             rRPower = gamepad1.left_stick_x;
-        } else if ((gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3)) {
+        } else if ((gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y > 0.3) || (gamepad1.left_stick_x > 0.3 && gamepad1.left_stick_y < -0.3) || (gamepad1.left_stick_x < -0.3 && gamepad1.left_stick_y < -0.3))
+        {
             fLPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
             fRPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
             rLPower = -gamepad1.left_stick_y - gamepad1.left_stick_x;
             rRPower = -gamepad1.left_stick_y + gamepad1.left_stick_x;
-        } else {
+        }
+        else
+        {
             fLPower = 0;
             fRPower = 0;
             rLPower = 0;
@@ -147,11 +164,13 @@ public class MecanumFullMode extends OpMode {
         rLPower += gamepad1.right_stick_x;
         rRPower -= gamepad1.right_stick_x;
 
-        if (gamepad2.x && !gamepad2.y) {
+        if (gamepad2.x && !gamepad2.y)
+        {
             fullSpeed = !fullSpeed;
         }
 
-        if (gamepad2.x && gamepad2.y) {
+        if (gamepad2.x && gamepad2.y)
+        {
             powerFactor = Math.abs(gamepad2.right_stick_y);
         }
 
@@ -207,7 +226,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeMover.setTargetPosition(position);
 
         // Turn On RUN_TO_POSITION
-        robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       //robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
