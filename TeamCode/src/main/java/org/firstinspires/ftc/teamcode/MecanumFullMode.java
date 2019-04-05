@@ -101,7 +101,9 @@ public class MecanumFullMode extends OpMode {
         {
             intakeMove(1, robot.intakeMover.getCurrentPosition() + 250);
         }
-/*   David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
+
+    /*
+        David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
         if (robot.intakeMover.getCurrentPosition() > 2200)
         {
             robot.intakeMover.setPower(1);
@@ -112,7 +114,7 @@ public class MecanumFullMode extends OpMode {
             robot.intakeMover.setPower(1);
             robot.intakeMover.setTargetPosition(robot.intakeMover.getCurrentPosition() + 1);
         }
-*/
+    */
         //Controls for intake arm
         if (gamepad2.right_bumper)
         {
@@ -224,7 +226,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeMover.setTargetPosition(position);
 
         // Turn On RUN_TO_POSITION
-        robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       //robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
