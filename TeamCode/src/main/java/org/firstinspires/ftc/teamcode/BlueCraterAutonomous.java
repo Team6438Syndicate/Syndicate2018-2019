@@ -173,82 +173,78 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //While the program is running
         while (opModeIsActive()) {
 
-            if (firstTime) {
+            //Move the robot off of the lander and drive into position to scan the minerals
+            //pinionMove(1, 500);
+            encoderRobotStrafe(1, -7);
+            encoderRobotDrive(1, 5);
+            encoderRobotStrafe(1, 5);
 
-                //Move the robot off of the lander and drive into position to scan the minerals
-                //pinionMove(1, 500);
-                encoderRobotStrafe(1, 24);
-                sleep(10000);
-                encoderRobotDrive(1, 5);
-                encoderRobotStrafe(1, -5);
+            //Check Block
+            block = queryTensorFlow();
 
-                //Check Block
-                //queryTensorFlow();
-                block = queryTensorFlow();
+            //Block logic (separated into ifs because we need different motions depending on where the block is
+            if (block == 1) {
 
-                //Block logic (separated into ifs because we need different motions depending on where the block is
-                if (block == 1) {
-
-                    //Telemetry to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "center");
-                    telemetry.update();
-
-                    //Movement to hit the block and return
-                    encoderRobotDrive(1, 15);
-                    encoderRobotDrive(1, -15);
-                    //sleep(500);
-                    firstTime = false;
-                }
-                else if (block == 2) {
-                    //Telemetry to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "right");
-                    telemetry.update();
-
-                    //Movement to hit the block and return
-                    encoderRobotStrafe(1, 40);
-                    encoderRobotDrive(1, 15);
-                    encoderRobotDrive(1, -15);
-                    encoderRobotStrafe(1, -20);
-                    //sleep(500);
-                    firstTime = false;
-                }
-                else if (block == 3) {
-                    //Telemetry to show the user what path we're running
-                    telemetry.addData("Path running currently: ", "left");
-                    telemetry.update();
-
-                    //Movement to hit the block and return
-                    encoderRobotDrive(1, 15);
-                    encoderRobotDrive(1, -15);
-                    encoderRobotStrafe(1, 20);
-                    //sleep(500);
-                    firstTime = false;
-                }
-
-                //Turn and towards wall
-                gyroRobotTurn(45);
-                encoderRobotStrafe(1, 10);
-
-                //Move to depot, extend intake and drop marker
-                encoderRobotDrive(1, -50);
-                tossMarker(1500);
-
-                //Move to crater and extend arm
-                encoderRobotDrive(1, 40);
-                intakeRotate(.4, 1700);
-                intakeExtend(1);
-
-                //Lets the user know the Autonomous is complete
-                telemetry.addData("Autonomous Complete", "True");
+                //Telemetry to show the user what path we're running
+                telemetry.addData("Path running currently: ", "center");
                 telemetry.update();
 
-                //End the opMode
-                requestOpModeStop();
-
-                //add diagnostic telemetry, this should never be shown
-                telemetry.addData("If you see this: ", "it's too late");
-                telemetry.update();
+                //Movement to hit the block and return
+                encoderRobotDrive(1, 25);
+                encoderRobotDrive(1, -20);
+                //sleep(500);
+                firstTime = false;
             }
+            else if (block == 2) {
+                //Telemetry to show the user what path we're running
+                telemetry.addData("Path running currently: ", "right");
+                telemetry.update();
+
+                //Movement to hit the block and return
+                encoderRobotDrive(1, 25);
+                encoderRobotDrive(1, -20);
+                encoderRobotStrafe(.8, 20);
+                //sleep(500);
+                firstTime = false;
+            }
+            else if (block == 3) {
+                //Telemetry to show the user what path we're running
+                telemetry.addData("Path running currently: ", "left");
+                telemetry.update();
+
+                //Movement to hit the block and return
+                encoderRobotStrafe(.8, -40);
+                encoderRobotDrive(1, 25);
+                encoderRobotDrive(1, -20);
+                encoderRobotStrafe(.8, 20);
+                //sleep(500);
+                firstTime = false;
+            }
+
+            //Turn and move towards wall
+            encoderRobotStrafe(.8, -30);
+            gyroRobotTurn(-45);
+            encoderRobotStrafe(.8, -10);
+
+            //Move to depot, extend intake and drop marker
+            encoderRobotDrive(1, -50);
+            tossMarker(1500);
+
+            //Move to crater and extend arm
+            encoderRobotDrive(1, 90);
+            intakeRotate(.4, 1700);
+            intakeExtend(1);
+
+            //Lets the user know the Autonomous is complete
+            telemetry.addData("Autonomous Complete", "True");
+            telemetry.update();
+
+            //End the opMode
+            requestOpModeStop();
+
+            //add diagnostic telemetry, this should never be shown
+            telemetry.addData("If you see this: ", "it's too late");
+            telemetry.update();
         }
     }
 
@@ -343,7 +339,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //Sleep to prepare for next action
         sleep(250);
     }
-    //Method for when the robot needs to correct its course
+    //Method for when the robot needs to correct its course while driving straight
     private void encoderRobotDriveRestart ( double speed, int distance)
     {
         //Declaring new targets
@@ -429,6 +425,10 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
         int fLRemainingDistance, fRRemainingDistance;
+        double direction;
+
+        getHeading();
+        direction = currentAngle.firstAngle;
 
         //Gets the motors starting positions
         int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
@@ -439,10 +439,10 @@ public class BlueCraterAutonomous extends LinearOpMode {
         //Ensure we are in op mode
         if (opModeIsActive()) {
             //Using the current position and the new desired position send this to the motor
-            fLTarget = startFLPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
-            fRTarget = startFRPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
-            rLTarget = startRLPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
-            rRTarget = startRRPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            fLTarget = startFLPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            fRTarget = startFRPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            rLTarget = startRLPosition - (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
+            rRTarget = startRRPosition + (int) (inches * robot.hexCPI * robot.mecanumMultiplier);
             robot.leftFrontMotor.setTargetPosition(fLTarget);
             robot.rightFrontMotor.setTargetPosition(fRTarget);
             robot.leftRearMotor.setTargetPosition(rLTarget);
@@ -464,12 +464,30 @@ public class BlueCraterAutonomous extends LinearOpMode {
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
                 fRRemainingDistance = fRTarget - robot.rightFrontMotor.getCurrentPosition();
-                telemetry.addData("Running to ", fRTarget);
-                telemetry.addData("Currently At", robot.leftFrontMotor.getCurrentPosition());
+                getHeading();
+
+                telemetry.addData("Direction Heading ", direction);
+                telemetry.addData("Direction Facing ", currentAngle.firstAngle);
+                telemetry.addData("Currently At ", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.addData("Running To ", fLTarget);
+                telemetry.addData("Remaining Distance ", fLRemainingDistance);
                 telemetry.update();
 
+                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
+                {
+                    gyroRobotTurn(direction - currentAngle.firstAngle);
+                    getHeading();
+                    direction = currentAngle.firstAngle;
+                    encoderRobotStrafeRestart(speed, fLRemainingDistance);
+                }
+
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
-                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fLRemainingDistance, fRRemainingDistance,
+                    robot.leftFrontMotor.setPower(0);
+                    robot.rightFrontMotor.setPower(0);
+                    robot.leftRearMotor.setPower(0);
+                    robot.rightRearMotor.setPower(0);
+                    sleep(pauseTime);
+                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fRRemainingDistance, fLRemainingDistance,
                             speed, speed, speed, speed);
                 }
             }
@@ -486,6 +504,88 @@ public class BlueCraterAutonomous extends LinearOpMode {
         }
         //Sleep to prepare for next action
         sleep(250);
+    }
+    //Method fro when the robot needs to correct its course while strafing
+    private void encoderRobotStrafeRestart ( double speed, int distance) {
+        //Declaring new targets
+        int fLTarget, fRTarget, rLTarget, rRTarget;
+        int fLRemainingDistance, fRRemainingDistance;
+        double direction;
+
+        getHeading();
+        direction = currentAngle.firstAngle;
+
+        //Gets the motors starting positions
+        int startFLPosition = robot.leftFrontMotor.getCurrentPosition();
+        int startFRPosition = robot.rightFrontMotor.getCurrentPosition();
+        int startRLPosition = robot.leftRearMotor.getCurrentPosition();
+        int startRRPosition = robot.rightRearMotor.getCurrentPosition();
+
+        //Ensure we are in op mode
+        if (opModeIsActive()) {
+            //Using the current position and the new desired position send this to the motor
+            fLTarget = startFLPosition + (distance);
+            fRTarget = startFRPosition - (distance);
+            rLTarget = startRLPosition - (distance);
+            rRTarget = startRRPosition + (distance);
+            robot.leftFrontMotor.setTargetPosition(fLTarget);
+            robot.rightFrontMotor.setTargetPosition(fRTarget);
+            robot.leftRearMotor.setTargetPosition(rLTarget);
+            robot.rightRearMotor.setTargetPosition(rRTarget);
+
+            //Turns the motors to run to position mode
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            //Sets the power to the absolute value of the speed of the method input
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
+
+            //While opMode is still active and the motors are going add telemetry to tell the user where its going
+            while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
+                fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
+                fRRemainingDistance = fRTarget - robot.rightFrontMotor.getCurrentPosition();
+                getHeading();
+
+                telemetry.addData("Direction Heading ", direction);
+                telemetry.addData("Direction Facing ", currentAngle.firstAngle);
+                telemetry.addData("Currently At ", robot.leftFrontMotor.getCurrentPosition());
+                telemetry.addData("Running To ", fLTarget);
+                telemetry.addData("Remaining Distance ", fLRemainingDistance);
+                telemetry.update();
+
+                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5) {
+                    gyroRobotTurn(direction - currentAngle.firstAngle);
+                    getHeading();
+                    direction = currentAngle.firstAngle;
+                    encoderRobotStrafeRestart(speed, fLRemainingDistance);
+                }
+
+                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                    robot.leftFrontMotor.setPower(0);
+                    robot.rightFrontMotor.setPower(0);
+                    robot.leftRearMotor.setPower(0);
+                    robot.rightRearMotor.setPower(0);
+                    sleep(pauseTime);
+                    pauseAutonomous(pauseTime, fLRemainingDistance, fRRemainingDistance, fRRemainingDistance, fLRemainingDistance,
+                            speed, speed, speed, speed);
+                }
+            }
+
+            //When done stop all the motion and turn off run to position
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftRearMotor.setPower(0);
+            robot.rightRearMotor.setPower(0);
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
     //Method to extend the intake
     private void intakeExtend ( double speed)
@@ -761,7 +861,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
         parameters.vuforiaLicenseKey = robot.VUFORIA_KEY;
 
         //Sets camera direction
-        //parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //Instantiate the Vuforia engine
         robot.vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -842,7 +942,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
                                         //block in the center
                                         return 1;
                                     } else {
-                                        encoderRobotStrafe(1, -20);
+                                        encoderRobotStrafe(1, 10);
                                         telemetry.addData("Scanning Right", "Right");
                                         telemetry.update();
                                         sleep(100);

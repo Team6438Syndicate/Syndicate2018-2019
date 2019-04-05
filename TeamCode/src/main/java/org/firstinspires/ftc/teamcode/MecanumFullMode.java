@@ -52,7 +52,7 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -77,7 +77,7 @@ public class MecanumFullMode extends OpMode {
     @Override
     public void loop() {
         //Variables for power
-        double fLPower, fRPower, rLPower, rRPower, actuatorPower;
+        double fLPower, fRPower, rLPower, rRPower, pinionPower;
 
         //more test
         //linearSlidePower = gamepad2.right_stick_y;
@@ -117,7 +117,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeSlide.setPower(1);
         robot.intakeSlide.setTargetPosition(robot.intakeSlide.getCurrentPosition() + 1);
 
-        actuatorPower = gamepad2.left_stick_y;
+        pinionPower = gamepad2.left_stick_y;
 
         //Controls for tank treads
         if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3)) {
@@ -166,14 +166,14 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setPower(fRPower);
         robot.leftRearMotor.setPower(rLPower);
         robot.rightRearMotor.setPower(rRPower);
-        //linearActuator.setPower(actuatorPower);
+        robot.pinionLift.setPower(pinionPower);
 
         //Telemetry to constantly refresh data to update user
         telemetry.addData("Front Left Power: ", fLPower);
         telemetry.addData("Front Right Power: ", fRPower);
         telemetry.addData("Rear Left Power: ", rLPower);
         telemetry.addData("Rear Right Power: ", rRPower);
-        telemetry.addData("Actuator Power", actuatorPower);
+        telemetry.addData("Pinion Power", pinionPower);
         telemetry.addData("Intake Height", robot.intakeMover.getCurrentPosition());
         telemetry.addData("Intake Speed", robot.intakeMover.getPower());
         //telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
