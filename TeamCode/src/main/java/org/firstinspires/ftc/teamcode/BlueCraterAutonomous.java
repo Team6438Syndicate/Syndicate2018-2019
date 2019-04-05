@@ -174,18 +174,17 @@ public class BlueCraterAutonomous extends LinearOpMode {
         while (opModeIsActive()) {
 
             if (firstTime) {
-                telemetry.addData("Temp ", imu.getTemperature());
-                telemetry.update();
 
                 //Move the robot off of the lander and drive into position to scan the minerals
                 //pinionMove(1, 500);
-                encoderRobotStrafe(1, 5);
+                encoderRobotStrafe(1, 24);
+                sleep(10000);
                 encoderRobotDrive(1, 5);
                 encoderRobotStrafe(1, -5);
 
                 //Check Block
                 //queryTensorFlow();
-                block = 1;
+                block = queryTensorFlow();
 
                 //Block logic (separated into ifs because we need different motions depending on where the block is
                 if (block == 1) {
