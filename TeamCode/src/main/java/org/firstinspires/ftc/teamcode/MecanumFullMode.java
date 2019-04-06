@@ -52,7 +52,7 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.pinionLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -64,6 +64,7 @@ public class MecanumFullMode extends OpMode {
 
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //telemetry
         telemetry.addData("Hardware Status: ", "Mapped");
@@ -102,6 +103,16 @@ public class MecanumFullMode extends OpMode {
             intakeMove(1, robot.intakeMover.getCurrentPosition() + 250);
         }
 
+        if (gamepad2.right_stick_y != 0 && (robot.pinionLift.getCurrentPosition() > robot.pinionBottom) && (robot.pinionLift.getCurrentPosition() < robot.pinionTop) )
+        {
+            pinionPower = gamepad2.left_stick_y;
+        }
+        else
+        {
+            pinionPower = 0;
+        }
+
+
     /*
         David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
         if (robot.intakeMover.getCurrentPosition() > 2200)
@@ -128,7 +139,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeSlide.setPower(1);
         robot.intakeSlide.setTargetPosition(robot.intakeSlide.getCurrentPosition() + 1);
 
-        pinionPower = gamepad2.left_stick_y;
+        //pinionPower = gamepad2.left_stick_y;
 
         //Controls for tank treads
         if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3))
@@ -197,6 +208,7 @@ public class MecanumFullMode extends OpMode {
         telemetry.addData("Intake Speed", robot.intakeMover.getPower());
         //telemetry.addData("range", String.format("%.01f in", sensorRange.getDistance(DistanceUnit.INCH)));
         telemetry.addData("Full Speed Enabled: ", fullSpeed);
+        telemetry.addData("Encoder For Pinion ", robot.pinionLift.getCurrentPosition());
         telemetry.addData("Speed Factor: ", powerFactor);
         //telemetry.addData("Linear Position:", linearSlidePosition);
         telemetry.update();
@@ -226,7 +238,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeMover.setTargetPosition(position);
 
         // Turn On RUN_TO_POSITION
-       //robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));
@@ -276,5 +288,34 @@ public class MecanumFullMode extends OpMode {
             telemetry.addData("Head Going to ", spinPosition);
             telemetry.update();
         }
+    }
+
+    private void pinionMove ( double speed, int position)
+    {
+        //Passes this target
+        robot.pinionLift.setTargetPosition(position);
+
+        // Turn On RUN_TO_POSITION
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+        robot.pinionLift.setPower(Math.abs(speed));
+
+        // keep looping while we are still active, and the motor is running.
+        while (robot.pinionLift.isBusy())
+        {
+            // Display it for the driver.
+            telemetry.addData("Pinion moving to", robot.pinionLift.getTargetPosition());
+            telemetry.addData("Pinion at", robot.pinionLift.getCurrentPosition());
+            telemetry.update();
+        }
+
+        // Stop all motion;
+        robot.pinionLift.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        //robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //  sleep(250);   // optional pause after each move
     }
 }

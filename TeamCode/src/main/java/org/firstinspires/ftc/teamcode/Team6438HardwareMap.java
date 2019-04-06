@@ -87,7 +87,8 @@ class Team6438HardwareMap
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
     //Variables for the actuator
-    final int laInterference = 1000;                   //Min position where the pinion actuator can be as to not cause damage
+    final int pinionBottom = -1000;                   //Min position where the pinion actuator can be as to not cause damage
+    final int pinionTop = 1000;
 
     //Vuforia variables
     final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -124,9 +125,10 @@ class Team6438HardwareMap
         rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
-        pinionLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        pinionLift.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMover.setDirection(DcMotorSimple.Direction.REVERSE);         //could oppose left
         intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
+
 
         //Set all motors to zero power to prevent unintended movement
         leftFrontMotor.setPower(0);

@@ -175,9 +175,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
             //Move the robot off of the lander and drive into position to scan the minerals
             //pinionMove(1, 500);
-            encoderRobotStrafe(1, -7);
+            encoderRobotStrafe(.4, -3);
             encoderRobotDrive(1, 5);
-            encoderRobotStrafe(1, 5);
 
             //Check Block
             block = queryTensorFlow();
@@ -192,6 +191,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 //Movement to hit the block and return
                 encoderRobotDrive(1, 25);
                 encoderRobotDrive(1, -20);
+                gyroRobotTurn(-45);
+                encoderRobotStrafe(0.7, -35);
                 //sleep(500);
                 firstTime = false;
             }
@@ -203,7 +204,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 //Movement to hit the block and return
                 encoderRobotDrive(1, 25);
                 encoderRobotDrive(1, -20);
-                encoderRobotStrafe(.8, -10);
+                gyroRobotTurn(-45);
+                encoderRobotStrafe(.7, -45);
                 //sleep(500);
                 firstTime = false;
             }
@@ -213,17 +215,16 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotStrafe(.8, -20);
+                encoderRobotStrafe(.5, -25);
                 encoderRobotDrive(1, 25);
-                encoderRobotDrive(1, -20);
-                encoderRobotStrafe(.8, 10);
+                encoderRobotDrive(1, -10);
+                gyroRobotTurn(-45);
+                encoderRobotStrafe(.5, -20);
                 //sleep(500);
                 firstTime = false;
             }
 
             //Turn and move towards wall
-            encoderRobotStrafe(.8, -30);
-            gyroRobotTurn(-45);
             encoderRobotStrafe(.8, -10);
 
             //Move to depot, extend intake and drop marker
@@ -472,14 +473,6 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 telemetry.addData("Running To ", fLTarget);
                 telemetry.addData("Remaining Distance ", fLRemainingDistance);
                 telemetry.update();
-
-                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
-                {
-                    gyroRobotTurn(direction - currentAngle.firstAngle);
-                    getHeading();
-                    direction = currentAngle.firstAngle;
-                    encoderRobotStrafeRestart(speed, fLRemainingDistance);
-                }
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     robot.leftFrontMotor.setPower(0);
@@ -942,10 +935,10 @@ public class BlueCraterAutonomous extends LinearOpMode {
                                         //block in the center
                                         return 1;
                                     } else {
-                                        encoderRobotStrafe(1, 10);
+                                        encoderRobotStrafe(.5, 15);
                                         telemetry.addData("Scanning Right", "Right");
                                         telemetry.update();
-                                        sleep(100);
+                                        sleep(200);
 
                                         List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                         if (updatedRecognitions2 != null) {
