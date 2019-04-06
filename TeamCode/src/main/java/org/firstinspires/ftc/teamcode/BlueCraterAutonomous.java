@@ -203,7 +203,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 //Movement to hit the block and return
                 encoderRobotDrive(1, 25);
                 encoderRobotDrive(1, -20);
-                encoderRobotStrafe(.8, 20);
+                encoderRobotStrafe(.8, -10);
                 //sleep(500);
                 firstTime = false;
             }
@@ -213,10 +213,10 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotStrafe(.8, -40);
+                encoderRobotStrafe(.8, -20);
                 encoderRobotDrive(1, 25);
                 encoderRobotDrive(1, -20);
-                encoderRobotStrafe(.8, 20);
+                encoderRobotStrafe(.8, 10);
                 //sleep(500);
                 firstTime = false;
             }
