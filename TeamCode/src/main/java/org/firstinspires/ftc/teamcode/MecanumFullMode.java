@@ -52,7 +52,7 @@ public class MecanumFullMode extends OpMode {
         robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.pinionLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pinionLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -64,7 +64,7 @@ public class MecanumFullMode extends OpMode {
 
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //robot.pinionLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //telemetry
         telemetry.addData("Hardware Status: ", "Mapped");
@@ -103,14 +103,14 @@ public class MecanumFullMode extends OpMode {
             intakeMove(1, robot.intakeMover.getCurrentPosition() + 250);
         }
 
-        if (gamepad2.right_stick_y != 0 && (robot.pinionLift.getCurrentPosition() > robot.pinionBottom) && (robot.pinionLift.getCurrentPosition() < robot.pinionTop) )
-        {
-            pinionPower = gamepad2.left_stick_y;
-        }
-        else
-        {
-            pinionPower = 0;
-        }
+        //if (gamepad2.right_stick_y != 0 /*&& (robot.pinionLift.getCurrentPosition() > robot.pinionBottom) && (robot.pinionLift.getCurrentPosition() < robot.pinionTop)*/ )
+        //{
+        //pinionPower = gamepad2.left_stick_y;
+        //}
+        //else
+        //{
+        //    pinionPower = 0;
+        //}
 
 
     /*
@@ -139,7 +139,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeSlide.setPower(1);
         robot.intakeSlide.setTargetPosition(robot.intakeSlide.getCurrentPosition() + 1);
 
-        //pinionPower = gamepad2.left_stick_y;
+        pinionPower = gamepad2.left_stick_y;
 
         //Controls for tank treads
         if ((gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_y < -0.1) && (gamepad1.left_stick_x < 0.3 && gamepad1.left_stick_x > -0.3))
