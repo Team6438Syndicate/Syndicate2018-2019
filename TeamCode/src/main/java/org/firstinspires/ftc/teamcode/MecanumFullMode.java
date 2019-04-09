@@ -238,7 +238,7 @@ public class MecanumFullMode extends OpMode {
         robot.intakeMover.setTargetPosition(position);
 
         // Turn On RUN_TO_POSITION
-        //robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.intakeMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // start motion.
         robot.intakeMover.setPower(Math.abs(speed));

@@ -176,7 +176,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
             //Move the robot off of the lander and drive into position to scan the minerals
             //pinionMove(1, 500);
             encoderRobotStrafe(.4, -3);
-            encoderRobotDrive(1, 5);
+            encoderRobotDrive(1, 7);
 
             //Check Block
             block = queryTensorFlow();
@@ -189,10 +189,9 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotDrive(1, 25);
-                encoderRobotDrive(1, -20);
-                gyroRobotTurn(-45);
-                encoderRobotStrafe(0.7, -35);
+                encoderRobotDrive(1, 20);
+                encoderRobotDrive(1, -11);
+                encoderRobotStrafe(.7, -25);
                 //sleep(500);
                 firstTime = false;
             }
@@ -203,9 +202,8 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
                 //Movement to hit the block and return
                 encoderRobotDrive(1, 25);
-                encoderRobotDrive(1, -20);
-                gyroRobotTurn(-45);
-                encoderRobotStrafe(.7, -45);
+                encoderRobotDrive(1, -12);
+                encoderRobotStrafe(.7, -40);
                 //sleep(500);
                 firstTime = false;
             }
@@ -217,23 +215,24 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 //Movement to hit the block and return
                 encoderRobotStrafe(.5, -25);
                 encoderRobotDrive(1, 25);
-                encoderRobotDrive(1, -10);
-                gyroRobotTurn(-45);
-                encoderRobotStrafe(.5, -20);
+                encoderRobotDrive(1, -12);
+                encoderRobotStrafe(.5, -10);
                 //sleep(500);
                 firstTime = false;
             }
 
             //Turn and move towards wall
-            encoderRobotStrafe(.8, -10);
+            sleep(200);
+            gyroRobotTurn(-50);
+            encoderRobotStrafe(.8, -20);
 
             //Move to depot, extend intake and drop marker
             encoderRobotDrive(1, -50);
-            tossMarker(1500);
+            tossMarker(1000);
 
             //Move to crater and extend arm
-            encoderRobotDrive(1, 90);
-            intakeRotate(.4, 1700);
+            encoderRobotDrive(1, 60);
+            intakeRotate(.8, 9000);
             intakeExtend(1);
 
             //Lets the user know the Autonomous is complete
@@ -309,13 +308,13 @@ public class BlueCraterAutonomous extends LinearOpMode {
                 telemetry.addData("Remaining Distance ", remainingDistance);
                 telemetry.update();
 
-                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
+                /*while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
                 {
                     gyroRobotTurn(direction - currentAngle.firstAngle);
                     getHeading();
                     direction = currentAngle.firstAngle;
                     encoderRobotDriveRestart(speed, remainingDistance);
-                }
+                }*/
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     robot.leftFrontMotor.setPower(0);
