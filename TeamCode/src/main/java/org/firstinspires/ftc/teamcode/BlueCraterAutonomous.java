@@ -233,6 +233,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
             //Move to crater and extend arm
             encoderRobotDrive(1, 60);
             intakeRotate(.8, 9000);
+            //might we add an extend clause also clause - a particular and separate article, stipulation, or proviso in a treaty, bill, or contract. synonym section; im right ur wrong clause is appropriate here
             intakeExtend(1);
 
             //Lets the user know the Autonomous is complete
