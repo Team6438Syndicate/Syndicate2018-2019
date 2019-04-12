@@ -16,9 +16,7 @@ public class MecanumFullMode extends OpMode {
 
     private boolean fullSpeed = false;
     private DistanceSensor sensorRange;
-    //DcMotor intakeSlide;
-    //DcMotor intakeMover;
-    //DcMotor linearActuator;
+
     private double powerFactor = 1;
     private final int INTAKE_ROTATION_FULL = 3300;
 
@@ -29,23 +27,6 @@ public class MecanumFullMode extends OpMode {
     public void init() {
         //init the hardware
         robot.init(hardwareMap);
-
-        //Map motors
-    /*  robot.leftFrontMotor        = hardwareMap.get(DcMotor.class, "leftFrontDrive");
-        robot.rightFrontMotor       = hardwareMap.get(DcMotor.class, "rightFrontDrive");
-        robot.leftRearMotor         = hardwareMap.get(DcMotor.class, "leftRearDrive");
-        robot.rightRearMotor        = hardwareMap.get(DcMotor.class, "rightRearDrive");
-        linearActuator              = hardwareMap.get(DcMotor.class, "linearActuator");
-        intakeSlide                 = hardwareMap.get(DcMotor.class, "intakeSlide");
-        intakeMover                 = hardwareMap.get(DcMotor.class, "intakeMover");
-
-        //Map servos
-        intakeSpin            = hardwareMap.get(Servo.class, "intakeSpin");
-
-        intakeSpin = hardwareMap.get(Servo.class, "cameraMount");
-
-        //sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        */
 
         //Drive Motors should drive without encoders
         robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -81,10 +62,6 @@ public class MecanumFullMode extends OpMode {
         //Variables for power
         double fLPower, fRPower, rLPower, rRPower, pinionPower;
 
-        //more test
-        //linearSlidePower = gamepad2.right_stick_y;
-        //intakeSlide.setPower(linearSlidePower);
-
         //Control for intake mineral grabbing and scoring
         if (gamepad2.a)
         {
@@ -103,29 +80,6 @@ public class MecanumFullMode extends OpMode {
             intakeMove(1, robot.intakeMover.getCurrentPosition() + 250);
         }
 
-        //if (gamepad2.right_stick_y != 0 /*&& (robot.pinionLift.getCurrentPosition() > robot.pinionBottom) && (robot.pinionLift.getCurrentPosition() < robot.pinionTop)*/ )
-        //{
-        //pinionPower = gamepad2.left_stick_y;
-        //}
-        //else
-        //{
-        //    pinionPower = 0;
-        //}
-
-
-    /*
-        David: Commented out because no clear purpose. Is this for automatic correction? Brad pls explain.
-        if (robot.intakeMover.getCurrentPosition() > 2200)
-        {
-            robot.intakeMover.setPower(1);
-            robot.intakeMover.setTargetPosition(robot.intakeMover.getCurrentPosition() - 1);
-        }
-        else
-        {
-            robot.intakeMover.setPower(1);
-            robot.intakeMover.setTargetPosition(robot.intakeMover.getCurrentPosition() + 1);
-        }
-    */
         //Controls for intake arm
         if (gamepad2.right_bumper)
         {

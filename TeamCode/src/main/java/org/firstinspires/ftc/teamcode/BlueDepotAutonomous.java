@@ -18,7 +18,6 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import android.graphics.Color;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.Map;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -53,13 +52,10 @@ import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
 @Autonomous(name = "Blue Crater", group = "Team 6438 Autonomous")
-public class BlueCrater2 extends LinearOpMode {
+public class BlueDepotAutonomous extends LinearOpMode {
 
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
-
-    //Reference to our coordinate object
-    //private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
 
     //First time evaluation
     private static boolean firstTime = true;
@@ -94,9 +90,6 @@ public class BlueCrater2 extends LinearOpMode {
     //Variables for TensorFlow
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
 
-    //Etime
-    ElapsedTime time;
-
     @Override
     public void runOpMode() throws InterruptedException {
         //Inits the hardware
@@ -120,7 +113,7 @@ public class BlueCrater2 extends LinearOpMode {
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        //Set 0 behavior to breaking
+        //Set 0 behavior to braking
         robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -159,13 +152,8 @@ public class BlueCrater2 extends LinearOpMode {
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
 
-        //Makes sure the camera is looking at the center
-        //robot.cameraMount.setPosition(robot.cameraMountCenter);
-
         //Wait for the start button to be pressed by the driver
         waitForStart();
-
-        time = new ElapsedTime();
 
         // Start the logging of measured acceleration
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
@@ -177,12 +165,11 @@ public class BlueCrater2 extends LinearOpMode {
         int block = 0;
 
         //While the program is running
-        if (opModeIsActive()) {
+        while (opModeIsActive()) {
 
             //Move the robot off of the lander and drive into position to scan the minerals
             //pinionMove(1, 500);
-            encoderRobotStrafe(.5, -3);
-            encoderRobotDrive(.5, 10);
+            encoderRobotDrive(.7, 10);
 
             //Check Block
             block = queryTensorFlow();
@@ -195,10 +182,11 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotDrive(.5, 15);
-                encoderRobotDrive(.5, -11);
-                encoderRobotStrafe(.5, -25);
-                //sleep(500);
+                encoderRobotDrive(1, 20);
+                encoderRobotDrive(1, -13);
+                encoderRobotStrafe(.3, -37);
+                sleep(200);
+                gyroRobotTurn(-35);
                 firstTime = false;
             }
             else if (block == 2) {
@@ -207,10 +195,12 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotDrive(.5, 25);
-                encoderRobotDrive(.5, -12);
-                encoderRobotStrafe(.5, -40);
-                //sleep(500);
+                encoderRobotDrive(1, 16);
+                encoderRobotDrive(1, -11);
+                encoderRobotStrafe(.3, -73.5);
+                sleep(200);
+                gyroRobotTurn(-44);
+                encoderRobotStrafe(.3, -10);
                 firstTime = false;
             }
             else if (block == 3) {
@@ -219,26 +209,29 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotStrafe(.5, -25);
-                encoderRobotDrive(.5, 25);
-                encoderRobotDrive(.5, -12);
-                encoderRobotStrafe(.5, -10);
-                //sleep(500);
+                encoderRobotStrafe(.3, -24.5);
+                encoderRobotDrive(1, 18);
+                encoderRobotDrive(1, -11);
+                encoderRobotStrafe(.3, -30);
+                sleep(200);
                 firstTime = false;
+                gyroRobotTurn(-45.5);
+                encoderRobotStrafe(.3, -4);
             }
 
-            //Turn and move towards wall
-            sleep(200);
-            gyroRobotTurn(-48);
-            encoderRobotStrafe(.5, -15);
-
             //Move to depot, extend intake and drop marker
-            encoderRobotDrive(.5, -50);
+            encoderRobotDrive(.5, -20);
             tossMarker(1000);
-
+            if(block == 3) gyroRobotTurn(3);
             //Move to crater and extend arm
-            encoderRobotDrive(.5, 60);
-            intakeRotate(.8, 9000);
+            if (block != 3) {
+                encoderRobotDrive(.5, 57.5);
+            }
+            else {
+                encoderRobotDrive (.5, 63);
+            }
+            //intakeRotate(.8, 9000);
+
             intakeExtend(1);
 
             //Lets the user know the Autonomous is complete
@@ -314,13 +307,13 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.addData("Remaining Distance ", remainingDistance);
                 telemetry.update();
 
-                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
+                /*while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5)
                 {
                     gyroRobotTurn(direction - currentAngle.firstAngle);
                     getHeading();
                     direction = currentAngle.firstAngle;
                     encoderRobotDriveRestart(speed, remainingDistance);
-                }
+                }*/
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     robot.leftFrontMotor.setPower(0);
@@ -342,6 +335,8 @@ public class BlueCrater2 extends LinearOpMode {
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        //Sleep to prepare for next action
+        sleep(250);
     }
     //Method for when the robot needs to correct its course while driving straight
     private void encoderRobotDriveRestart ( double speed, int distance)
@@ -420,6 +415,8 @@ public class BlueCrater2 extends LinearOpMode {
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        //Sleep to prepare for next action
+        sleep(250);
     }
     //Method to strafe the robot (Positive inches is right, negative inches is left)
     private void encoderRobotStrafe ( double speed, double inches)
@@ -428,13 +425,6 @@ public class BlueCrater2 extends LinearOpMode {
         int fLTarget, fRTarget, rLTarget, rRTarget;
         int fLRemainingDistance, fRRemainingDistance;
         double direction;
-
-        //Declaring incremental speed
-        double Pmax;
-        double k = 2.5;
-        double P = 0;
-        double t = 0;
-        double Tinitial = 0;
 
         getHeading();
         direction = currentAngle.firstAngle;
@@ -463,26 +453,11 @@ public class BlueCrater2 extends LinearOpMode {
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            Pmax = Math.abs(speed);
-
-            if(Pmax > 0.10) {
-                if(Tinitial == 0) Tinitial = time.seconds();
-                t = time.seconds() - Tinitial;
-                P = Pmax - Math.exp(-k * t);
-            } else {
-                P = 0;
-                t = 0;
-                Tinitial = 0;
-            }
-            double flp, rrp, rlp, frp;
-            flp = rrp = P;
-            rlp = frp = -P;
-
             //Sets the power to the absolute value of the speed of the method input
-            robot.leftFrontMotor.setPower(Math.abs(flp));
-            robot.rightFrontMotor.setPower(Math.abs(frp));
-            robot.leftRearMotor.setPower(Math.abs(rlp));
-            robot.rightRearMotor.setPower(Math.abs(rrp));
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftRearMotor.setPower(Math.abs(speed));
+            robot.rightRearMotor.setPower(Math.abs(speed));
 
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
@@ -496,14 +471,6 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.addData("Running To ", fLTarget);
                 telemetry.addData("Remaining Distance ", fLRemainingDistance);
                 telemetry.update();
-
-                while (currentAngle.firstAngle < direction - 7 || currentAngle.firstAngle > direction + 7)
-                {
-                    gyroRobotTurn(direction - currentAngle.firstAngle);
-                    getHeading();
-                    direction = currentAngle.firstAngle;
-                    encoderRobotStrafeRestart(speed, fLRemainingDistance);
-                }
 
                 while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
                     robot.leftFrontMotor.setPower(0);
@@ -526,6 +493,8 @@ public class BlueCrater2 extends LinearOpMode {
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        //Sleep to prepare for next action
+        sleep(250);
     }
     //Method fro when the robot needs to correct its course while strafing
     private void encoderRobotStrafeRestart ( double speed, int distance) {
@@ -580,7 +549,7 @@ public class BlueCrater2 extends LinearOpMode {
                 telemetry.addData("Remaining Distance ", fLRemainingDistance);
                 telemetry.update();
 
-                while (currentAngle.firstAngle < direction - 7 || currentAngle.firstAngle > direction + 7) {
+                while (currentAngle.firstAngle < direction - 5 || currentAngle.firstAngle > direction + 5) {
                     gyroRobotTurn(direction - currentAngle.firstAngle);
                     getHeading();
                     direction = currentAngle.firstAngle;
@@ -780,7 +749,7 @@ public class BlueCrater2 extends LinearOpMode {
 
         //Ensure we are in op mode
         if (opModeIsActive()) {
-            double speed = 0.2;
+            double speed = 0.3;
             turnTarget = getTarget(degrees);
 
             if (degrees < 0) {
@@ -953,6 +922,7 @@ public class BlueCrater2 extends LinearOpMode {
                                 telemetry.addData( "mineralNumber", updatedRecognitions.size());
                                 telemetry.update();
                                 */
+                                if (recognition.getRight() > 200 && recognition.getLeft() < 500) {
                                     if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                         telemetry.addData("Value", "Center");
                                         telemetry.addData("Confidence", recognition.getConfidence());
@@ -963,11 +933,11 @@ public class BlueCrater2 extends LinearOpMode {
                                         //block in the center
                                         return 1;
                                     } else {
-                                        encoderRobotStrafe(.5, 15);
+                                        encoderRobotStrafe(.5, 17);
                                         telemetry.addData("Scanning Right", "Right");
                                         telemetry.update();
-                                        sleep(200);
 
+                                        sleep(200);
                                         List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                         if (updatedRecognitions2 != null) {
                                             //noinspection LoopStatementThatDoesntLoop
@@ -978,6 +948,8 @@ public class BlueCrater2 extends LinearOpMode {
                                                 telemetry.addData("mineralRight2 ", recognition2.getRight());
                                                 telemetry.update();
 
+
+                                                //if (recognition2.getRight() > 112) {
                                                 if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                                     telemetry.addData("value", "Right");
                                                     telemetry.addData("Confidence", recognition.getConfidence());
@@ -995,9 +967,11 @@ public class BlueCrater2 extends LinearOpMode {
                                                     //block on the left
                                                     return 3;
                                                 }
+                                                //}
                                             }
                                         }
                                     }
+                                }
                             }
                         }
                     }
