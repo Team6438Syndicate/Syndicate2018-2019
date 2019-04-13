@@ -57,6 +57,9 @@ public class BlueCraterAutonomous extends LinearOpMode {
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
+    //Reference to our coordinate object
+    //private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
+
     //First time evaluation
     private static boolean firstTime = true;
 
@@ -113,7 +116,7 @@ public class BlueCraterAutonomous extends LinearOpMode {
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        //Set 0 behavior to braking
+        //Set 0 behavior to breaking
         robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -151,6 +154,9 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
+
+        //Makes sure the camera is looking at the center
+        //robot.cameraMount.setPosition(robot.cameraMountCenter);
 
         //Wait for the start button to be pressed by the driver
         waitForStart();
@@ -230,7 +236,6 @@ public class BlueCraterAutonomous extends LinearOpMode {
             else {
                 encoderRobotDrive (.5, 63);
             }
-            //intakeRotate(.8, 9000);
 
             intakeExtend(1);
 
@@ -950,23 +955,23 @@ public class BlueCraterAutonomous extends LinearOpMode {
 
 
                                                 //if (recognition2.getRight() > 112) {
-                                                    if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                                        telemetry.addData("value", "Right");
-                                                        telemetry.addData("Confidence", recognition.getConfidence());
-                                                        telemetry.update();
-                                                        robot.tfod.shutdown();
+                                                if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                                    telemetry.addData("value", "Right");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
 
-                                                        //block on the right
-                                                        return 2;
-                                                    } else {
-                                                        telemetry.addData("value", "Left");
-                                                        telemetry.addData("Confidence", recognition.getConfidence());
-                                                        telemetry.update();
-                                                        robot.tfod.shutdown();
+                                                    //block on the right
+                                                    return 2;
+                                                } else {
+                                                    telemetry.addData("value", "Left");
+                                                    telemetry.addData("Confidence", recognition.getConfidence());
+                                                    telemetry.update();
+                                                    robot.tfod.shutdown();
 
-                                                        //block on the left
-                                                        return 3;
-                                                    }
+                                                    //block on the left
+                                                    return 3;
+                                                }
                                                 //}
                                             }
                                         }

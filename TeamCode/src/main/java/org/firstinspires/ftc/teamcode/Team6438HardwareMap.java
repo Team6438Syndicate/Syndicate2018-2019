@@ -83,7 +83,7 @@ class Team6438HardwareMap
     //This is the lowest the intake can be before causing the motor to lock.
 
     //Positions for the slides
-    final int slideExtended = 1500;                     //This is the motor encoder position when the slide is out
+    final int slideExtended = 900;                     //This is the motor encoder position when the slide is out
     final int slideUnExtended = 0;                      //This is the motor encoder position when the slide is all the way in
 
     //Variables for the actuator

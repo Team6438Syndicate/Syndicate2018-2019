@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 
 //@Disabled    //Uncomment this if the op mode needs to not show up on the DS
-@Autonomous(name = "Blue Crater", group = "Team 6438 Autonomous")
+@Autonomous(name = "Blue Depot", group = "Team 6438 Autonomous")
 public class BlueDepotAutonomous extends LinearOpMode {
 
     //Reference to our hardware map
@@ -169,7 +169,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
 
             //Move the robot off of the lander and drive into position to scan the minerals
             //pinionMove(1, 500);
-            encoderRobotDrive(.7, 10);
+            encoderRobotDrive(.7, 14);
 
             //Check Block
             block = queryTensorFlow();
@@ -184,9 +184,9 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 //Movement to hit the block and return
                 encoderRobotDrive(1, 20);
                 encoderRobotDrive(1, -13);
-                encoderRobotStrafe(.3, -37);
+                encoderRobotStrafe(.3, -45);
                 sleep(200);
-                gyroRobotTurn(-35);
+                gyroRobotTurn(35);
                 firstTime = false;
             }
             else if (block == 2) {
@@ -199,7 +199,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 encoderRobotDrive(1, -11);
                 encoderRobotStrafe(.3, -73.5);
                 sleep(200);
-                gyroRobotTurn(-44);
+                gyroRobotTurn(44);
                 encoderRobotStrafe(.3, -10);
                 firstTime = false;
             }
@@ -215,17 +215,18 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 encoderRobotStrafe(.3, -30);
                 sleep(200);
                 firstTime = false;
-                gyroRobotTurn(-45.5);
+                gyroRobotTurn(45.5);
                 encoderRobotStrafe(.3, -4);
             }
 
             //Move to depot, extend intake and drop marker
-            encoderRobotDrive(.5, -20);
+            gyroRobotTurn(90);
+            encoderRobotDrive(.5, -47.5);
             tossMarker(1000);
             if(block == 3) gyroRobotTurn(3);
             //Move to crater and extend arm
             if (block != 3) {
-                encoderRobotDrive(.5, 57.5);
+                encoderRobotDrive(.5, 55);
             }
             else {
                 encoderRobotDrive (.5, 63);
@@ -947,7 +948,6 @@ public class BlueDepotAutonomous extends LinearOpMode {
                                                 telemetry.addData("mineralLeft2 ", recognition2.getLeft());
                                                 telemetry.addData("mineralRight2 ", recognition2.getRight());
                                                 telemetry.update();
-
 
                                                 //if (recognition2.getRight() > 112) {
                                                 if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {

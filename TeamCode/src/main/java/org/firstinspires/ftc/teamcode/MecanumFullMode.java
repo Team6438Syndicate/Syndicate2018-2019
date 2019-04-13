@@ -90,9 +90,11 @@ public class MecanumFullMode extends OpMode {
             moveIntakeSlide(1, 0);
         }
 
+        //why
         robot.intakeSlide.setPower(1);
         robot.intakeSlide.setTargetPosition(robot.intakeSlide.getCurrentPosition() + 1);
 
+        //ok
         pinionPower = gamepad2.left_stick_y;
 
         //Controls for tank treads
@@ -146,6 +148,7 @@ public class MecanumFullMode extends OpMode {
             rRPower = 0.5 * rRPower;
         }
 
+        //apply the power
         robot.leftFrontMotor.setPower(fLPower);
         robot.rightFrontMotor.setPower(fRPower);
         robot.leftRearMotor.setPower(rLPower);
