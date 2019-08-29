@@ -22,12 +22,14 @@ import java.util.Map;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -57,6 +59,9 @@ public class BlueDepotAutonomous extends LinearOpMode {
     //Reference to our hardware map
     private Team6438HardwareMap robot = new Team6438HardwareMap();
 
+    //Reference to our coordinate object
+    //private coordinateObject coordinateSystem = new coordinateObject(57.5, 86.5);
+
     //First time evaluation
     private static boolean firstTime = true;
 
@@ -74,9 +79,11 @@ public class BlueDepotAutonomous extends LinearOpMode {
     // The IMU sensor object
     private BNO055IMU imu;
 
+    // Set eTime
+    private ElapsedTime runtime = new ElapsedTime();
+
     //Distance sensor object
-    private DistanceSensor sensorRange;
-    private ColorSensor sensorColor;
+    private Rev2mDistanceSensor sensorDistance;
 
     //Used for distance stops
     private boolean firstDetection = true;
@@ -113,7 +120,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
         robot.intakeMover.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intakeSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        //Set 0 behavior to braking
+        //Set 0 behavior to breaking
         robot.leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.leftRearMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -131,11 +138,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         //Set up color/distance sensor
-        sensorRange = robot.sensorDistance;
-        sensorColor = robot.sensorColor;
-
-        //Turn on LED for color/distance sensor
-        sensorColor.enableLed(true);
+        sensorDistance = robot.sensorRange;
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
@@ -151,6 +154,10 @@ public class BlueDepotAutonomous extends LinearOpMode {
 
         //init the vuforia engine when the class is called forward (selected on DS)
         initVuforia();
+
+        //Hold Intake
+        robot.intakeSlide.setPower(1);
+        robot.intakeRotator.setPosition(0.4);
 
         //Wait for the start button to be pressed by the driver
         waitForStart();
@@ -169,7 +176,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
 
             //Move the robot off of the lander and drive into position to scan the minerals
             //pinionMove(1, 500);
-            encoderRobotDrive(.7, 14);
+            encoderRobotDrive(.7, 12);
 
             //Check Block
             block = queryTensorFlow();
@@ -182,12 +189,12 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotDrive(1, 20);
+                encoderRobotDrive(1, 18);
                 encoderRobotDrive(1, -13);
-                encoderRobotStrafe(.3, -45);
-                sleep(200);
-                gyroRobotTurn(35);
-                firstTime = false;
+                gyroRobotTurn(-5);
+                encoderRobotStrafe(.3, -35);
+                gyroRobotTurn(126);
+                encoderRobotStrafe(.3, 6);
             }
             else if (block == 2) {
                 //Telemetry to show the user what path we're running
@@ -195,13 +202,14 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotDrive(1, 16);
-                encoderRobotDrive(1, -11);
-                encoderRobotStrafe(.3, -73.5);
-                sleep(200);
-                gyroRobotTurn(44);
-                encoderRobotStrafe(.3, -10);
-                firstTime = false;
+                encoderRobotDrive(1, 23);
+                encoderRobotDrive(1, -17);
+                gyroRobotTurn(43);
+                gyroRobotTurn(-5);
+                encoderRobotStrafe(.3, -36);
+                gyroRobotTurn(133);
+                encoderRobotStrafe(.3, 7);
+
             }
             else if (block == 3) {
                 //Telemetry to show the user what path we're running
@@ -209,38 +217,41 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 telemetry.update();
 
                 //Movement to hit the block and return
-                encoderRobotStrafe(.3, -24.5);
-                encoderRobotDrive(1, 18);
-                encoderRobotDrive(1, -11);
-                encoderRobotStrafe(.3, -30);
-                sleep(200);
-                firstTime = false;
-                gyroRobotTurn(45.5);
-                encoderRobotStrafe(.3, -4);
+                gyroRobotTurn(86);
+                encoderRobotStrafe(0.3, 2);
+                encoderRobotDrive(1, 35);
+                gyroRobotTurn(86);
+                encoderRobotDrive(0.5, -15);
+                tossMarker(2000);
+                encoderRobotStrafe(0.3, 6);
+                encoderRobotDrive(0.5, 60);
             }
 
             //Move to depot, extend intake and drop marker
-            gyroRobotTurn(90);
-            encoderRobotDrive(.5, -47.5);
-            tossMarker(1000);
-            if(block == 3) gyroRobotTurn(3);
-            //Move to crater and extend arm
             if (block != 3) {
+                firstTime = false;
+                encoderRobotDrive(.5, -40);
+                tossMarker(2000);
+                //Move to crater and extend arm
+                encoderRobotStrafe(.3, 2);
                 encoderRobotDrive(.5, 55);
             }
-            else {
-                encoderRobotDrive (.5, 63);
-            }
-            //intakeRotate(.8, 9000);
 
+            robot.intakeRotator.setPosition(.6);
+            robot.intakeSlide.setTargetPosition(-10);
+            intakeRotate(.3, -1250);
             intakeExtend(1);
+
+            intakeRotate(1, -1400);
+            robot.intakeRotator.setPosition(.4);
+            robot.leftIntake.setPower(-1);
+            robot.rightIntake.setPower(-1);
 
             //Lets the user know the Autonomous is complete
             telemetry.addData("Autonomous Complete", "True");
             telemetry.update();
 
-            //End the opMode
-            requestOpModeStop();
+            sleep(30000);
 
             //add diagnostic telemetry, this should never be shown
             telemetry.addData("If you see this: ", "it's too late");
@@ -296,6 +307,8 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
 
+            runtime.reset();
+
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 remainingDistance = targetFL - robot.leftFrontMotor.getCurrentPosition();
@@ -316,7 +329,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                     encoderRobotDriveRestart(speed, remainingDistance);
                 }*/
 
-                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                while (sensorDistance.getDistance(DistanceUnit.CM) <= pauseDistance && runtime.seconds() < 2) {
                     robot.leftFrontMotor.setPower(0);
                     robot.rightFrontMotor.setPower(0);
                     robot.leftRearMotor.setPower(0);
@@ -376,6 +389,8 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
 
+            runtime.reset();
+
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 remainingDistance = distance - robot.leftFrontMotor.getCurrentPosition();
@@ -396,7 +411,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                     encoderRobotDriveRestart(speed, remainingDistance);
                 }
 
-                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                while (sensorDistance.getDistance(DistanceUnit.CM) <= pauseDistance && runtime.seconds() < 2) {
                     robot.leftFrontMotor.setPower(0);
                     robot.rightFrontMotor.setPower(0);
                     robot.leftRearMotor.setPower(0);
@@ -460,6 +475,8 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
 
+            runtime.reset();
+
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
@@ -473,7 +490,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                 telemetry.addData("Remaining Distance ", fLRemainingDistance);
                 telemetry.update();
 
-                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                while (sensorDistance.getDistance(DistanceUnit.CM) <= pauseDistance && runtime.seconds() < 2) {
                     robot.leftFrontMotor.setPower(0);
                     robot.rightFrontMotor.setPower(0);
                     robot.leftRearMotor.setPower(0);
@@ -494,11 +511,10 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        //Sleep to prepare for next action
-        sleep(250);
     }
     //Method fro when the robot needs to correct its course while strafing
-    private void encoderRobotStrafeRestart ( double speed, int distance) {
+    private void encoderRobotStrafeRestart ( double speed, int distance)
+    {
         //Declaring new targets
         int fLTarget, fRTarget, rLTarget, rRTarget;
         int fLRemainingDistance, fRRemainingDistance;
@@ -537,6 +553,8 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.leftRearMotor.setPower(Math.abs(speed));
             robot.rightRearMotor.setPower(Math.abs(speed));
 
+            runtime.reset();
+
             //While opMode is still active and the motors are going add telemetry to tell the user where its going
             while (opModeIsActive() && robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy() && robot.leftRearMotor.isBusy() && robot.rightRearMotor.isBusy()) {
                 fLRemainingDistance = fLTarget - robot.leftFrontMotor.getCurrentPosition();
@@ -557,7 +575,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                     encoderRobotStrafeRestart(speed, fLRemainingDistance);
                 }
 
-                while (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+                while (sensorDistance.getDistance(DistanceUnit.CM) <= pauseDistance && runtime.seconds() < 2) {
                     robot.leftFrontMotor.setPower(0);
                     robot.rightFrontMotor.setPower(0);
                     robot.leftRearMotor.setPower(0);
@@ -653,6 +671,8 @@ public class BlueDepotAutonomous extends LinearOpMode {
     private void tossMarker ( long pause)
     {
         //Toss the servo
+        robot.intakeRotator.setPosition(0.4);
+
         robot.leftIntake.setPower(robot.toss);
         robot.rightIntake.setPower(robot.toss);
 
@@ -697,7 +717,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
             robot.rightRearMotor.setPower(0);
             sleep(time);
 
-            if (sensorRange.getDistance(DistanceUnit.CM) <= pauseDistance) {
+            if (sensorDistance.getDistance(DistanceUnit.CM) <= pauseDistance) {
                 pauseAutonomous(pauseTime, encoderRemainingDistanceFL, encoderRemainingDistanceFR, encoderRemainingDistanceBL, encoderRemainingDistanceBR,
                         motorPowerOriginalFL, motorPowerOriginalFR, motorPowerOriginalBL, motorPowerOriginalBR);
             }
@@ -725,7 +745,6 @@ public class BlueDepotAutonomous extends LinearOpMode {
     //Math to determine what angle to turn to
     private double getTarget ( double degrees)
     {
-
         double newAngle;
         turnTarget = degrees;
 
@@ -934,11 +953,11 @@ public class BlueDepotAutonomous extends LinearOpMode {
                                         //block in the center
                                         return 1;
                                     } else {
-                                        encoderRobotStrafe(.5, 17);
+                                        gyroRobotTurn(-43);
                                         telemetry.addData("Scanning Right", "Right");
                                         telemetry.update();
 
-                                        sleep(200);
+                                        sleep(250);
                                         List<Recognition> updatedRecognitions2 = robot.tfod.getUpdatedRecognitions();
                                         if (updatedRecognitions2 != null) {
                                             //noinspection LoopStatementThatDoesntLoop
@@ -948,6 +967,7 @@ public class BlueDepotAutonomous extends LinearOpMode {
                                                 telemetry.addData("mineralLeft2 ", recognition2.getLeft());
                                                 telemetry.addData("mineralRight2 ", recognition2.getRight());
                                                 telemetry.update();
+
 
                                                 //if (recognition2.getRight() > 112) {
                                                 if (recognition2.getLabel().equals(LABEL_GOLD_MINERAL)) {

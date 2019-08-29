@@ -13,16 +13,15 @@ package org.firstinspires.ftc.teamcode;
 
 //Imports
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+//imports
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -39,17 +38,17 @@ class Team6438HardwareMap
     DcMotor intakeSlide      = null;
 
     //Servo mapping
-    Servo cameraMount        = null;
+    Servo   intakeRotator    = null;
     CRServo leftIntake       = null;
     CRServo rightIntake      = null;
+    RevBlinkinLedDriver blinkinLedDriver = null;
 
     //Webcam mapping
     WebcamName camera;
 
     //Sensor Mapping
     BNO055IMU imu     = null;
-    DistanceSensor sensorDistance;
-    ColorSensor sensorColor;
+    Rev2mDistanceSensor sensorRange;
     //ModernRoboticsI2cRangeSensor rangeSensor;
 
     //Variables
@@ -120,15 +119,17 @@ class Team6438HardwareMap
         intakeMover      = hwMap.get(DcMotor.class, "intakeMover");
         intakeSlide      = hwMap.get(DcMotor.class,"intakeSlide");
 
+        //Led Driver
+        blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "blinkin");
+
         //Reverse the right Motor and linear slide motor to make code operation easier
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
         rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
         rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
         pinionLift.setDirection(DcMotorSimple.Direction.REVERSE);
-        intakeMover.setDirection(DcMotorSimple.Direction.REVERSE);         //could oppose left
-        intakeSlide.setDirection(DcMotorSimple.Direction.FORWARD);                               //Could change
-
+        intakeMover.setDirection(DcMotorSimple.Direction.FORWARD);         //could oppose left
+        intakeSlide.setDirection(DcMotorSimple.Direction.REVERSE);                               //Could change
 
         //Set all motors to zero power to prevent unintended movement
         leftFrontMotor.setPower(0);
@@ -141,9 +142,7 @@ class Team6438HardwareMap
 
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed servos.
-        cameraMount = hwMap.get(Servo.class, "cameraMount");            //may no longer exist
-
-        //intake
+        intakeRotator = hwMap.get(Servo.class, "intakeRotator");
         leftIntake = hwMap.get(CRServo.class,"leftIntake");
         rightIntake = hwMap.get(CRServo.class,"rightIntake");
 
@@ -157,8 +156,6 @@ class Team6438HardwareMap
         //------------------------------------------------------------------------------------------
         // Define and initialize ALL installed sensors.
         imu = hwMap.get(BNO055IMU.class, "imu");
-        sensorDistance = hwMap.get(DistanceSensor.class, "distanceSensor");
-        sensorColor = hwMap.get(ColorSensor.class, "distanceSensor");
-        //rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangeSensor");
+        sensorRange = hwMap.get(Rev2mDistanceSensor.class, "distanceSensor");
     }
 }

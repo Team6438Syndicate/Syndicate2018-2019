@@ -56,16 +56,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Disabled
 public class SensorREV2mDistance extends LinearOpMode {
 
-    private SensorREVColorDistance sensorRange;
+    private Rev2mDistanceSensor sensorRange;
 
     @Override
     public void runOpMode() {
         // you can use this as a regular DistanceSensor.
-        sensorRange = hardwareMap.get(SensorREVColorDistance.class, "distanceSensor");
+        sensorRange = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorRange;
+        Rev2mDistanceSensor sensorTimeOfFlight = sensorRange;
 
         telemetry.addData(">>", "Press start to continue");
         telemetry.update();
